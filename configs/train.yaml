@@ -1,0 +1,13 @@
+
+dataloader:
+  # path: "data/names/*.txt"
+  path: "data/eng-fra.txt"
+
+model:
+  # hidden_layer_size: 32
+  hidden_layer_size: 128
+  path: ./logs/model.pth
+
+trainer:
+  learning_rate: 0.005
+  n_iters: 100000
