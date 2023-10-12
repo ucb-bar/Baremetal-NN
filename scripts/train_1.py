@@ -12,7 +12,7 @@ from logger import Logger
 from trainer import EncoderTrainer
 
 
-conf = OmegaConf.load('./configs/train.yaml')
+conf = OmegaConf.load("./configs/train.yaml")
 
 dataloader = Dataloader(conf.dataloader.path)
 

@@ -27,7 +27,7 @@ CFLAGS += -lc -lrdimon -u _printf_float
 
 LDFLAGS = -static
 
-include ../libgloss.mk
+include ./libgloss.mk
 
 PROGRAMS ?= char-rnn
 
