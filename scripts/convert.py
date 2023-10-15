@@ -12,7 +12,7 @@ from dataloader import Dataloader
 from model import EncoderRNN
 
 
-conf = OmegaConf.load('./configs/train.yaml')
+conf = OmegaConf.load('./configs/eval.yaml')
 
 
 class Operator:
@@ -97,18 +97,39 @@ class CodeConverter:
             model_code += "#include \"operators.h\"\n"
             model_code += "#include \"weights.h\"\n"
             model_code += "\n"
-            model_code += "static Matrix i2h_weight_t = {.rows = 32, .cols = 57, .data = I2H_WEIGHT_T_DATA};\n"
-            model_code += "static Matrix i2h_bias = {.rows = 1, .cols = 32, .data = I2H_BIAS_DATA};\n"
-            model_code += "static Matrix h2o_weight_t = {.rows = 32, .cols = 32, .data = H2O_WEIGHT_T_DATA};\n"
-            model_code += "static Matrix h2o_bias = {.rows = 1, .cols = 32, .data = H2O_BIAS_DATA};\n"
+            model_code += "static Matrix i2h_weight_transposed = {\n"
+            model_code += INDENT + ".rows = I2H_WEIGHT_TRANSPOSED_ROWS,\n"
+            model_code += INDENT + ".cols = I2H_WEIGHT_TRANSPOSED_COLS,\n"
+            model_code += INDENT + ".data = I2H_WEIGHT_TRANSPOSED_DATA\n"
+            model_code += "};\n"
+            model_code += "static Matrix i2h_bias = {\n"
+            model_code += INDENT + ".rows = I2H_BIAS_ROWS,\n"
+            model_code += INDENT + ".cols = I2H_BIAS_COLS,\n"
+            model_code += INDENT + ".data = I2H_BIAS_DATA\n"
+            model_code += "};\n"
+            model_code += "static Matrix h2o_weight_transposed = {\n"
+            model_code += INDENT + ".rows = H2O_WEIGHT_TRANSPOSED_ROWS,\n"
+            model_code += INDENT + ".cols = H2O_WEIGHT_TRANSPOSED_COLS,\n"
+            model_code += INDENT + ".data = H2O_WEIGHT_TRANSPOSED_DATA\n"
+            model_code += "};\n"
+            model_code += "static Matrix h2o_bias = {\n"
+            model_code += INDENT + ".rows = H2O_BIAS_ROWS,\n"
+            model_code += INDENT + ".cols = H2O_BIAS_COLS,\n"
+            model_code += INDENT + ".data = H2O_BIAS_DATA\n"
+            model_code += "};\n"
             model_code += "\n"
             model_code += "\n"
-            model_code += "static void forward(Matrix *output, Matrix* input) {\n"
+            model_code += "static void forward(Matrix *output, Matrix *input) {\n"
 
 
         prev_layer_name = "input"
-        model_code += INDENT+"# Input\n"
-        model_code += INDENT+"{layer_name}_out = input\n".format(layer_name=prev_layer_name)
+        
+        if target == CodeConverter.Target.Numpy:
+            model_code += INDENT+"# Input\n"
+            model_code += INDENT+"{layer_name}_out = input\n".format(layer_name=prev_layer_name)
+        elif target == CodeConverter.Target.C:
+            model_code += INDENT+"// Input\n"
+            model_code += INDENT+"Matrix *{layer_name}_out = input;\n".format(layer_name=prev_layer_name)
         for layer_name, module in model.named_modules():
             print("Find network:", layer_name, type(module))
 
@@ -128,11 +149,11 @@ class CodeConverter:
                         if target == CodeConverter.Target.Numpy:
                             weights_code += "{layer_name}_weight_rows = {value}\n".format(layer_name=layer_name, value=array.shape[0])
                             weights_code += "{layer_name}_weight_cols = {value}\n".format(layer_name=layer_name, value=array.shape[1])
-                            weights_code += "{layer_name}_weight_T = np.array([".format(layer_name=layer_name)
+                            weights_code += "{layer_name}_weight_transposed = np.array([".format(layer_name=layer_name)
                         elif target == CodeConverter.Target.C:
-                            weights_code += "const static size_t {layer_name}_WEIGHT_T_ROWS = {value};\n".format(layer_name=layer_name.upper(), value=array.shape[0])
-                            weights_code += "const static size_t {layer_name}_WEIGHT_T_COLS = {value};\n".format(layer_name=layer_name.upper(), value=array.shape[1])
-                            weights_code += "const static float {layer_name}_WEIGHT_DATA[] = {{".format(layer_name=layer_name.upper())
+                            weights_code += "const static size_t {layer_name}_WEIGHT_TRANSPOSED_ROWS = {value};\n".format(layer_name=layer_name.upper(), value=array.shape[0])
+                            weights_code += "const static size_t {layer_name}_WEIGHT_TRANSPOSED_COLS = {value};\n".format(layer_name=layer_name.upper(), value=array.shape[1])
+                            weights_code += "const static float {layer_name}_WEIGHT_TRANSPOSED_DATA[] = {{".format(layer_name=layer_name.upper())
                     elif key == "bias":
                         print("  ", key, "\t:", array.shape[0])
                         if target == CodeConverter.Target.Numpy:
@@ -157,10 +178,10 @@ class CodeConverter:
 
                 if target == CodeConverter.Target.Numpy:
                     model_code += INDENT+"# Linear\n"
-                    model_code += INDENT+"{layer_name}_out = nn_linear({prev_layer_name}_out, {layer_name}_weight_T, {layer_name}_bias)\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
+                    model_code += INDENT+"{layer_name}_out = nn_linear({prev_layer_name}_out, {layer_name}_weight_transposed, {layer_name}_bias)\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
                 elif target == CodeConverter.Target.C:
                     model_code += INDENT+"// Linear\n"
-                    model_code += INDENT+"NN_linear(output, {layer_name}_weight_t, {layer_name}_bias, input);\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
+                    model_code += INDENT+"NN_linear({layer_name}_out, {layer_name}_weight_transposed, {layer_name}_bias, {prev_layer_name}_out);\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
                 
             if type(module) == torch.nn.LogSoftmax:
                 used_operators.append(LogSoftmax)
@@ -169,7 +190,7 @@ class CodeConverter:
                     model_code += INDENT+"{layer_name}_out = nn_logsoftmax({prev_layer_name}_out)\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
                 elif target == CodeConverter.Target.C:
                     model_code += INDENT+"// Log Softmax\n"
-                    model_code += INDENT+"NN_logsoftmax(output, input);\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
+                    model_code += INDENT+"NN_logSoftmax({layer_name}_out, {prev_layer_name}_out);\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
 
                 
             prev_layer_name = layer_name
@@ -191,12 +212,14 @@ class CodeConverter:
 
 
 dataloader = Dataloader(conf.dataloader.path)
+dataloader.load()
+
 model = EncoderRNN(dataloader.n_letters, conf.model.hidden_layer_size, dataloader.n_categories)
-model.load("./logs/model.pth")
+model.load("./logs/model_h8_300000.pt")
 
 print("shape of network:", dataloader.n_letters, conf.model.hidden_layer_size, dataloader.n_categories)
 
-target = CodeConverter.Target.Numpy
+target = CodeConverter.Target.C
 
 
 converter = CodeConverter()
@@ -214,6 +237,7 @@ if os.path.exists(path):
     shutil.rmtree(path)
 os.mkdir(path)
 
+print("writing results to {path}...".format(path=path))
 with open(os.path.join(path, "nn"+file_extension), "w") as f:
     with open("libs/nn"+file_extension, "r") as nn_file:
         f.write(nn_file.read())

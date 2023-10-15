@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "network.h": "c"
+        "network.h": "c",
+        "weights.h": "c"
     }
 }

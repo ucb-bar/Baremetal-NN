@@ -1,7 +1,9 @@
+#include "nn.h"
+#include "model.h"
 
 
 int input_size = 57;
-int hidden_size = 32;
+int hidden_size = 8;
 int output_size = 18;
 
 
@@ -28,48 +30,7 @@ void encodeOneHot(Matrix *input, char c) {
   }
 }
 
-
-
-
-
-void forward(Matrix *output, char *input) {
-  Matrix input_1;
-  initMatrix(&input_1, 1, input_size);
-
-  Matrix hidden;
-  initMatrix(&hidden, 1, hidden_size);
-  memset(hidden.data, 0, hidden_size * sizeof(float));
-
-
-  Matrix layer_input;
-  initMatrix(&layer_input, 1, input_size + hidden_size);
-  Matrix layer_1_output;
-  initMatrix(&layer_1_output, 1, hidden_size);  
-  Matrix layer_2_output;
-  initMatrix(&layer_2_output, 1, output_size);
-
-  int i=0;
-  while (input[i] != '\0') {
-    encodeOneHot(&input_1, input[i]);
-    
-    concatenate(&layer_input, &input_1, &hidden);
-
-    matmul(&layer_1_output, &layer_input, &I2H_WEIGHT);
-    matadd(&layer_1_output, &layer_1_output, &I2H_BIAS);
-
-    memcpy(hidden.data, layer_1_output.data, hidden_size * sizeof(float));
-
-    matmul(&layer_2_output, &layer_1_output, &H2O_WEIGHT);
-    matadd(&layer_2_output, &layer_2_output, &H2O_BIAS);
-
-    logSoftmax(output, &layer_2_output);
-
-    i += 1;
-  }
-}
-
-
-char *inputs[] = {
+char *input_strs[] = {
   "sakura",
   "Vandroogenbroeck",
   "Xue Bu Dong Le!",
@@ -79,20 +40,32 @@ int main() {
   printf("\n\n");
 
   Matrix output;
-  initMatrix(&output, 1, output_size);
+  NN_initMatrix(&output, 1, output_size);
+  
+  Matrix input;
+  NN_initMatrix(&input, 1, input_size + hidden_size);
+  
+  Matrix hidden;
+  NN_initMatrix(&hidden, 1, hidden_size);
 
   int index;
 
-  for (int i=0; i<3; i+=1) {
+  for (int i=0; i<1; i+=1) {
+    char *str = input_strs[i];
 
-    char *input = inputs[i];
+    memset(hidden.data, 0, hidden.rows * hidden.cols * sizeof(float));
+    
+    for (int j=1; j<strlen(str); j+=1) {
+      encodeOneHot(&input, str[j]);
+      NN_linear(&hidden, &i2h_weight_transposed, &i2h_bias, &input);
 
-    forward(&output, input);
-
+      forward(&output, &hidden, &input);
+    }
+    
     // printMatrix(&output);
     index = argmax(&output);
     
-    printf("\n> %s\n", input);
+    printf("\n> %s\n", str);
     printf("score: (");
     printDouble(output.data[index], 2);
     printf("), predicted: (%d, %s)\n", index, categories[index]);

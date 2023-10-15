@@ -1,3 +1,6 @@
+#ifndef NN_H
+#define NN_H
+
 #include <math.h>
 #include <float.h>
 #include <stddef.h>
@@ -17,13 +20,13 @@ void _assert(int condition, char *message) {
   }
 }
 
-void initMatrix(Matrix *m, size_t rows, size_t cols) {
+void NN_initMatrix(Matrix *m, size_t rows, size_t cols) {
   m->rows = rows;
   m->cols = cols;
   m->data = malloc(rows * cols * sizeof(float));
 }
 
-void matmul(Matrix *out, Matrix *a, Matrix *b) {
+void NN_matmul(Matrix *out, Matrix *a, Matrix *b) {
   _assert(a->cols == b->rows, "matmul: dimension mismatch");
   _assert(out->rows == a->rows, "matmul: dimension mismatch");
   _assert(out->cols == b->cols, "matmul: dimension mismatch");
@@ -38,7 +41,7 @@ void matmul(Matrix *out, Matrix *a, Matrix *b) {
   }
 }
 
-void matadd(Matrix *out, Matrix *a, Matrix *b) {
+void NN_matadd(Matrix *out, Matrix *a, Matrix *b) {
   _assert(a->rows == b->rows, "matadd: dimension mismatch");
   _assert(a->cols == b->cols, "matadd: dimension mismatch");
   for (size_t i = 0; i < a->rows; i++) {
@@ -48,7 +51,12 @@ void matadd(Matrix *out, Matrix *a, Matrix *b) {
   }
 }
 
-void transpose(Matrix *out, Matrix *a) {
+void NN_linear(Matrix *out, Matrix *weight, Matrix *bias, Matrix *input) {
+  NN_matmul(out, input, weight);
+  NN_matadd(out, out, bias);
+}
+
+void NN_transpose(Matrix *out, Matrix *a) {
   for (size_t i = 0; i < a->rows; i++) {
     for (size_t j = 0; j < a->cols; j++) {
       out->data[j * out->cols + i] = a->data[i * a->cols + j];
@@ -56,7 +64,7 @@ void transpose(Matrix *out, Matrix *a) {
   }
 }
 
-void concatenate(Matrix *out, Matrix *a, Matrix *b) {
+void NN_concatenate(Matrix *out, Matrix *a, Matrix *b) {
   for (size_t i = 0; i < a->cols; i++) {
     out->data[i] = a->data[i];
   }
@@ -65,7 +73,7 @@ void concatenate(Matrix *out, Matrix *a, Matrix *b) {
   }
 }
 
-void logSoftmax(Matrix *out, Matrix *a) {
+void NN_logSoftmax(Matrix *out, Matrix *a) {
   float sum = 0;
   for (size_t i = 0; i < a->cols; i++) {
     sum += exp(a->data[i]);
@@ -111,3 +119,5 @@ size_t argmax(Matrix *a) {
   }
   return max_index;
 }
+
+#endif  // NN_H

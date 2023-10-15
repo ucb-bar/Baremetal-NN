@@ -1,0 +1,13 @@
+
+dataloader:
+  path: "data/names/*.txt"
+
+model:
+  hidden_layer_size: 8
+  path: "logs/model_h8_300000.pt"
+
+trainer:
+
+
+logger:
+  log_every: 10000

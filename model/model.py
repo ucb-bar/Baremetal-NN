@@ -1,33 +1,44 @@
 import torch
 import torch.nn as nn
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-class EncoderRNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(EncoderRNN, self).__init__()
+class RNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size, device="cpu"):
+        super(RNN, self).__init__()
 
+        self.device = device
+        self.input_size = input_size
         self.hidden_size = hidden_size
-
-        self.i2h = nn.Linear(input_size + hidden_size, hidden_size)
-        self.h2o = nn.Linear(hidden_size, output_size)
-        self.softmax = nn.LogSoftmax(dim=1)
-
-    def forward(self, input, hidden):
-        combined = torch.cat((input, hidden), 1)
-        hidden = self.i2h(combined)
-        output = self.h2o(hidden)
-        output = self.softmax(output)
-        return output, hidden
-
-    def initHidden(self):
-        return torch.zeros(1, self.hidden_size)
+        self.output_size = output_size
+        
+    def initializeHiddenState(self):
+        self.prev_hidden_state = torch.zeros(1, self.hidden_size).to(self.device)
 
     def load(self, path):
         self.load_state_dict(torch.load(path))
     
     def save(self, path):
         torch.save(self.state_dict(), path)
+
+class EncoderRNN(RNN):
+    def __init__(self, input_size, hidden_size, output_size, device="cpu"):
+        super(EncoderRNN, self).__init__(input_size, hidden_size, output_size, device)
+
+        self.i2h = nn.Linear(self.input_size + self.hidden_size, self.hidden_size).to(self.device)
+        self.h2o = nn.Linear(self.hidden_size, self.output_size).to(self.device)
+        self.softmax = nn.LogSoftmax(dim=1).to(self.device)
+
+    def forward(self, input):
+        combined = torch.cat((input, self.prev_hidden_state), 1).to(self.device)
+        
+        hidden = self.i2h(combined)
+        output = self.h2o(hidden)
+        output = self.softmax(output)
+
+        self.prev_hidden_state = hidden
+        
+        return output
+
 
 import numpy as np
 import json

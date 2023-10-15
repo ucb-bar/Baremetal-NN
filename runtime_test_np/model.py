@@ -13,4 +13,4 @@ def forward(input):
     h2o_out = nn_linear(i2h_out, h2o_weight_T, h2o_bias)
     # Log Softmax
     softmax_out = nn_logsoftmax(h2o_out)
-    return softmax_out
+    return softmax_out, i2h_out
