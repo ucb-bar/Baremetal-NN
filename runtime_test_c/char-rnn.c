@@ -32,8 +32,8 @@ void encodeOneHot(Matrix *input, char c) {
 
 char *input_strs[] = {
   "sakura",
-  "Vandroogenbroeck",
-  "Xue Bu Dong Le!",
+  "Schadenfreude",
+  "Ni Hao",
 };
 
 int main() {
