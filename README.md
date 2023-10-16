@@ -1,4 +1,10 @@
-# Convert the model
+# Baremetal-NN
+
+![](docs/overview.png)
+
+Baremetal-NN is a tool for converting PyTorch models into raw C codes that can be executed standalone in a bare-metal runtime on research chips. 
+
+## Convert the model
 
 ```bash
 python ./scripts/convert.py
