@@ -63,11 +63,11 @@ int main() {
     }
     
     // printMatrix(&output);
-    index = argmax(&output);
+    index = NN_argmax(&output);
     
     printf("\n> %s\n", str);
     printf("score: (");
-    printDouble(output.data[index], 2);
+    NN_printFloat(output.data[index], 2);
     printf("), predicted: (%d, %s)\n", index, categories[index]);
   }
 

@@ -1,5 +1,5 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef __MODEL_H
+#define __MODEL_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -7,7 +7,6 @@
 #include <float.h>
 
 #include "nn.h"
-#include "operators.h"
 #include "weights.h"
 
 static Matrix i2h_weight_transposed = {
@@ -43,4 +42,4 @@ static void forward(Matrix *output, Matrix *hidden, Matrix *input) {
   NN_logSoftmax(output, output);
 }
 
-#endif  // MODEL_H
+#endif  // __MODEL_H
