@@ -14,20 +14,6 @@ from model import EncoderRNN
 
 conf = OmegaConf.load('./configs/eval.yaml')
 
-
-class Operator:
-    c_implementation = ""
-    np_implementation = ""
-
-class Linear(Operator):
-    c_implementation = """"""
-    np_implementation = """"""
-    
-class LogSoftmax(Operator):
-    c_implementation = """"""
-    np_implementation = """"""
-
-
 class CodeConverter:
     class Target:
         Numpy = "numpy"
@@ -40,16 +26,38 @@ class CodeConverter:
         print("loading model...")
         print(model)
         self.model = model
+    
+    def dump(self, out_path, target: Target = Target.C):
+        weights_code, model_code = self.convert(target)
+        
+        if target == CodeConverter.Target.Numpy:
+            file_extension = ".py"
+        elif target == CodeConverter.Target.C:
+            file_extension = ".h"
+        
+        # test if directory exists
+        if os.path.exists(out_path):
+            shutil.rmtree(out_path)
+        os.mkdir(out_path)
 
-    def dump(self, target):
+        print("writing results to {path}...".format(path=out_path))
+        with open(os.path.join(out_path, "nn"+file_extension), "w") as f:
+            with open("libs/nn"+file_extension, "r") as nn_file:
+                f.write(nn_file.read())
+            
+        with open(os.path.join(out_path, "weights"+file_extension), "w") as f:
+            f.write(weights_code)
+
+        with open(os.path.join(out_path, "model"+file_extension), "w") as f:
+            f.write(model_code)
+            
+
+    def convert(self, target):
         if target == CodeConverter.Target.Numpy:
             print("dumping model as numpy...")
         elif target == CodeConverter.Target.C:
             print("dumping model as c...")
         
-        # stores the content of operators.xx
-        operators_code = ""
-        used_operators = []
         # stores the content of network.xx
         model_code = ""
         # stores the content of weights.xx
@@ -63,9 +71,6 @@ class CodeConverter:
         if target == CodeConverter.Target.Numpy:
             weights_code += "import numpy as np\n"
             weights_code += "\n"
-
-            operators_code += "import numpy as np\n"
-            operators_code += "\n"
 
             model_code += "import numpy as np\n"
             model_code += "\n"
@@ -81,12 +86,6 @@ class CodeConverter:
             weights_code += "#include <math.h>\n"
             weights_code += "#include <float.h>\n"
             weights_code += "\n"
-            
-            operators_code += "#include <stdint.h>\n"
-            operators_code += "#include <stddef.h>\n"
-            operators_code += "#include <math.h>\n"
-            operators_code += "#include <float.h>\n"
-            operators_code += "\n"
 
             model_code += "#include <stdint.h>\n"
             model_code += "#include <stddef.h>\n"
@@ -137,7 +136,6 @@ class CodeConverter:
                 # this is just wrapper of the PyTorch module, we should ignore
                 continue
             if type(module) == torch.nn.Linear:
-                used_operators.append(Linear)
                 for key in module.state_dict():
                     array = module.state_dict()[key].numpy()
                     
@@ -184,7 +182,6 @@ class CodeConverter:
                     model_code += INDENT+"NN_linear({layer_name}_out, {layer_name}_weight_transposed, {layer_name}_bias, {prev_layer_name}_out);\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
                 
             if type(module) == torch.nn.LogSoftmax:
-                used_operators.append(LogSoftmax)
                 if target == CodeConverter.Target.Numpy:
                     model_code += INDENT+"# Log Softmax\n"
                     model_code += INDENT+"{layer_name}_out = nn_logsoftmax({prev_layer_name}_out)\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
@@ -200,14 +197,7 @@ class CodeConverter:
         elif target == CodeConverter.Target.C:
             model_code += "}\n\n"
 
-        for op in used_operators:
-            if target == CodeConverter.Target.Numpy:
-                operators_code += op.np_implementation
-            elif target == CodeConverter.Target.C:        
-                operators_code += op.c_implementation
-            operators_code += "\n\n"
-
-        return operators_code, weights_code, model_code
+        return weights_code, model_code
 
 
 
@@ -219,82 +209,11 @@ model.load("./logs/model_h8_300000.pt")
 
 print("shape of network:", dataloader.n_letters, conf.model.hidden_layer_size, dataloader.n_categories)
 
-target = CodeConverter.Target.C
-
 
 converter = CodeConverter()
 converter.load(model)
-operators_code, weights_code, model_code = converter.dump(target)
 
 path = "./runtime"
-if target == CodeConverter.Target.Numpy:
-    file_extension = ".py"
-elif target == CodeConverter.Target.C:
-    file_extension = ".h"
 
-# test if directory exists
-if os.path.exists(path):
-    shutil.rmtree(path)
-os.mkdir(path)
+converter.dump(path, target=CodeConverter.Target.C)
 
-print("writing results to {path}...".format(path=path))
-with open(os.path.join(path, "nn"+file_extension), "w") as f:
-    with open("libs/nn"+file_extension, "r") as nn_file:
-        f.write(nn_file.read())
-
-with open(os.path.join(path, "operators"+file_extension), "w") as f:
-    f.write(operators_code)
-    
-with open(os.path.join(path, "weights"+file_extension), "w") as f:
-    f.write(weights_code)
-
-with open(os.path.join(path, "model"+file_extension), "w") as f:
-    f.write(model_code)
-    
-
-quit()
-
-
-
-
-
-
-
-
-
-
-
-model_dict = dict(model.state_dict())
-
-
-with open("weights.h", "w") as f:
-    f.write("#include <float.h>\n")
-    f.write("#include <stddef.h>\n")
-    f.write("\n")
-    
-
-    for key in model_dict:
-        print(key)
-        array = model_dict[key].numpy()
-        layer_name = key.split(".")[0]
-
-        if ".weight" in key:
-            # store the transposed array in advance
-            array = array.T
-            f.write("const static size_t {layer_name}_WEIGHT_T_ROWS = {value};\n".format(layer_name=layer_name.upper(), value=array.shape[0]))
-            f.write("const static size_t {layer_name}_WEIGHT_T_COLS = {value};\n".format(layer_name=layer_name.upper(), value=array.shape[1]))
-            f.write("const static float {layer_name}_WEIGHT_DATA[] = {{".format(layer_name=layer_name.upper()))
-        elif ".bias" in key:
-            f.write("const static size_t {layer_name}_BIAS_ROWS = {value};\n".format(layer_name=layer_name.upper(), value=1))
-            f.write("const static size_t {layer_name}_BIAS_COLS = {value};\n".format(layer_name=layer_name.upper(), value=array.shape[0]))
-            f.write("const static float {layer_name}_BIAS_DATA[] = {{".format(layer_name=layer_name.upper()))
-            
-        flat_array = np.ndarray.flatten(array)
-        for i in range(flat_array.shape[0]-1):
-            f.write("{value}, ".format(value=flat_array[i]))
-        f.write("{value}".format(value=flat_array[flat_array.shape[0]-1]))
-            
-        f.write("};\n")
-        f.write("\n")
-
-    f.write("\n\n")
