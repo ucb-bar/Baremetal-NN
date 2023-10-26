@@ -1,5 +1,5 @@
-#ifndef NN_H
-#define NN_H
+#ifndef __NN_H
+#define __NN_H
 
 #include <math.h>
 #include <float.h>
@@ -120,4 +120,4 @@ size_t argmax(Matrix *a) {
   return max_index;
 }
 
-#endif  // NN_H
+#endif  // __NN_H

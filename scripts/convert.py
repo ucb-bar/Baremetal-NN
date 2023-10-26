@@ -81,12 +81,18 @@ class CodeConverter:
             model_code += "def forward(input):\n"
     
         elif target == CodeConverter.Target.C:
+            weights_code += "#ifndef __WEIGHTS_H\n"
+            weights_code += "#define __WEIGHTS_H\n"
+            weights_code += "\n"
             weights_code += "#include <stdint.h>\n"
             weights_code += "#include <stddef.h>\n"
             weights_code += "#include <math.h>\n"
             weights_code += "#include <float.h>\n"
             weights_code += "\n"
 
+            model_code += "#ifndef __MODEL_H\n"
+            model_code += "#define __MODEL_H\n"
+            model_code += "\n"
             model_code += "#include <stdint.h>\n"
             model_code += "#include <stddef.h>\n"
             model_code += "#include <math.h>\n"
@@ -196,6 +202,9 @@ class CodeConverter:
             model_code += INDENT+"return {prev_layer_name}_out\n".format(prev_layer_name=prev_layer_name)
         elif target == CodeConverter.Target.C:
             model_code += "}\n\n"
+            model_code += "#endif  // __MODEL_H\n"
+            weights_code += "\n\n"
+            weights_code += "#endif  // __WEIGHTS_H\n"
 
         return weights_code, model_code
 
