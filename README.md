@@ -2,7 +2,7 @@
 
 ![](docs/overview.png)
 
-Baremetal-NN is a tool for converting PyTorch models into raw C codes that can be executed standalone in a bare-metal runtime on research chips. 
+Baremetal-NN is a tool for converting PyTorch models into raw C codes that can be executed standalone in a baremetal runtime on research chips. 
 
 ## Convert the model
 
@@ -21,7 +21,6 @@ the converter will dump out three files:
 `weights.h`: stores the weights and biases of the network.
 
 `model.h`: stores the code representation of the model forward pass.
-
 
 
 ### In numpy mode:
