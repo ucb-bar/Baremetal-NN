@@ -5,7 +5,21 @@
 
 #include "nn_types.h"
 #include "nn_add.h"
+#include "nn_clip.h"
+#include "nn_linear.h"
+#include "nn_matmul.h"
+#include "nn_relu.h"
+#include "nn_transpose.h"
 
+
+
+void NN_assert(int condition, char *message) {
+  if (!condition) {
+    printf("Assertion failed: ");
+    printf("%s\n", message);
+    exit(1);
+  }
+}
 
 
 /**
@@ -15,27 +29,24 @@
  * @param shape: shape of tensor
  * @param dtype: DataType
  */
-Tensor NN_tensor(size_t ndim, size_t *shape, DataType dtype, void *data) {
-  Tensor t;
-  t.ndim = ndim;
-  t.dtype = dtype;
-  t.data = data;
+void NN_initTensor(Tensor *t, size_t ndim, size_t *shape, DataType dtype, void *data) {
+  t->ndim = ndim;
+  t->dtype = dtype;
+  t->data = data;
 
   // set shape
   for (size_t i = 0; i < ndim; i += 1) {
-    t.shape[i] = shape[i];
+    t->shape[i] = shape[i];
   }
   for (size_t i = ndim; i < MAX_DIMS; i += 1) {
-    t.shape[i] = 0;
+    t->shape[i] = 0;
   }
   
   // calculate size (number of elements)
-  t.size = 1;
+  t->size = 1;
   for (size_t i = 0; i < ndim; i += 1) {
-    t.size *= t.shape[i];
+    t->size *= t->shape[i];
   }
-
-  return t;
 }
 
 
@@ -57,7 +68,7 @@ void NN_printFloat(float v, int16_t num_digits) {
 void NN_printShape(Tensor *t) {
   printf("(");
   for (size_t i = 0; i < t->ndim; i += 1) {
-    printf("%d", t->shape[i]);
+    printf("%d", (int)t->shape[i]);
     if (i < t->ndim-1) {
       printf(", ");
     }
@@ -137,10 +148,12 @@ void NN_asType(Tensor *t, DataType dtype) {
 
 
 /**
- * Copy data from source tensor to destination tensor
+ * Copies values from one tensor to another
  * 
+ * @param dst: destination tensor
+ * @param src: source tensor
  */
-void NN_copyFrom(Tensor *dst, Tensor *src) {
+void NN_copyTo(Tensor *dst, Tensor *src) {
   assert(dst->shape[0] == src->shape[0]);
   assert(dst->shape[1] == src->shape[1]);
   assert(dst->dtype == src->dtype);
