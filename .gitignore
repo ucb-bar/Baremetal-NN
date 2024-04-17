@@ -1,8 +1,8 @@
 
 .conda-env/
+.vscode/
 
 example/mnist/data/
-
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
