@@ -70,6 +70,11 @@ void NN_initTensor(Tensor *t, size_t ndim, size_t *shape, DataType dtype, void *
   }
 }
 
+void NN_freeTensor(Tensor *t) {
+  free(t->data);
+  free(t);
+}
+
 
 /*
  * ====== Print Functions ======
