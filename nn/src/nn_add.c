@@ -84,12 +84,33 @@ void NN_add_I32(Tensor *out, Tensor *a, Tensor *b) {
 
 void NN_add_F32(Tensor *out, Tensor *a, Tensor *b) {
   assert(a->shape[0] == b->shape[0]);
-  assert(a->shape[1] == b->shape[1]);
   assert(a->dtype == DTYPE_F32);
   assert(b->dtype == DTYPE_F32);
   assert(out->dtype == DTYPE_F32);
 
-  for (size_t i = 0; i<out->size; i+=1) {
-    ((float *)out->data)[i] = ((float *)a->data)[i] + ((float *)b->data)[i];
+  if (b->ndim == 0) {
+    for (size_t i = 0; i<out->size; i+=1) {
+      ((float *)out->data)[i] = ((float *)a->data)[i] + ((float *)b->data)[0];
+    }
+    return;
+  }
+
+  if (b->ndim == 1) {
+    assert(a->shape[1] == b->shape[0]);
+
+    for (size_t i = 0; i<out->shape[0]; i+=1) {
+      for (size_t j = 0; j<out->shape[1]; j+=1) {
+        ((float *)out->data)[i*out->shape[1]+j] = ((float *)a->data)[i*a->shape[1]+j] + ((float *)b->data)[j];
+      }
+    }
+    return;
+  }
+
+  if (b->ndim == 2) {
+    assert(a->shape[1] == b->shape[1]);
+
+    for (size_t i = 0; i<out->size; i+=1) {
+      ((float *)out->data)[i] = ((float *)a->data)[i] + ((float *)b->data)[i];
+    }
   }
 }
