@@ -23,7 +23,7 @@
     ".balign 4\n"                             /* Word alignment */\
     ".section \".text\"\n")                   /* Restore section */
 
-IMPORT_BIN(".rodata", "../test.txt", externdata);
+IMPORT_BIN(".rodata", "../test.bin", externdata);
 
 /* Declaration of symbols (any type can be used) */
 extern uint8_t externdata[];

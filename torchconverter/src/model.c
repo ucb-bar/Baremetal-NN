@@ -13,52 +13,29 @@ const float fc2_bias_data[20] = {0.11700403690338135, 0.21335089206695557, 0.188
 const float fc3_weight_data[100] = {0.04956826567649841, 0.20224463939666748, 0.049671471118927, -0.009589076042175293, 0.029676884412765503, 0.17095091938972473, 0.21007409691810608, -0.12875902652740479, 0.02589687705039978, -0.029519349336624146, 0.15815606713294983, 0.21782797574996948, 0.0674121081829071, 0.13209810853004456, -0.0886622816324234, 0.20959436893463135, 0.22204169631004333, 0.08436763286590576, 0.03603404760360718, -0.18804869055747986, -0.07194182276725769, 0.10430175065994263, -0.07029105722904205, -0.16529704630374908, -0.18120159208774567, -0.006236225366592407, -0.09780539572238922, -0.22345206141471863, 0.0550176203250885, 0.013406366109848022, -0.1815318912267685, -0.046104609966278076, 0.027683347463607788, 0.06233358383178711, 0.05622479319572449, -0.08665129542350769, 0.11376678943634033, 0.21104511618614197, 0.0028600096702575684, 0.20793870091438293, 0.2147955298423767, 0.1738966405391693, 0.035457462072372437, -0.10322581231594086, 0.053149789571762085, -0.09823954105377197, -0.15976858139038086, -0.16325682401657104, -0.16005437076091766, 0.20117288827896118, 0.09375572204589844, -0.07838208973407745, 0.026484251022338867, -0.013929635286331177, -0.002033725380897522, 0.04579642415046692, -0.08253845572471619, 0.02467261254787445, -0.16472290456295013, -0.09559087455272675, -0.21702255308628082, 0.07156315445899963, -0.22280669212341309, -0.03858545422554016, -0.046665892004966736, -0.09793893992900848, -0.2083951234817505, 0.023907020688056946, -0.08858267962932587, -0.08392742276191711, 0.043019384145736694, -0.07770282030105591, 0.04483094811439514, 0.10628068447113037, -0.05359192192554474, 0.12421396374702454, 0.030942976474761963, -0.09041142463684082, -0.03770868480205536, 0.18500223755836487, 0.16176477074623108, 0.052802443504333496, 0.19430571794509888, 0.22157880663871765, -0.0618877112865448, 0.17161345481872559, 0.19333922863006592, -0.20966151356697083, 0.15572577714920044, 0.051158785820007324, 0.15422135591506958, 0.026135355234146118, 0.20873209834098816, -0.19996190071105957, -0.027682319283485413, 0.10008740425109863, -0.05272865295410156, -0.16755563020706177, 0.08871462941169739, 0.04495888948440552};
 const float fc3_bias_data[5] = {-0.02634650468826294, -0.1155988946557045, 0.16878947615623474, -0.025923654437065125, 0.04112434387207031};
 
+Tensor forward(float input_data[10]) {
+  Tensor input = NN_tensor(2, (size_t[]){ 1, 10 }, DTYPE_F32, (float *)input_data);
+  float fc1_out_data[10] = {0};
+Tensor fc1_out = NN_tensor(2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)fc1_out_data);
+Tensor fc1_weight = NN_tensor(2, (size_t[]){ 10, 15 }, DTYPE_F32, (float *)fc1_weight_data);
+Tensor fc1_bias = NN_tensor(2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)fc1_bias_data);
+  float fc2_out_data[15] = {0};
+Tensor fc2_out = NN_tensor(2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)fc2_out_data);
+Tensor fc2_weight = NN_tensor(2, (size_t[]){ 15, 20 }, DTYPE_F32, (float *)fc2_weight_data);
+Tensor fc2_bias = NN_tensor(2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)fc2_bias_data);
+  float fc3_out_data[20] = {0};
+Tensor fc3_out = NN_tensor(2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)fc3_out_data);
+Tensor fc3_weight = NN_tensor(2, (size_t[]){ 20, 5 }, DTYPE_F32, (float *)fc3_weight_data);
+Tensor fc3_bias = NN_tensor(2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)fc3_bias_data);
 
-typedef struct {
-  Tensor input;
-  Tensor fc1_weight;
-  Tensor fc1_bias;
-  Tensor fc1_out;
-  Tensor fc2_weight;
-  Tensor fc2_bias;
-  Tensor fc2_out;
-  Tensor fc3_weight;
-  Tensor fc3_bias;
-  Tensor output;
-} Model;
-
-
-void forward(Model *model) {
-  NN_initTensor(&model->fc1_weight, 2, (size_t[]){ 10, 15 }, DTYPE_F32, (float *)fc1_weight_data);
-  NN_initTensor(&model->fc1_bias, 2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)fc1_bias_data);
-  NN_initTensor(&model->fc1_out, 2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)malloc(15 * sizeof(float)));
-  
-  NN_initTensor(&model->fc2_weight, 2, (size_t[]){ 15, 20 }, DTYPE_F32, (float *)fc2_weight_data);
-  NN_initTensor(&model->fc2_bias, 2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)fc2_bias_data);
-  NN_initTensor(&model->fc2_out, 2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)malloc(20 * sizeof(float)));
-  
-  NN_initTensor(&model->fc3_weight, 2, (size_t[]){ 20, 5 }, DTYPE_F32, (float *)fc3_weight_data);
-  NN_initTensor(&model->fc3_bias, 2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)fc3_bias_data);
-  NN_initTensor(&model->output, 2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)malloc(5 * sizeof(float)));
-
-  NN_linear_F32(&model->fc1_out, &model->input, &model->fc1_weight, &model->fc1_bias);
-  NN_linear_F32(&model->fc2_out, &model->fc1_out, &model->fc2_weight, &model->fc2_bias);
-  NN_linear_F32(&model->output, &model->fc2_out, &model->fc3_weight, &model->fc3_bias);
-
-  NN_printf(&model->output);
+  // NN_linear_F32(&fc1_out, &input, &fc1_weight, &fc1_bias);
+  // NN_linear_F32(&fc2_out, &fc1_out, &fc2_weight, &fc2_bias);
+  // NN_linear_F32(&fc3_out, &fc2_out, &fc3_weight, &fc3_bias);
+  return fc3_out;
 }
 
 int main() {
-  Model *model = (Model *)malloc(sizeof(Model));
-
-  float *input_data = (float[]){0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-  NN_initTensor(&model->input, 2, (size_t[]){ 1, 10 }, DTYPE_F32, input_data);
-
-  forward(model);
-
-  NN_printf(&model->output);
-
-  free(model->output.data);
-  free(model);
+  float *input_data = (float[]){0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0});
+  forward(input);
   return 0;
 }
