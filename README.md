@@ -35,3 +35,9 @@ the converter will dump out three files:
 
 `model.py`
 
+
+Note:
+
+memory layout: NHWC
+
+**N**: batch, **H**: height, **W**: width, **C**: channels
