@@ -4,11 +4,12 @@ import torch.nn.functional as F
 
 
 class MLP(nn.Module):
-    def __init__(self):
+    def __init__(self, device="cpu"):
         super().__init__()
-        self.fc1 = nn.Linear(1 * 28 * 28, 16)
-        self.fc2 = nn.Linear(16, 16)
-        self.fc3 = nn.Linear(16, 10)
+        self.device = device
+        self.fc1 = nn.Linear(1 * 28 * 28, 16, device=self.device)
+        self.fc2 = nn.Linear(16, 16, device=self.device)
+        self.fc3 = nn.Linear(16, 10, device=self.device)
 
     def forward(self, x):
         x = torch.flatten(x, 1) # flatten all dimensions except batch
