@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define MAX_DIMS            3
+#define MAX_DIMS            4
 
 
 typedef enum {
