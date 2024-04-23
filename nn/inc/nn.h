@@ -5,7 +5,36 @@
 
 #include "nn_types.h"
 #include "nn_add.h"
+#include "nn_clip.h"
+#include "nn_linear.h"
+#include "nn_matmul.h"
+#include "nn_relu.h"
+#include "nn_transpose.h"
 
+
+// http://elm-chan.org/junk/32bit/binclude.html
+#define INCLUDE_FILE(section, filename, symbol) asm (\
+    ".section "#section"\n"                   /* Change section */\
+    ".balign 4\n"                             /* Word alignment */\
+    ".global "#symbol"_start\n"               /* Export the object start address */\
+    ".global "#symbol"_data\n"                /* Export the object address */\
+    #symbol"_start:\n"                        /* Define the object start address label */\
+    #symbol"_data:\n"                         /* Define the object label */\
+    ".incbin \""filename"\"\n"                /* Import the file */\
+    ".global "#symbol"_end\n"                 /* Export the object end address */\
+    #symbol"_end:\n"                          /* Define the object end address label */\
+    ".balign 4\n"                             /* Word alignment */\
+    ".section \".text\"\n")                   /* Restore section */
+
+
+
+void NN_assert(int condition, char *message) {
+  if (!condition) {
+    printf("Assertion failed: ");
+    printf("%s\n", message);
+    exit(1);
+  }
+}
 
 
 /**
@@ -15,29 +44,43 @@
  * @param shape: shape of tensor
  * @param dtype: DataType
  */
-Tensor NN_tensor(size_t ndim, size_t *shape, DataType dtype, void *data) {
-  Tensor t;
-  t.ndim = ndim;
-  t.dtype = dtype;
-  t.data = data;
+void NN_initTensor(Tensor *t, size_t ndim, size_t *shape, DataType dtype, void *data) {
+  t->ndim = ndim;
+  t->dtype = dtype;
+  t->data = data;
 
   // set shape
   for (size_t i = 0; i < ndim; i += 1) {
-    t.shape[i] = shape[i];
+    t->shape[i] = shape[i];
   }
   for (size_t i = ndim; i < MAX_DIMS; i += 1) {
-    t.shape[i] = 0;
+    t->shape[i] = 0;
+  }
+
+  // set stride
+  t->stride[0] = NN_sizeof(dtype);
+  for (size_t i = 1; i <= ndim; i += 1) {
+    t->stride[i] = t->stride[i-1] * t->shape[ndim-i];
   }
   
   // calculate size (number of elements)
-  t.size = 1;
+  t->size = 1;
   for (size_t i = 0; i < ndim; i += 1) {
-    t.size *= t.shape[i];
+    t->size *= t->shape[i];
   }
-
-  return t;
 }
 
+void NN_freeTensor(Tensor *t) {
+  free(t->data);
+  free(t);
+}
+
+
+/*
+ * ====== Print Functions ======
+ *
+ * These functions assumes that printf is available.
+ */
 
 void NN_printFloat(float v, int16_t num_digits) {
   int32_t scale = 1;
@@ -51,13 +94,19 @@ void NN_printFloat(float v, int16_t num_digits) {
   if (fractional_part < 0) {
     fractional_part *= -1;
   }
+  if (v < 0) {
+    printf("-");
+  }
+  else {
+    printf(" ");
+  }
   printf("%i.%i", integer_part, fractional_part);
 }
 
 void NN_printShape(Tensor *t) {
   printf("(");
   for (size_t i = 0; i < t->ndim; i += 1) {
-    printf("%d", t->shape[i]);
+    printf("%d", (int)t->shape[i]);
     if (i < t->ndim-1) {
       printf(", ");
     }
@@ -67,6 +116,29 @@ void NN_printShape(Tensor *t) {
 
 void NN_printf(Tensor *t) {
   // print data with torch.Tensor style
+  if (t->ndim == 1) {
+    printf("[");
+    for (size_t i=0; i<t->shape[0]; i+=1) {
+      switch (t->dtype) {
+        case DTYPE_I8:
+          printf("%d", ((int8_t *)t->data)[i]);
+          break;
+        case DTYPE_I32:
+          printf("%d", ((int32_t *)t->data)[i]);
+          break;
+        case DTYPE_F32:
+          NN_printFloat(((float *)t->data)[i], 4);
+          break;
+      }
+      if (i < t->shape[0]-1) {
+        printf(" ");
+      }
+    }
+    printf("]");
+    printf("\n");
+    return;
+  }
+
   printf("[");
   for (size_t i=0; i<t->shape[0]; i+=1) {
     if (i != 0) {
@@ -82,7 +154,7 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int32_t *)t->data)[i*t->shape[1]+j]);
           break;
         case DTYPE_F32:
-          printf("%f", ((float *)t->data)[i*t->shape[1]+j]);
+          NN_printFloat(((float *)t->data)[i*t->shape[1]+j], 4);
           break;
       }
       if (j < t->shape[1]-1) {
@@ -137,10 +209,12 @@ void NN_asType(Tensor *t, DataType dtype) {
 
 
 /**
- * Copy data from source tensor to destination tensor
+ * Copies values from one tensor to another
  * 
+ * @param dst: destination tensor
+ * @param src: source tensor
  */
-void NN_copyFrom(Tensor *dst, Tensor *src) {
+void NN_copyTo(Tensor *dst, Tensor *src) {
   assert(dst->shape[0] == src->shape[0]);
   assert(dst->shape[1] == src->shape[1]);
   assert(dst->dtype == src->dtype);

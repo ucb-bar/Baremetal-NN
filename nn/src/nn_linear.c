@@ -5,8 +5,7 @@ void NN_linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b) {
   assert(x->shape[1] == w->shape[0]);
   assert(y->shape[0] == x->shape[0]);
   assert(y->shape[1] == w->shape[1]);
-  assert(b->shape[0] == w->shape[1]);
-  assert(b->shape[1] == 1);
+  // assert(b->shape[1] == w->shape[1]);
   assert(x->dtype == DTYPE_F32);
   assert(w->dtype == DTYPE_F32);
   assert(b->dtype == DTYPE_F32);
@@ -21,7 +20,6 @@ void NN_linear_I32(Tensor *y, Tensor *x, Tensor *w, Tensor *b) {
   assert(y->shape[0] == x->shape[0]);
   assert(y->shape[1] == w->shape[1]);
   assert(b->shape[0] == w->shape[1]);
-  assert(b->shape[1] == 1);
   assert(x->dtype == DTYPE_I32);
   assert(w->dtype == DTYPE_I32);
   assert(b->dtype == DTYPE_I32);

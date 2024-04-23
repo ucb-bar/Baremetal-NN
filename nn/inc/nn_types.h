@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define MAX_DIMS            3
+#define MAX_DIMS            4
 
 
 typedef enum {
@@ -26,7 +26,7 @@ typedef struct {
   // stride[1] = stride[0] * shape[ndim-1]
   // stride[2] = stride[1] * shape[ndim-2]
   // ...
-  // size_t stride[MAX_DIMS+1];  /** stride, in bytes */
+  size_t stride[MAX_DIMS+1];  /** stride, in bytes */
 
   void *data;                 /** data */
 } Tensor;
