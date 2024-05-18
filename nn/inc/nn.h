@@ -6,6 +6,7 @@
 #include "nn_types.h"
 #include "nn_add.h"
 #include "nn_clip.h"
+#include "nn_elu.h"
 #include "nn_linear.h"
 #include "nn_matmul.h"
 #include "nn_relu.h"
@@ -99,7 +100,7 @@ void NN_printFloat(float v, int16_t num_digits) {
   if (v < 0 && integer_part == 0) {
     printf("-");
   }
-  printf("%i.%i", integer_part, fractional_part);
+  printf("%li.%li", integer_part, fractional_part);
 }
 
 void NN_printShape(Tensor *t) {
@@ -123,7 +124,7 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int8_t *)t->data)[i]);
           break;
         case DTYPE_I32:
-          printf("%d", ((int32_t *)t->data)[i]);
+          printf("%ld", ((int32_t *)t->data)[i]);
           break;
         case DTYPE_F32:
           NN_printFloat(((float *)t->data)[i], 4);
@@ -150,7 +151,7 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int8_t *)t->data)[i*t->shape[1]+j]);
           break;
         case DTYPE_I32:
-          printf("%d", ((int32_t *)t->data)[i*t->shape[1]+j]);
+          printf("%ld", ((int32_t *)t->data)[i*t->shape[1]+j]);
           break;
         case DTYPE_F32:
           NN_printFloat(((float *)t->data)[i*t->shape[1]+j], 4);
