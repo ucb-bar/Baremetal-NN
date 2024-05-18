@@ -94,11 +94,10 @@ void NN_printFloat(float v, int16_t num_digits) {
   if (fractional_part < 0) {
     fractional_part *= -1;
   }
-  if (v < 0) {
+  
+  // integer does not have a "negative zero"
+  if (v < 0 && integer_part == 0) {
     printf("-");
-  }
-  else {
-    printf(" ");
   }
   printf("%i.%i", integer_part, fractional_part);
 }
@@ -127,8 +126,7 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int32_t *)t->data)[i]);
           break;
         case DTYPE_F32:
-          // NN_printFloat(((float *)t->data)[i], 4);
-          printf("%f", ((float *)t->data)[i]);
+          NN_printFloat(((float *)t->data)[i], 4);
           break;
       }
       if (i < t->shape[0]-1) {
@@ -155,8 +153,7 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int32_t *)t->data)[i*t->shape[1]+j]);
           break;
         case DTYPE_F32:
-          // NN_printFloat(((float *)t->data)[i*t->shape[1]+j], 4);
-          printf("%f", ((float *)t->data)[i*t->shape[1]+j]);
+          NN_printFloat(((float *)t->data)[i*t->shape[1]+j], 4);
           break;
       }
       if (j < t->shape[1]-1) {
