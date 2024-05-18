@@ -127,7 +127,8 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int32_t *)t->data)[i]);
           break;
         case DTYPE_F32:
-          NN_printFloat(((float *)t->data)[i], 4);
+          // NN_printFloat(((float *)t->data)[i], 4);
+          printf("%f", ((float *)t->data)[i]);
           break;
       }
       if (i < t->shape[0]-1) {
@@ -154,7 +155,8 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int32_t *)t->data)[i*t->shape[1]+j]);
           break;
         case DTYPE_F32:
-          NN_printFloat(((float *)t->data)[i*t->shape[1]+j], 4);
+          // NN_printFloat(((float *)t->data)[i*t->shape[1]+j], 4);
+          printf("%f", ((float *)t->data)[i*t->shape[1]+j]);
           break;
       }
       if (j < t->shape[1]-1) {
