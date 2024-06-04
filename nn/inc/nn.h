@@ -82,25 +82,40 @@ void NN_freeTensor(Tensor *t) {
  *
  * These functions assumes that printf is available.
  */
-
 void NN_printFloat(float v, int16_t num_digits) {
-  int32_t scale = 1;
-  int32_t integer_part, fractional_part;
-  while (num_digits != 0) {
-    scale *= 10;
-    num_digits -= 1;
+  if (v < 0) {
+    printf("-");  // Print the minus sign for negative numbers
+    v = -v;        // Make the number positive for processing
   }
-  integer_part = (int32_t)v;
-  fractional_part = (int32_t)((v-(float)(int32_t)v)*scale);
-  if (fractional_part < 0) {
-    fractional_part *= -1;
+
+  // Calculate the integer part of the number
+  long int_part = (long)v;
+  float fractional_part = v - int_part;
+
+  // Count the number of digits in the integer part
+  long temp = int_part;
+  int int_digits = (int_part == 0) ? 1 : 0; // Handle zero as a special case
+  while (temp > 0) {
+    int_digits++;
+    temp /= 10;
   }
-  
-  // integer does not have a "negative zero"
-  if (v < 0 && integer_part == 0) {
-    printf("-");
+
+  // Print the integer part
+  printf("%ld", int_part);
+
+  // Calculate the number of fractional digits we can print
+  int fractional_digits = num_digits - int_digits;
+  if (fractional_digits > 0) {
+    printf("."); // Print the decimal point
+
+    // Handle the fractional part
+    while (fractional_digits-- > 0) {
+      fractional_part *= 10;
+      int digit = (int)(fractional_part);
+      printf("%d", digit);
+      fractional_part -= digit;
+    }
   }
-  printf("%li.%li", integer_part, fractional_part);
 }
 
 void NN_printShape(Tensor *t) {
@@ -124,7 +139,7 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int8_t *)t->data)[i]);
           break;
         case DTYPE_I32:
-          printf("%ld", ((int32_t *)t->data)[i]);
+          printf("%ld", (size_t)((int32_t *)t->data)[i]);
           break;
         case DTYPE_F32:
           NN_printFloat(((float *)t->data)[i], 4);
@@ -151,7 +166,7 @@ void NN_printf(Tensor *t) {
           printf("%d", ((int8_t *)t->data)[i*t->shape[1]+j]);
           break;
         case DTYPE_I32:
-          printf("%ld", ((int32_t *)t->data)[i*t->shape[1]+j]);
+          printf("%ld", (size_t)((int32_t *)t->data)[i*t->shape[1]+j]);
           break;
         case DTYPE_F32:
           NN_printFloat(((float *)t->data)[i*t->shape[1]+j], 4);
