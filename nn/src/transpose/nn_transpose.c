@@ -12,12 +12,6 @@
  * @param a: input tensor of shape (m, n)
  */
 void NN_transpose(Tensor *out, Tensor *a) {
-  assert(out->shape[0] == a->shape[1]);
-  assert(out->shape[1] == a->shape[0]);
-  assert(a->ndim == 2);
-  assert(out->dtype == a->dtype);
-  assert(out->data != a->data);
-
   if (a->dtype == DTYPE_F32) {
     NN_transpose_F32(out, a);
     return;

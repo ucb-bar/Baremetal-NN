@@ -5,6 +5,7 @@
 
 #include "nn_tensor.h"
 
+
 /**
  * Element-wise addition
  * 
@@ -24,5 +25,6 @@ void NN_add_INT(Tensor *out, Tensor *a, Tensor *b);
 
 
 void NN_add_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
+
 
 #endif // __NN_ADD_H
