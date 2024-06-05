@@ -3,14 +3,11 @@
 
 #include <assert.h>
 
-#include "nn_types.h"
+#include "nn_tensor.h"
 #include "nn_add.h"
-#include "nn_clip.h"
-#include "nn_elu.h"
-#include "nn_linear.h"
 #include "nn_matmul.h"
-#include "nn_relu.h"
-#include "nn_transpose.h"
+
+
 
 
 // http://elm-chan.org/junk/32bit/binclude.html
@@ -126,7 +123,7 @@ void NN_printShape(Tensor *t) {
       printf(", ");
     }
   }
-  printf(")\n");
+  printf(")");
 }
 
 void NN_printf(Tensor *t) {

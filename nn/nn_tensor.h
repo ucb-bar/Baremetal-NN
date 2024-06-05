@@ -10,8 +10,14 @@
 
 typedef enum {
   DTYPE_I8,
+  DTYPE_I16,
   DTYPE_I32,
+  DTYPE_I64,
+  DTYPE_I128,
+  DTYPE_F8,
+  DTYPE_F16,
   DTYPE_F32,
+  DTYPE_F64,
 } DataType;
 
 
