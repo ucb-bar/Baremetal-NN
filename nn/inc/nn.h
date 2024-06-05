@@ -58,10 +58,10 @@ void NN_initTensor(Tensor *t, size_t ndim, size_t *shape, DataType dtype, void *
     t->shape[i] = 0;
   }
 
-  // set stride
-  t->stride[0] = NN_sizeof(dtype);
-  for (size_t i = 1; i <= ndim; i += 1) {
-    t->stride[i] = t->stride[i-1] * t->shape[ndim-i];
+  // set strides
+  t->strides[ndim-1] = NN_sizeof(dtype);
+  for (size_t i = 0; i < ndim-1; i += 1) {
+    t->strides[ndim-i-2] = t->strides[ndim-i-1] * t->shape[ndim-i-1];
   }
   
   // calculate size (number of elements)

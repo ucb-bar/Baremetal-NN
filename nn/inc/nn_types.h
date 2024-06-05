@@ -22,11 +22,11 @@ typedef struct {
   
   size_t shape[MAX_DIMS];     /** shape of tensor */
   
-  // stride[0] = sizeof(dtype)
-  // stride[1] = stride[0] * shape[ndim-1]
-  // stride[2] = stride[1] * shape[ndim-2]
+  // strides[0] = strides[1] * shape[1]
+  // strides[1] = strides[2] * shape[2]
   // ...
-  size_t stride[MAX_DIMS+1];  /** stride, in bytes */
+  // strides[ndim-1] = sizeof(dtype)
+  size_t strides[MAX_DIMS];   /** strides, in bytes */
 
   void *data;                 /** data */
 } Tensor;
