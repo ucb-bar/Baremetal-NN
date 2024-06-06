@@ -12,29 +12,20 @@ void NN_printFloat(float v, int16_t num_digits) {
   long int_part = (long)v;
   float fractional_part = v - int_part;
 
-  // Count the number of digits in the integer part
-  long temp = int_part;
-  int int_digits = (int_part == 0) ? 1 : 0; // Handle zero as a special case
-  while (temp > 0) {
-    int_digits++;
-    temp /= 10;
-  }
-
   // Print the integer part
   printf("%ld", int_part);
 
-  // Calculate the number of fractional digits we can print
-  int fractional_digits = num_digits - int_digits;
-  if (fractional_digits > 0) {
+  if (num_digits > 0) {
     printf("."); // Print the decimal point
+  }
 
-    // Handle the fractional part
-    while (fractional_digits-- > 0) {
-      fractional_part *= 10;
-      int digit = (int)(fractional_part);
-      printf("%d", digit);
-      fractional_part -= digit;
-    }
+  // Handle the fractional part
+  while (num_digits > 0) {
+    num_digits -= 1;
+    fractional_part *= 10;
+    int digit = (int)(fractional_part);
+    printf("%d", digit);
+    fractional_part -= digit;
   }
 }
 
