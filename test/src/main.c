@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <math.h>
 
 #include "nn.h"
@@ -15,21 +14,17 @@ static void enable_vector_operations() {
     asm volatile("csrw mstatus, %0"::"r"(mstatus));
 }
 
-bool float_eq(float golden, float actual, float relErr) {
-    return (fabs(actual - golden) < relErr) || (fabs((actual - golden) / actual) < relErr);
+uint8_t float_eq(float golden, float actual, float relErr) {
+  return (fabs(actual - golden) < relErr) || (fabs((actual - golden) / actual) < relErr);
 }
 
-bool compare_2d(float *golden, float *actual, int n, int m) {
-    for (int i = 0; i < m * n; ++i)
-        if (!float_eq(golden[i], actual[i], 1e-6))
-            return false;
-    return true;
-}
-
-void NN_random(Tensor *t) {
-  for (int i = 0; i < t->size; i += 1) {
-    ((float *)t->data)[i] = (float)rand() / RAND_MAX; // + (rand() % 10);
+uint8_t compare_2d(float *golden, float *actual, int n, int m) {
+  for (int i = 0; i < m * n; i+=1) {
+    if (!float_eq(golden[i], actual[i], 1e-6)) {
+      return 0;
+    }
   }
+  return 1;
 }
 
 
@@ -44,34 +39,66 @@ int main() {
   uint64_t start, total;
   srand(seed);
 
-  Tensor *A = (Tensor *)malloc(sizeof(Tensor));
-  Tensor *B = (Tensor *)malloc(sizeof(Tensor));
-  Tensor *B_T = (Tensor *)malloc(sizeof(Tensor));
-  Tensor *f = (Tensor *)malloc(sizeof(Tensor));
 
-  NN_initTensor(A, 2, (size_t[]){M, O}, DTYPE_F32, (float *)malloc(M * O * sizeof(float)));
-  NN_initTensor(B, 2, (size_t[]){O, N}, DTYPE_F32, (float *)malloc(O * N * sizeof(float)));
-  NN_initTensor(f, 2, (size_t[]){M, N}, DTYPE_F32, (float *)malloc(M * N * sizeof(float)));
+  {
+    Tensor *A = NN_rand(2, (size_t[]){M, O}, DTYPE_F32);
+    Tensor *B = NN_rand(2, (size_t[]){O, N}, DTYPE_F32);
+    Tensor *f = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
 
-  NN_random(A);
-  NN_random(B);
-  NN_random(f);
+    printf("matmul:         ");
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    
+    NN_matmul_F32(golden, A, B);
+    // start = read_cycles();
+    NN_matmul_F32_RVV(actual, A, B);
+    // total = read_cycles() - start;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", total);
 
-  printf("matmul:         ");
-  Tensor *golden = (Tensor *)malloc(sizeof(Tensor));
-  NN_initTensor(golden, 2, (size_t[]){M, N}, DTYPE_F32, (float *)malloc(M * N * sizeof(float)));
-  Tensor *actual = (Tensor *)malloc(sizeof(Tensor));
-  NN_initTensor(actual, 2, (size_t[]){M, N}, DTYPE_F32, (float *)malloc(M * N * sizeof(float)));
-  
-  NN_matmul_F32(golden, A, B);
-  // start = read_cycles();
-  // matmul_rvv(A->data, B->data, actual->data, N, M, O);
-  NN_matmul_F32_RVV(actual, A, B);
-  // total = read_cycles() - start;
-  printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", total);
+    // NN_printf(golden);
+    // NN_printf(actual);
 
-  NN_printf(golden);
-  NN_printf(actual);
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+    NN_freeTensorData(B);
+    NN_deleteTensor(B);
+    NN_freeTensorData(f);
+    NN_deleteTensor(f);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
+  }
+
+  {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *B = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+
+    printf("matadd:         ");
+    NN_add_F32(golden, A, B);
+    // start = read_cycles();
+    NN_add_F32_RVV(actual, A, B);
+    // total = read_cycles() - start;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", total);
+
+    // NN_printf(A);
+    // NN_printf(B);
+    // NN_printf(golden);
+    // NN_printf(actual);
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+    NN_freeTensorData(B);
+    NN_deleteTensor(B);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
+  }
 
 
   return 0;

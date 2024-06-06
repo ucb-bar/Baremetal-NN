@@ -102,6 +102,8 @@ Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype);
 
 Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype);
 
+Tensor *NN_rand(size_t ndim, size_t *shape, DataType dtype);
+
 /**
  * Convert tensor data type
  * 

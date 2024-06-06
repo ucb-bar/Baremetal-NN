@@ -92,6 +92,32 @@ Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype) {
   return t;
 }
 
+Tensor *NN_rand(size_t ndim, size_t *shape, DataType dtype) {
+  Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
+
+  switch (dtype) {
+    case DTYPE_I8:
+      for (size_t i = 0; i<t->size; i+=1) {
+        ((int8_t *)t->data)[i] = rand() % 256 - 128;
+      }
+      break;
+    case DTYPE_I32:
+      for (size_t i = 0; i<t->size; i+=1) {
+        ((int32_t *)t->data)[i] = rand();
+      }
+      break;
+    case DTYPE_F32:
+      for (size_t i = 0; i<t->size; i+=1) {
+        ((float *)t->data)[i] = (float)rand() / RAND_MAX;
+      }
+      break;
+    default:
+      printf("[WARNING] Unsupported data type: %d\n", dtype);
+  }
+
+  return t;
+}
+
 void NN_asType(Tensor *t, DataType dtype) {
   if (t->dtype == dtype) {
     return;
