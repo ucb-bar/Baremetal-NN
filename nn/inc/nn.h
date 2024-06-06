@@ -7,9 +7,11 @@
 #include "nn_print.h"
 #include "nn_add.h"
 #include "nn_copy.h"
+#include "nn_linear.h"
 #include "nn_matmul.h"
 #include "nn_max.h"
 #include "nn_min.h"
+#include "nn_sum.h"
 
 
 // http://elm-chan.org/junk/32bit/binclude.html
