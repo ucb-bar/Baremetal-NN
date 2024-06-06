@@ -4,6 +4,22 @@
 
 Baremetal-NN is a tool for converting PyTorch models into raw C codes that can be executed standalone in a baremetal runtime on research chips. 
 
+## Run Test
+
+```bash
+cd test/
+mkdir build/
+cd build/
+cmake ..
+```
+
+```bash
+make
+spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./example 
+```
+
+
+
 ## Convert the model
 
 ```bash
