@@ -8,6 +8,8 @@
 #include "nn_add.h"
 #include "nn_copy.h"
 #include "nn_matmul.h"
+#include "nn_max.h"
+#include "nn_min.h"
 
 
 // http://elm-chan.org/junk/32bit/binclude.html

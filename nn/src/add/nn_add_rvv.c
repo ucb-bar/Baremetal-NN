@@ -15,14 +15,16 @@ void NN_add_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
   float *a_data = (float *)a->data;
   float *b_data = (float *)b->data;
 
-  int k = out->shape[0] * out->shape[1];
-  int l = 0;
-  for (size_t vl; k > 0; k -= vl, l += vl) {
+  // TODO: add broadcasting support
+
+  size_t i = 0;
+  size_t vl = 0;
+  for (size_t k = out->shape[0] * out->shape[1]; k > 0; k -= vl, i += vl) {
     vl = __riscv_vsetvl_e32m1(k);
-    vfloat32m1_t vec_a = __riscv_vle32_v_f32m1(a_data + l, vl);
-    vfloat32m1_t vec_b = __riscv_vle32_v_f32m1(b_data + l, vl);
+    vfloat32m1_t vec_a = __riscv_vle32_v_f32m1(a_data + i, vl);
+    vfloat32m1_t vec_b = __riscv_vle32_v_f32m1(b_data + i, vl);
     vfloat32m1_t vec_c = __riscv_vfadd_vv_f32m1(vec_a, vec_b, vl);
-    __riscv_vse32_v_f32m1(out_data + l, vec_c, vl);
+    __riscv_vse32_v_f32m1(out_data + i, vec_c, vl);
   }
 }
 

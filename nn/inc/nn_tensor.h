@@ -77,35 +77,80 @@ static inline const char *NN_getDataTypeName(DataType dtype) {
   }
 }
 
+/**
+ * Frees the memory allocated for the tensor data
+ */
 static inline void NN_freeTensorData(Tensor *t) {
   free(t->data);
 }
 
+/**
+ * Frees the memory allocated for the tensor
+ */
 static inline void NN_deleteTensor(Tensor *t) {
   free(t);
 }
 
-
 /**
- * Initialize a tensor
+ * Initialize a given tensor
  * 
  * @param ndim: number of dimensions
  * @param shape: shape of tensor
- * @param dtype: DataType
+ * @param dtype: data type
  * @param data: pointer to data, if NULL, the data will be allocated
  */
 void NN_initTensor(Tensor *t, size_t ndim, size_t *shape, DataType dtype, void *data);
 
+/**
+ * Create a new tensor
+ * 
+ * @param ndim: number of dimensions
+ * @param shape: shape of tensor
+ * @param dtype: data type
+ * @param data: pointer to data, if NULL, the data will be allocated
+ * @return Tensor
+*/
 Tensor *NN_tensor(size_t ndim, size_t *shape, DataType dtype, void *data);
 
+/**
+ * Returns a tensor filled with the scalar value 0.
+ * 
+ * @param ndim: number of dimensions
+ * @param shape: shape of tensor
+ * @param dtype: data type
+ * @return Tensor
+ */
 Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype);
 
+/**
+ * Returns a tensor filled with the scalar value 1.
+ * 
+ * @param ndim: number of dimensions
+ * @param shape: shape of tensor
+ * @param dtype: data type
+ * @return Tensor
+ */
 Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype);
 
+/**
+ * Returns a tensor filled with random numbers from a uniform distribution.
+ * 
+ * The range of the random number is dependent on the data type:
+ * - For Float32, the range is [0, 1]
+ * - For Int8, the range is [0, 255]
+ * - For Int32, the range is [0, RAND_MAX]
+ * 
+ * @param ndim: number of dimensions
+ * @param shape: shape of tensor
+ * @param dtype: data type
+ * @return Tensor
+ */
 Tensor *NN_rand(size_t ndim, size_t *shape, DataType dtype);
 
 /**
- * Convert tensor data type
+ * Returns this tensor cast to the type of the given tensor.
+ * 
+ * This is a no-op if the tensor is already of the correct type. 
  * 
  * @param t: input tensor
  * @param dtype: target data type

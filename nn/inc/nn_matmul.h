@@ -26,5 +26,7 @@ void NN_matmul_I32(Tensor *out, Tensor *a, Tensor *b);
 
 void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
 
+void NN_matmul_I8_I8_I32_EAGLEX(Tensor *out, Tensor *a, Tensor *b);
+
 
 #endif // __NN_MATMUL_H

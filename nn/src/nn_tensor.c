@@ -98,7 +98,7 @@ Tensor *NN_rand(size_t ndim, size_t *shape, DataType dtype) {
   switch (dtype) {
     case DTYPE_I8:
       for (size_t i = 0; i<t->size; i+=1) {
-        ((int8_t *)t->data)[i] = rand() % 256 - 128;
+        ((int8_t *)t->data)[i] = rand() % 256;
       }
       break;
     case DTYPE_I32:

@@ -1,3 +1,7 @@
+
+# the CMake files are still very hacky
+# TODO: organize the build system properly
+
 cmake_minimum_required(VERSION 3.15)
 
 set(PROJECT_NAME        "example")
@@ -23,8 +27,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Og")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -O2")
 
 set(STATIC_LINKING TRUE)
 
@@ -49,10 +53,12 @@ set(CMAKE_SIZE         "${TOOLCHAIN_PREFIX}-size")
 set(CMAKE_STRIP        "${TOOLCHAIN_PREFIX}-ld")
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=medany -march=rv64gcv_zfh -mabi=lp64d -fno-common -fno-builtin-printf")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -mcmodel=medany -march=rv64gcv_zfh -mabi=lp64d -fno-common -fno-builtin-printf")
 set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
 set(CMAKE_EXE_LINKER_FLAGS "-static -lm -lstdc++ -Wl,-Map=output.map -L${LIBGLOSS_DIR} -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE} -T ${CMAKE_SOURCE_DIR}/htif.ld")
 
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -u _printf_float")
 
 message(CMAKE_C_FLAGS: ${CMAKE_C_FLAGS})
 

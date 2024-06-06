@@ -14,8 +14,4 @@
  */
 void NN_linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
 
-void NN_linear_I32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
-
-void NN_linear_I8_I8_I8_I32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
-
 #endif // __NN_LINEAR_H

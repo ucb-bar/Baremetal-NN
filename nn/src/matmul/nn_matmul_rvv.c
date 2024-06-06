@@ -19,6 +19,7 @@ void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
       float *ptr_a = (float *)a->data + i * a->shape[1];
       float *ptr_b = (float *)b->data + j;
       vfloat32m1_t vec_s = __riscv_vfmv_v_f_f32m1(0, vlmax);
+      
       size_t vl = 0;
       for (int k = a->shape[1]; k > 0; k -= vl, ptr_a += vl, ptr_b += vl) {
         vl = __riscv_vsetvl_e32m1(k);
