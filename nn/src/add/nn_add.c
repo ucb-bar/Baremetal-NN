@@ -22,35 +22,34 @@ void NN_add_F32(Tensor *out, Tensor *a, Tensor *b) {
   assert(a->shape[0] == b->shape[0]);
   
   out->dtype = DTYPE_F32;
-
-  uint8_t *a_ptr = a->data;
-  uint8_t *b_ptr = b->data;
-  uint8_t *out_ptr = out->data;
-
   for (size_t i = 0; i<out->ndim; i+=1) {
     out->shape[i] = a->shape[i] > b->shape[i] ? a->shape[i] : b->shape[i];
   }
+
+  uint8_t *out_ptr = out->data;
+  uint8_t *a_ptr = a->data;
+  uint8_t *b_ptr = b->data;
 
   switch (out->ndim) {
     case 1:
       for (size_t i = 0; i<out->shape[0]; i+=1) {
         *((float *)out_ptr) = *((float *)a_ptr) + *((float *)b_ptr);
+        out_ptr += out->strides[0];
         a_ptr += a->strides[0];
         b_ptr += b->strides[0];
-        out_ptr += out->strides[0];
       }
       return;
     case 2:
       for (size_t i = 0; i<out->shape[0]; i+=1) {
         for (size_t j = 0; j<out->shape[1]; j+=1) {
           *((float *)out_ptr) = *((float *)a_ptr) + *((float *)b_ptr);
+          out_ptr += out->strides[1];
           a_ptr += a->strides[1];
           b_ptr += b->strides[1];
-          out_ptr += out->strides[1];
         }
         a_ptr -= a->strides[1] * a->shape[1];
-        b_ptr -= b->strides[1] * b->shape[1];
         a_ptr += a->strides[0];
+        b_ptr -= b->strides[1] * b->shape[1];
         b_ptr += b->strides[0];
       }
       return;
@@ -70,35 +69,34 @@ void NN_add_INT(Tensor *out, Tensor *a, Tensor *b) {
   assert(a->shape[0] == b->shape[0]);
 
   out->dtype = DTYPE_I32;
-  
-  uint8_t *a_ptr = a->data;
-  uint8_t *b_ptr = b->data;
-  uint8_t *out_ptr = out->data;
-
   for (size_t i = 0; i<out->ndim; i+=1) {
     out->shape[i] = a->shape[i] > b->shape[i] ? a->shape[i] : b->shape[i];
   }
   
+  uint8_t *out_ptr = out->data;
+  uint8_t *a_ptr = a->data;
+  uint8_t *b_ptr = b->data;
+
   switch (out->ndim) {
     case 1:
       for (size_t i = 0; i<out->shape[0]; i+=1) {
         *((int32_t *)out_ptr) = *((int32_t *)a_ptr) + *((int32_t *)b_ptr);
+        out_ptr += out->strides[0];
         a_ptr += a->strides[0];
         b_ptr += b->strides[0];
-        out_ptr += out->strides[0];
       }
       return;
     case 2:
       for (size_t i = 0; i<out->shape[0]; i+=1) {
         for (size_t j = 0; j<out->shape[1]; j+=1) {
           *((int32_t *)out_ptr) = *((int32_t *)a_ptr) + *((int32_t *)b_ptr);
+          out_ptr += out->strides[1];
           a_ptr += a->strides[1];
           b_ptr += b->strides[1];
-          out_ptr += out->strides[1];
         }
         a_ptr -= a->strides[1] * a->shape[1];
-        b_ptr -= b->strides[1] * b->shape[1];
         a_ptr += a->strides[0];
+        b_ptr -= b->strides[1] * b->shape[1];
         b_ptr += b->strides[0];
       }
       return;

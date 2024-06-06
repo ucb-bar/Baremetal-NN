@@ -12,6 +12,9 @@ set(SOURCES
   src/add/nn_add_rvv.c
 
   src/copy/nn_copy.c
+
+  src/linear/nn_linear.c
+  src/linear/nn_linear_rvv.c
   
   src/matmul/nn_matmul.c
   src/matmul/nn_matmul_eaglex.c
@@ -22,6 +25,10 @@ set(SOURCES
   
   src/min/nn_min.c
   src/min/nn_min_rvv.c
+
+  src/sum/nn_sum.c
+
+  src/transpose/nn_transpose.c
 
 )
 

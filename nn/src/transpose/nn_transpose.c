@@ -16,53 +16,21 @@ void NN_transpose(Tensor *out, Tensor *a) {
     NN_transpose_F32(out, a);
     return;
   }
-  if (a->dtype == DTYPE_I8) {
-    NN_transpose_I8(out, a);
-    return;
-  }
-  if (a->dtype == DTYPE_I32) {
-    NN_transpose_I32(out, a);
-    return;
-  }
   printf("Unsupported data type %s\n", NN_getDataTypeName(a->dtype));
 }
 
-void NN_transpose_I8(Tensor *out, Tensor *a) {
-  assert(out->shape[0] == a->shape[1]);
-  assert(out->shape[1] == a->shape[0]);
-  assert(a->ndim == 2);
-  assert(out->dtype == a->dtype);
-
-  for (size_t i = 0; i<a->shape[0]; i+=1) {
-    for (size_t j = 0; j<a->shape[1]; j+=1) {
-      ((int8_t *)out->data)[i*a->shape[1]+j] = ((int8_t *)a->data)[j*a->shape[0]+i];
-    }
-  }
-}
-
-void NN_transpose_I32(Tensor *out, Tensor *a) {
-  assert(out->shape[0] == a->shape[1]);
-  assert(out->shape[1] == a->shape[0]);
-  assert(a->ndim == 2);
-  assert(out->dtype == a->dtype);
-
-  for (size_t i = 0; i<a->shape[0]; i+=1) {
-    for (size_t j = 0; j<a->shape[1]; j+=1) {
-      ((int32_t *)out->data)[i*a->shape[1]+j] = ((int32_t *)a->data)[j*a->shape[0]+i];
-    }
-  }
-}
-
 void NN_transpose_F32(Tensor *out, Tensor *a) {
-  assert(out->shape[0] == a->shape[1]);
-  assert(out->shape[1] == a->shape[0]);
+  // currently only support 2D matrix transpose
   assert(a->ndim == 2);
-  assert(out->dtype == a->dtype);
+  
+  out->dtype = DTYPE_F32;
 
-  for (size_t i = 0; i<a->shape[0]; i+=1) {
-    for (size_t j = 0; j<a->shape[1]; j+=1) {
-      ((float *)out->data)[i*a->shape[1]+j] = ((float *)a->data)[j*a->shape[0]+i];
-    }
-  }
+  size_t shape0 = a->shape[0];
+  out->shape[0] = a->shape[1];
+  out->shape[1] = shape0;
+
+  size_t strides0 = a->strides[0];
+  out->strides[0] = a->strides[1];
+  out->strides[1] = strides0;
 }
 

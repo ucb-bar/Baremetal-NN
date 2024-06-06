@@ -29,9 +29,9 @@ uint8_t compare_2d(float *golden, float *actual, int n, int m) {
 }
 
 
+#define M  3
 #define N  4
-#define M  6
-#define O  3
+#define O  5
 
 int main() {
   enable_vector_operations();
@@ -75,7 +75,6 @@ int main() {
   // matvec
   {
 
-
   }
 
   // max and min
@@ -95,11 +94,6 @@ int main() {
     float min_actual =  NN_min_F32_RVV(A);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", float_eq(min_cpu, min_actual, 1e-6) ? "pass" : "fail", cycles);
-
-    NN_printf(A);
-    printf("max:");
-    NN_printFloat(max_cpu, 6);
-    printf("\n");
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);
@@ -194,6 +188,72 @@ int main() {
   {
 
   }
+
+
+  // linear
+  {
+    int batch = 1;
+    int out_features = 4;
+    int in_features = 3;
+
+    Tensor *x = NN_ones(2, (size_t[]){batch, in_features}, DTYPE_F32);
+    Tensor *w = NN_ones(2, (size_t[]){out_features, in_features}, DTYPE_F32);
+    Tensor *b = NN_ones(2, (size_t[]){batch, out_features}, DTYPE_F32);
+
+    Tensor *y = NN_tensor(2, (size_t[]){batch, out_features}, DTYPE_F32, NULL);
+
+    // NN_linear_F32(y, x, w, b);
+    NN_linear_F32_RVV(y, x, w, b);
+
+    NN_printf(y);
+  }
+
+
+
+  // sum
+  // {
+  //   Tensor *A = NN_ones(2, (size_t[]){M, N}, DTYPE_F32);
+  //   Tensor *B = NN_ones(2, (size_t[]){M, 1}, DTYPE_F32);
+
+  //   ((float *)A->data)[0] = 0;
+  //   ((float *)A->data)[1] = 1;
+  //   ((float *)A->data)[2] = 2;
+  //   ((float *)A->data)[3] = 3;
+  //   ((float *)A->data)[4] = 4;
+  //   ((float *)A->data)[5] = 5;
+
+  //   printf("shape: (%d, %d)\n", A->shape[0], A->shape[1]);
+  //   printf("strides: (%d, %d)\n", A->strides[0], A->strides[1]);
+    
+  //   printf("shape: (%d, %d)\n", B->shape[0], B->shape[1]);
+  //   printf("strides: (%d, %d)\n", B->strides[0], B->strides[1]);
+
+
+
+  //   // NN_printf(A);
+
+  //   // transpose
+  //   size_t shape_0 = A->shape[0];
+  //   size_t shape_1 = A->shape[1];
+  //   size_t strides_0 = A->strides[0];
+  //   size_t strides_1 = A->strides[1];
+  //   A->shape[0] = shape_1;
+  //   A->shape[1] = shape_0;
+  //   A->strides[0] = strides_1;
+  //   A->strides[1] = strides_0;
+    
+  //   printf("shape: (%d, %d)\n", A->shape[0], A->shape[1]);
+  //   printf("strides: (%d, %d)\n", A->strides[0], A->strides[1]);
+
+  //   // NN_printf(A);
+
+  //   printf("sum:\t\t");
+  //   float sum_cpu = NN_sum_F32(A);
+  //   NN_printFloat(sum_cpu, 4);
+  //   printf("\n");
+    
+  // }
+
 
 
   return 0;

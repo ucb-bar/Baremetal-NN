@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-#include "nn_types.h"
+#include "nn_tensor.h"
 
 
 /**

@@ -5,7 +5,9 @@
 
 #include "nn_tensor.h"
 #include "nn_add.h"
+#include "nn_transpose.h"
 #include "nn_matmul.h"
+
 
 
 /**

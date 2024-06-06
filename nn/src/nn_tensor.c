@@ -2,34 +2,34 @@
 #include "nn_tensor.h"
 
 
-void NN_initTensor(Tensor *t, size_t ndim, size_t *shape, DataType dtype, void *data) {
-  t->ndim = ndim;
-  t->dtype = dtype;
+void NN_initTensor(Tensor *tensor, size_t ndim, size_t *shape, DataType dtype, void *data) {
+  tensor->ndim = ndim;
+  tensor->dtype = dtype;
 
   // set shape
   for (size_t i = 0; i < ndim; i += 1) {
-    t->shape[i] = shape[i];
+    tensor->shape[i] = shape[i];
   }
   for (size_t i = ndim; i < MAX_DIMS; i += 1) {
-    t->shape[i] = 0;
+    tensor->shape[i] = 0;
   }
 
   // set strides
-  t->strides[ndim-1] = NN_sizeof(dtype);
+  tensor->strides[ndim-1] = NN_sizeof(dtype);
   for (size_t i = 0; i < ndim-1; i += 1) {
-    t->strides[ndim-i-2] = t->strides[ndim-i-1] * t->shape[ndim-i-1];
+    tensor->strides[ndim-i-2] = tensor->strides[ndim-i-1] * tensor->shape[ndim-i-1];
   }
   
   // calculate size (number of elements)
-  t->size = 1;
+  tensor->size = 1;
   for (size_t i = 0; i < ndim; i += 1) {
-    t->size *= t->shape[i];
+    tensor->size *= tensor->shape[i];
   }
   
   if (data == NULL) {
-    t->data = malloc(NN_sizeof(dtype) * t->size);
+    tensor->data = malloc(NN_sizeof(dtype) * tensor->size);
   } else {
-    t->data = data;
+    tensor->data = data;
   }
 }
 
