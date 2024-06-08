@@ -23,9 +23,6 @@ void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
   vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
   for (size_t i = 0; i < a->shape[0]; i += 1) {
     for (size_t j = 0; j < b->shape[1]; j += 1) {
-      // a_ptr = a->data + a->strides[0] * i;
-      // b_ptr = b->data + b->strides[1] * j;
-
       uint8_t *a_ptr_v = a_ptr;
       uint8_t *b_ptr_v = b_ptr;
       
@@ -54,4 +51,3 @@ void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
     b_ptr -= b->strides[1] * b->shape[1];
   }  
 }
-

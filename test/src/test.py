@@ -1,13 +1,22 @@
 import torch
 
-batch = 5
-out_features = 2
+
+# seed random number generator
+torch.manual_seed(0)
+
+batch = 1
+out_features = 4
 in_features = 3
 
-x = torch.ones((batch, in_features))
-w = torch.ones((out_features, in_features))
-b = torch.zeros((out_features))
+l = torch.nn.Linear(in_features, out_features)
 
-y = x @ w.T + b
+print(l.state_dict()["weight"].numpy().flatten())
+print(l.state_dict()["bias"].numpy().flatten())
 
-print(y)
+
+input = torch.ones(batch, in_features)
+
+output = l.forward(input)
+
+print(output)
+
