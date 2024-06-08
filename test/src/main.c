@@ -44,6 +44,7 @@ int main() {
   {
     Tensor *A = NN_rand(2, (size_t[]){M, O}, DTYPE_F32);
     Tensor *B = NN_rand(2, (size_t[]){O, N}, DTYPE_F32);
+    Tensor *BT = NN_rand(2, (size_t[]){N, O}, DTYPE_F32);
     Tensor *f = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
 
     printf("matmul:\t\t");
@@ -55,9 +56,15 @@ int main() {
     NN_matmul_F32_RVV(actual, A, B);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
+    
+    printf("matmult:\t");
+    
+    NN_matmult_F32(golden, A, BT);
+    cycles = READ_CSR("mcycle");
+    NN_matmult_F32_RVV(actual, A, BT);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    // NN_printf(golden);
-    // NN_printf(actual);
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);
@@ -75,12 +82,15 @@ int main() {
   // matvec
   {
     Tensor *H = NN_rand(2, (size_t[]){N, M}, DTYPE_F32);
+    Tensor *HT = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
     Tensor *V = NN_rand(2, (size_t[]){M, 1}, DTYPE_F32);
     Tensor *W = NN_rand(2, (size_t[]){1, M}, DTYPE_F32);
     
     printf("matvec:\t\t");
     Tensor *golden_vec = NN_tensor(2, (size_t[]){N, 1}, DTYPE_F32, NULL);
     Tensor *actual_vec = NN_tensor(2, (size_t[]){N, 1}, DTYPE_F32, NULL);
+    Tensor *golden_vect = NN_tensor(2, (size_t[]){1, N}, DTYPE_F32, NULL);
+    Tensor *actual_vect = NN_tensor(2, (size_t[]){1, N}, DTYPE_F32, NULL);
 
     NN_matmul_F32(golden_vec, H, V);
     cycles = READ_CSR("mcycle");
@@ -89,15 +99,13 @@ int main() {
     printf("%s (%lu)\n", compare_2d(golden_vec->data, actual_vec->data, N, 1) ? "PASS" : "FAIL", cycles);
 
     printf("matvec_t:\t");
-    NN_transpose_F32(H, H);
-    NN_transpose_F32(golden_vec, golden_vec);
-    NN_transpose_F32(actual_vec, actual_vec);
+    NN_transpose_F32(HT, H);
     
-    NN_matmul_F32(golden_vec, W, H);
+    NN_matmul_F32(golden_vect, W, HT);
     cycles = READ_CSR("mcycle");
-    NN_matmul_F32_RVV(actual_vec, W, H);
+    NN_matmul_F32_RVV(actual_vect, W, HT);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", compare_2d(golden_vec->data, actual_vec->data, N, 1) ? "PASS" : "FAIL", cycles);
+    printf("%s (%lu)\n", compare_2d(golden_vect->data, actual_vect->data, N, 1) ? "PASS" : "FAIL", cycles);
 
     NN_freeTensorData(H);
     NN_deleteTensor(H);
@@ -256,9 +264,6 @@ int main() {
     NN_transpose_F32(B, A);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", (B->shape[0] == N && B->shape[1] == M) ? "PASS" : "FAIL", cycles);
-
-    printf("  A is contiguous: %s\n", NN_isContiguous(A) ? "YES" : "NO");
-    printf("  B is contiguous: %s\n", NN_isContiguous(B) ? "YES" : "NO");
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);

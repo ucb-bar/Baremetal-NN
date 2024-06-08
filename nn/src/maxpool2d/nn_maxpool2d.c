@@ -42,16 +42,14 @@ void NN_maxpool2d_F32(Tensor *out, Tensor *in, size_t *kernel_size, size_t *stri
           window.ndim = 2;
           window.shape[0] = pool_height;
           window.shape[1] = pool_width;
-          window.strides[0] = in->strides[2];
-          window.strides[1] = in->strides[3];
           window.dtype = DTYPE_F32;
-          window.data = in_ptr + n * in->strides[0] + c * in->strides[1] + h_start * in->strides[2] + w_start * in->strides[3];
+          window.data = in_ptr + n * in->shape[1] * in->shape[2] * in->shape[3] + c * in->shape[2] * in->shape[3] + h_start * in->shape[3] + w_start;
 
           // Get the maximum value in the current pooling window
           float max_value = NN_max(&window);
 
           // Store the maximum value in the output tensor
-          out_ptr[n * out->strides[0] + c * out->strides[1] + h * out->strides[2] + w * out->strides[3]] = max_value;
+          out_ptr[n * out->shape[1] * out->shape[2] * out->shape[3] + c * out->shape[2] * out->shape[3] + h * out->shape[3] + w] = max_value;
         }
       }
     }

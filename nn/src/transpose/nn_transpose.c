@@ -26,12 +26,10 @@ void NN_transpose_F32(Tensor *out, Tensor *a) {
   assert(out->ndim == 2);
   assert(out->dtype == DTYPE_F32);
   
-  size_t shape0 = a->shape[0];
-  out->shape[0] = a->shape[1];
-  out->shape[1] = shape0;
-
-  size_t strides0 = a->strides[0];
-  out->strides[0] = a->strides[1];
-  out->strides[1] = strides0;
+  for (size_t i = 0; i < a->shape[0]; i += 1) {
+    for (size_t j = 0; j < a->shape[1]; j += 1) {
+      ((float *)out->data)[j * out->shape[1] + i] = ((float *)a->data)[i * a->shape[1] + j];
+    }
+  }
 }
 

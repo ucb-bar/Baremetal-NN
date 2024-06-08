@@ -30,15 +30,7 @@ typedef struct {
   DataType dtype;             /** datatype */
   size_t ndim;                /** number of dimensions */
   size_t size;                /** number of elements */
-  
   size_t shape[MAX_DIMS];     /** shape of tensor */
-  
-  // strides[0] = strides[1] * shape[1]
-  // strides[1] = strides[2] * shape[2]
-  // ...
-  // strides[ndim-1] = sizeof(dtype)
-  size_t strides[MAX_DIMS];   /** strides, in bytes */
-
   void *data;                 /** data */
 } Tensor;
 
@@ -98,63 +90,9 @@ static inline uint8_t NN_is3D(Tensor *tensor) {
   return tensor->ndim == 3;
 }
 
-static inline int32_t NN_get_I32_1D(Tensor *tensor, size_t i) {
-  return *((int32_t *)((uint8_t *)tensor->data + i * tensor->strides[0]));
+static inline uint8_t NN_is4D(Tensor *tensor) {
+  return tensor->ndim == 4;
 }
-
-static inline void NN_set_I32_1D(Tensor *tensor, size_t i, int32_t value) {
-  *((int32_t *)((uint8_t *)tensor->data + i * tensor->strides[0])) = value;
-}
-
-static inline int32_t NN_get_I32_2D(Tensor *tensor, size_t i0, size_t i1) {
-  return *((int32_t *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1]));
-}
-
-static inline void NN_set_I32_2D(Tensor *tensor, size_t i0, size_t i1, int32_t value) {
-  *((int32_t *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1])) = value;
-}
-
-static inline int32_t NN_get_I32_3D(Tensor *tensor, size_t i0, size_t i1, size_t i2) {
-  return *((int32_t *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1] + i2 * tensor->strides[2]));
-}
-
-static inline void NN_set_I32_3D(Tensor *tensor, size_t i0, size_t i1, size_t i2, int32_t value) {
-  *((int32_t *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1] + i2 * tensor->strides[2])) = value;
-}
-
-static inline float NN_get_F32_1D(Tensor *tensor, size_t i) {
-  return *((float *)((uint8_t *)tensor->data + i * tensor->strides[0]));
-}
-
-static inline void NN_set_F32_1D(Tensor *tensor, size_t i, float value) {
-  *((float *)((uint8_t *)tensor->data + i * tensor->strides[0])) = value;
-}
-
-static inline float NN_get_F32_2D(Tensor *tensor, size_t i0, size_t i1) {
-  return *((float *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1]));
-}
-
-static inline void NN_set_F32_2D(Tensor *tensor, size_t i0, size_t i1, float value) {
-  *((float *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1])) = value;
-}
-
-static inline float NN_get_F32_3D(Tensor *tensor, size_t i0, size_t i1, size_t i2) {
-  return *((float *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1] + i2 * tensor->strides[2]));
-}
-
-static inline void NN_set_F32_3D(Tensor *tensor, size_t i0, size_t i1, size_t i2, float value) {
-  *((float *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1] + i2 * tensor->strides[2])) = value;
-}
-
-static inline uint8_t NN_isContiguous(Tensor *tensor) {
-  switch (tensor->ndim) {
-    case 1:
-      return tensor->strides[0] == NN_sizeof(tensor->dtype);
-    case 2:
-      return tensor->strides[1] == NN_sizeof(tensor->dtype) && tensor->strides[0] == tensor->shape[1] * tensor->strides[1];
-  }
-}
-
 
 /**
  * Frees the memory allocated for the tensor data

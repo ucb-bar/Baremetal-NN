@@ -14,12 +14,6 @@ void NN_initTensor(Tensor *tensor, size_t ndim, size_t *shape, DataType dtype, v
     tensor->shape[i] = 0;
   }
 
-  // set strides
-  tensor->strides[ndim-1] = NN_sizeof(dtype);
-  for (size_t i = 0; i < ndim-1; i += 1) {
-    tensor->strides[ndim-i-2] = tensor->strides[ndim-i-1] * tensor->shape[ndim-i-1];
-  }
-  
   // calculate size (number of elements)
   tensor->size = 1;
   for (size_t i = 0; i < ndim; i += 1) {
@@ -33,7 +27,6 @@ void NN_initTensor(Tensor *tensor, size_t ndim, size_t *shape, DataType dtype, v
   }
 }
 
-
 Tensor *NN_tensor(size_t ndim, size_t *shape, DataType dtype, void *data) {
   Tensor *t = (Tensor *)malloc(sizeof(Tensor));
   NN_initTensor(t, ndim, shape, dtype, data);
@@ -45,17 +38,17 @@ Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype) {
 
   switch (dtype) {
     case DTYPE_I8:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((int8_t *)t->data)[i] = 0;
       }
       break;
     case DTYPE_I32:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((int32_t *)t->data)[i] = 0;
       }
       break;
     case DTYPE_F32:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((float *)t->data)[i] = 0;
       }
       break;
@@ -71,17 +64,17 @@ Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype) {
 
   switch (dtype) {
     case DTYPE_I8:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((int8_t *)t->data)[i] = 1;
       }
       break;
     case DTYPE_I32:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((int32_t *)t->data)[i] = 1;
       }
       break;
     case DTYPE_F32:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((float *)t->data)[i] = 1;
       }
       break;
@@ -97,17 +90,17 @@ Tensor *NN_rand(size_t ndim, size_t *shape, DataType dtype) {
 
   switch (dtype) {
     case DTYPE_I8:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((int8_t *)t->data)[i] = rand() % 256;
       }
       break;
     case DTYPE_I32:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((int32_t *)t->data)[i] = rand();
       }
       break;
     case DTYPE_F32:
-      for (size_t i = 0; i<t->size; i+=1) {
+      for (size_t i = 0; i < t->size; i += 1) {
         ((float *)t->data)[i] = (float)rand() / RAND_MAX;
       }
       break;
@@ -123,14 +116,14 @@ void NN_asType(Tensor *t, DataType dtype) {
     return;
   }
   if (t->dtype == DTYPE_I32 && dtype == DTYPE_F32) {
-    for (size_t i = 0; i<t->size; i+=1) {
+    for (size_t i = 0; i < t->size; i += 1) {
       ((float *)t->data)[i] = (float)((int32_t *)t->data)[i];
     }
     t->dtype = DTYPE_F32;
     return;
   }
   if (t->dtype == DTYPE_I32 && dtype == DTYPE_I8) {
-    for (size_t i = 0; i<t->size; i+=1) {
+    for (size_t i = 0; i < t->size; i += 1) {
       ((int8_t *)t->data)[i] = (int8_t)((int32_t *)t->data)[i];
     }
     t->dtype = DTYPE_I8;
@@ -138,7 +131,7 @@ void NN_asType(Tensor *t, DataType dtype) {
   }
 
   if (t->dtype == DTYPE_F32 && dtype == DTYPE_I32) {
-    for (size_t i = 0; i<t->size; i+=1) {
+    for (size_t i = 0; i < t->size; i += 1) {
       ((int32_t *)t->data)[i] = (int32_t)((float *)t->data)[i];
     }
     t->dtype = DTYPE_I32;

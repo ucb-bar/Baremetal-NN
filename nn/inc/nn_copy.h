@@ -1,6 +1,9 @@
 #ifndef __NN_COPY_H
 #define __NN_COPY_H
 
+#include <assert.h>
+#include <string.h>
+
 #include "nn_tensor.h"
 
 

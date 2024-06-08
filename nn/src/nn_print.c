@@ -54,10 +54,10 @@ void NN_printf(Tensor *tensor) {
             printf("%d", *((int8_t *)tensor->data + i));
             break;
           case DTYPE_I32:
-            printf("%ld", NN_get_I32_1D(tensor, i));
+            printf("%ld", *((int32_t *)tensor->data + i));
             break;
           case DTYPE_F32:
-            NN_printFloat(NN_get_F32_1D(tensor, i), 4);
+            NN_printFloat(*((float *)tensor->data + i), 4);
             break;
         }
         if (i < tensor->shape[0]-1) {
@@ -78,10 +78,10 @@ void NN_printf(Tensor *tensor) {
               printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1] + j));
               break;
             case DTYPE_I32:
-              printf("%ld", NN_get_I32_2D(tensor, i, j));
+              printf("%ld", *((int32_t *)tensor->data + i*tensor->shape[1] + j));
               break;
             case DTYPE_F32:
-              NN_printFloat(NN_get_F32_2D(tensor, i, j), 4);
+              NN_printFloat(*((float *)tensor->data + i*tensor->shape[1] + j), 4);
               break;
           }
           if (j < tensor->shape[1]-1) {
@@ -112,10 +112,10 @@ void NN_printf(Tensor *tensor) {
                 printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k));
                 break;
               case DTYPE_I32:
-                printf("%ld", NN_get_I32_3D(tensor, i, j, k));
+                printf("%ld", *((int32_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k));
                 break;
               case DTYPE_F32:
-                NN_printFloat(NN_get_F32_3D(tensor, i, j, k), 4);
+                NN_printFloat(*((float *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k), 4);
                 break;
             }
             if (k < tensor->shape[2]-1) {
@@ -126,6 +126,47 @@ void NN_printf(Tensor *tensor) {
         }
         printf("]");
       }
+      break;
+
+    case 4:
+      for (size_t i=0; i<tensor->shape[0]; i+=1) {
+        if (i != 0) {
+          printf("\n");
+        }
+        printf("[");
+        for (size_t j=0; j<tensor->shape[1]; j+=1) {
+          if (j != 0) {
+            printf(" ");
+          }
+          printf("[");
+          for (size_t k=0; k<tensor->shape[2]; k+=1) {
+            if (k != 0) {
+              printf(" ");
+            }
+            printf("[");
+            for (size_t l=0; l<tensor->shape[3]; l+=1) {
+              switch (tensor->dtype) {
+                case DTYPE_I8:
+                  printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + j*tensor->shape[2]*tensor->shape[3] + k*tensor->shape[3] + l));
+                  break;
+                case DTYPE_I32:
+                  printf("%ld", *((int32_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + j*tensor->shape[2]*tensor->shape[3] + k*tensor->shape[3] + l));
+                  break;
+                case DTYPE_F32:
+                  NN_printFloat(*((float *)tensor->data + i*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + j*tensor->shape[2]*tensor->shape[3] + k*tensor->shape[3] + l), 4);
+                  break;
+              }
+              if (l < tensor->shape[3]-1) {
+                printf(" ");
+              }
+            }
+            printf("]");
+          }
+          printf("]");
+        }
+        printf("]");
+      }
+      break;
   }
       
   printf("]");

@@ -9,9 +9,9 @@ void NN_sub_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
   assert(b->dtype == DTYPE_F32);
   assert(out->dtype == DTYPE_F32);
   
-  uint8_t *out_ptr = out->data;
-  uint8_t *a_ptr = a->data;
-  uint8_t *b_ptr = b->data;
+  float *out_ptr = out->data;
+  float *a_ptr = a->data;
+  float *b_ptr = b->data;
   
   // TODO: currently only support 2dim
   assert(a->ndim == 2);
@@ -22,13 +22,13 @@ void NN_sub_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
   size_t n = out->shape[0] * out->shape[1];
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);
-    vfloat32m1_t vec_a = __riscv_vlse32_v_f32m1((float *)a_ptr, a->strides[1], vl);
-    vfloat32m1_t vec_b = __riscv_vlse32_v_f32m1((float *)b_ptr, b->strides[1], vl);
+    vfloat32m1_t vec_a = __riscv_vle32_v_f32m1(a_ptr, vl);
+    vfloat32m1_t vec_b = __riscv_vle32_v_f32m1(b_ptr, vl);
     vfloat32m1_t vec_out = __riscv_vfsub_vv_f32m1(vec_a, vec_b, vl);
-    __riscv_vsse32_v_f32m1((float *)out_ptr, out->strides[1], vec_out, vl);
-    a_ptr += vl * a->strides[1];
-    b_ptr += vl * b->strides[1];
-    out_ptr += vl * out->strides[1];
+    __riscv_vse32_v_f32m1(out_ptr, vec_out, vl);
+    a_ptr += vl;
+    b_ptr += vl;
+    out_ptr += vl;
     n -= vl;
   }
 
