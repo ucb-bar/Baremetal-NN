@@ -11,6 +11,7 @@
 #include "nn_matmul.h"
 #include "nn_max.h"
 #include "nn_min.h"
+#include "nn_mul.h"
 #include "nn_sum.h"
 
 

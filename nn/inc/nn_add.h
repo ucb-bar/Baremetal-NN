@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "nn_tensor.h"
+#include "nn_print.h"
 
 
 /**

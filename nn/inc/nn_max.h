@@ -10,13 +10,13 @@
 /**
  * Returns the maximum value of all elements in the input tensor.
  * 
- * @param t: input tensor
+ * @param tensor: input tensor
  */
-float NN_max(Tensor *t);
+float NN_max(Tensor *tensor);
 
-float NN_max_F32(Tensor *t);
+float NN_max_F32(Tensor *tensor);
 
-float NN_max_F32_RVV(Tensor *t);
+float NN_max_F32_RVV(Tensor *tensor);
 
 
 #endif // __NN_MAX_H

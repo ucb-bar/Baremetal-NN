@@ -10,13 +10,13 @@
 /**
  * Returns the minimum value of all elements in the input tensor.
  * 
- * @param t: input tensor
+ * @param tensor: input tensor
  */
-float NN_min(Tensor *t);
+float NN_min(Tensor *tensor);
 
-float NN_min_F32(Tensor *t);
+float NN_min_F32(Tensor *tensor);
 
-float NN_min_F32_RVV(Tensor *t);
+float NN_min_F32_RVV(Tensor *tensor);
 
 
 #endif // __NN_MIN_H

@@ -31,8 +31,8 @@ void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
       size_t n = a->shape[1];
       while (n > 0) {
         size_t vl = __riscv_vsetvl_e32m1(n);
-        vfloat32m1_t vec_a = __riscv_vlse32_v_f32m1(a_ptr_v, a->strides[1], vl);
-        vfloat32m1_t vec_b = __riscv_vlse32_v_f32m1(b_ptr_v, b->strides[0], vl);
+        vfloat32m1_t vec_a = __riscv_vlse32_v_f32m1((float *)a_ptr_v, a->strides[1], vl);
+        vfloat32m1_t vec_b = __riscv_vlse32_v_f32m1((float *)b_ptr_v, b->strides[0], vl);
         vec_s = __riscv_vfmacc_vv_f32m1(vec_s, vec_a, vec_b, vl);
         
         a_ptr_v += vl * a->strides[1];

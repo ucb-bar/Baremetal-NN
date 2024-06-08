@@ -22,7 +22,7 @@ void NN_add_F32(Tensor *out, Tensor *a, Tensor *b) {
   assert(a->shape[0] == b->shape[0]);
   
   out->dtype = DTYPE_F32;
-  for (size_t i = 0; i<out->ndim; i+=1) {
+  for (size_t i = 0; i < out->ndim; i += 1) {
     out->shape[i] = a->shape[i] > b->shape[i] ? a->shape[i] : b->shape[i];
   }
 
@@ -32,7 +32,7 @@ void NN_add_F32(Tensor *out, Tensor *a, Tensor *b) {
 
   switch (out->ndim) {
     case 1:
-      for (size_t i = 0; i<out->shape[0]; i+=1) {
+      for (size_t i = 0; i < out->shape[0]; i += 1) {
         *((float *)out_ptr) = *((float *)a_ptr) + *((float *)b_ptr);
         out_ptr += out->strides[0];
         a_ptr += a->strides[0];
@@ -40,8 +40,8 @@ void NN_add_F32(Tensor *out, Tensor *a, Tensor *b) {
       }
       return;
     case 2:
-      for (size_t i = 0; i<out->shape[0]; i+=1) {
-        for (size_t j = 0; j<out->shape[1]; j+=1) {
+      for (size_t i = 0; i < out->shape[0]; i += 1) {
+        for (size_t j = 0; j < out->shape[1]; j += 1) {
           *((float *)out_ptr) = *((float *)a_ptr) + *((float *)b_ptr);
           out_ptr += out->strides[1];
           a_ptr += a->strides[1];
@@ -56,9 +56,9 @@ void NN_add_F32(Tensor *out, Tensor *a, Tensor *b) {
   }
   
   printf("Unsupported operation between tensor with shape ");
-  NN_printShape(a->shape);
+  NN_printShape(a);
   printf(" and ");
-  NN_printShape(b->shape);
+  NN_printShape(b);
   printf("\n");
 }
 
@@ -79,7 +79,7 @@ void NN_add_INT(Tensor *out, Tensor *a, Tensor *b) {
 
   switch (out->ndim) {
     case 1:
-      for (size_t i = 0; i<out->shape[0]; i+=1) {
+      for (size_t i = 0; i < out->shape[0]; i += 1) {
         *((int32_t *)out_ptr) = *((int32_t *)a_ptr) + *((int32_t *)b_ptr);
         out_ptr += out->strides[0];
         a_ptr += a->strides[0];
@@ -87,8 +87,8 @@ void NN_add_INT(Tensor *out, Tensor *a, Tensor *b) {
       }
       return;
     case 2:
-      for (size_t i = 0; i<out->shape[0]; i+=1) {
-        for (size_t j = 0; j<out->shape[1]; j+=1) {
+      for (size_t i = 0; i < out->shape[0]; i += 1) {
+        for (size_t j = 0; j < out->shape[1]; j += 1) {
           *((int32_t *)out_ptr) = *((int32_t *)a_ptr) + *((int32_t *)b_ptr);
           out_ptr += out->strides[1];
           a_ptr += a->strides[1];
@@ -103,9 +103,9 @@ void NN_add_INT(Tensor *out, Tensor *a, Tensor *b) {
   }
 
   printf("Unsupported operation between tensor with shape ");
-  NN_printShape(a->shape);
+  NN_printShape(a);
   printf(" and ");
-  NN_printShape(b->shape);
+  NN_printShape(b);
   printf("\n");
 }
 
