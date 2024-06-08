@@ -29,6 +29,9 @@ set(SOURCES
   src/mul/nn_mul.c
   src/mul/nn_mul_rvv.c
 
+  src/sub/nn_sub.c
+  src/sub/nn_sub_rvv.c
+
   src/sum/nn_sum.c
 
   src/transpose/nn_transpose.c

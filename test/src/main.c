@@ -90,6 +90,8 @@ int main() {
 
     printf("matvec_t:\t");
     NN_transpose_F32(H, H);
+    NN_transpose_F32(golden_vec, golden_vec);
+    NN_transpose_F32(actual_vec, actual_vec);
     
     NN_matmul_F32(golden_vec, W, H);
     cycles = READ_CSR("mcycle");
@@ -150,7 +152,27 @@ int main() {
 
   // matsub
   {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *B = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
+    printf("matsub:\t\t");
+    NN_sub_F32(golden, A, B);
+    cycles = READ_CSR("mcycle");
+    NN_sub_F32_RVV(actual, A, B);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", cycles);
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+    NN_freeTensorData(B);
+    NN_deleteTensor(B);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
   }
 
   // matadd
@@ -162,15 +184,10 @@ int main() {
 
     printf("matadd:\t\t");
     NN_add_F32(golden, A, B);
-    // start = read_cycles();
+    cycles = READ_CSR("mcycle");
     NN_add_F32_RVV(actual, A, B);
-    // total = read_cycles() - start;
+    cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", cycles);
-
-    // NN_printf(A);
-    // NN_printf(B);
-    // NN_printf(golden);
-    // NN_printf(actual);
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);
