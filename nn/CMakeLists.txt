@@ -23,6 +23,8 @@ set(SOURCES
   src/max/nn_max.c
   src/max/nn_max_rvv.c
   
+  src/maxpool2d/nn_maxpool2d.c
+  
   src/min/nn_min.c
   src/min/nn_min_rvv.c
   
