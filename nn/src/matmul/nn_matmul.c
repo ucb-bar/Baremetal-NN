@@ -105,15 +105,13 @@ void NN_matmul_I32(Tensor *out, Tensor *a, Tensor *b) {
   // currently only support 2D matrix multiplication
   assert(a->ndim == 2);
   assert(b->ndim == 2);
-  assert(a->dtype == DTYPE_I32);
-  assert(b->dtype == DTYPE_I32);
-  assert(a->shape[1] == b->shape[0]);
+  assert(a->dtype == DTYPE_F32);
+  assert(b->dtype == DTYPE_F32);
+  assert(out->dtype == DTYPE_F32);
+  assert(b->shape[0] == a->shape[1]);
+  assert(out->shape[0] == a->shape[0]);
+  assert(out->shape[1] == b->shape[1]);
   
-  out->dtype = DTYPE_I32;
-
-  out->shape[0] = a->shape[0];
-  out->shape[1] = b->shape[1];
-
   int8_t *out_ptr = out->data;
   int8_t *a_ptr = a->data;
   int8_t *b_ptr = b->data;

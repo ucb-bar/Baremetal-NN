@@ -2,11 +2,12 @@
 #include "nn_relu.h"
 
 void NN_relu_F32(Tensor *y, Tensor *x) {
+  assert(x->ndim == 2);
+  assert(y->ndim == 2);
   assert(x->dtype == DTYPE_F32);
-
-  y->dtype = DTYPE_F32;
-  y->shape[0] == x->shape[0];
-  y->shape[1] == x->shape[1];
+  assert(y->dtype == DTYPE_F32);
+  assert(y->shape[0] == x->shape[0]);
+  assert(y->shape[1] == x->shape[1]);
 
   float *y_data = (float *)y->data;
   float *x_data = (float *)x->data;

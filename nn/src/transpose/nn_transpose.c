@@ -22,9 +22,10 @@ void NN_transpose(Tensor *out, Tensor *a) {
 void NN_transpose_F32(Tensor *out, Tensor *a) {
   // currently only support 2D matrix transpose
   assert(a->ndim == 2);
+  assert(a->dtype == DTYPE_F32);
+  assert(out->ndim == 2);
+  assert(out->dtype == DTYPE_F32);
   
-  out->dtype = DTYPE_F32;
-
   size_t shape0 = a->shape[0];
   out->shape[0] = a->shape[1];
   out->shape[1] = shape0;

@@ -3,17 +3,20 @@
 #include "riscv_vector.h"
 
 void NN_add_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
+  assert(b->ndim == a->ndim);
+  assert(out->ndim == a->ndim);
   assert(a->dtype == DTYPE_F32);
   assert(b->dtype == DTYPE_F32);
-  assert(a->shape[0] == b->shape[0]);
-  
-  out->dtype = DTYPE_F32;
-  out->shape[0] = a->shape[0];
-  out->shape[1] = a->shape[1];
+  assert(out->dtype == DTYPE_F32);
   
   uint8_t *out_ptr = out->data;
   uint8_t *a_ptr = a->data;
   uint8_t *b_ptr = b->data;
+  
+  // TODO: currently only support 2dim
+  assert(in->ndim == 2);
+  assert(out->shape[0] == in->shape[0]);
+  assert(out->shape[1] == in->shape[1]);
 
   // TODO: add broadcasting support
   size_t n = out->shape[0] * out->shape[1];

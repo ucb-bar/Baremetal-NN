@@ -12,6 +12,8 @@ void NN_mul_F32_RVV(Tensor *out, Tensor *in, float scalar) {
   
   // TODO: currently only support 2dim
   assert(in->ndim == 2);
+  assert(out->shape[0] == in->shape[0]);
+  assert(out->shape[1] == in->shape[1]);
   
   size_t n = in->shape[0] * in->shape[1];
   while (n > 0) {

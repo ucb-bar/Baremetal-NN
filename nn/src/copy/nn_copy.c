@@ -2,9 +2,10 @@
 #include "nn_copy.h"
 
 void NN_copy(Tensor *dst, Tensor *src) {
-  dst->dtype = src->dtype;
-  dst->shape[0] = src->shape[0];
-  dst->shape[1] = src->shape[1];
+  assert(dst->ndim == src->ndim);
+  assert(dst->dtype == src->dtype);
+  assert(dst->shape[0] == src->shape[0]);
+  assert(dst->shape[1] == src->shape[1]);
   
   switch (dst->dtype) {
     case DTYPE_I8:

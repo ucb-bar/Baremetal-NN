@@ -8,11 +8,10 @@ void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
   assert(b->ndim == 2);
   assert(a->dtype == DTYPE_F32);
   assert(b->dtype == DTYPE_F32);
-  assert(a->shape[1] == b->shape[0]);
-  
-  out->dtype = DTYPE_F32;
-  out->shape[0] = a->shape[0];
-  out->shape[1] = b->shape[1];
+  assert(out->dtype == DTYPE_F32);
+  assert(b->shape[0] == a->shape[1]);
+  assert(out->shape[0] == a->shape[0]);
+  assert(out->shape[1] == b->shape[1]);
 
   uint8_t *out_ptr = out->data;
   uint8_t *a_ptr = a->data;
