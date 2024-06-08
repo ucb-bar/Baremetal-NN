@@ -146,6 +146,15 @@ static inline void NN_set_F32_3D(Tensor *tensor, size_t i0, size_t i1, size_t i2
   *((float *)((uint8_t *)tensor->data + i0 * tensor->strides[0] + i1 * tensor->strides[1] + i2 * tensor->strides[2])) = value;
 }
 
+static inline uint8_t NN_isContiguous(Tensor *tensor) {
+  switch (tensor->ndim) {
+    case 1:
+      return tensor->strides[0] == NN_sizeof(tensor->dtype);
+    case 2:
+      return tensor->strides[1] == NN_sizeof(tensor->dtype) && tensor->strides[0] == tensor->shape[1] * tensor->strides[1];
+  }
+}
+
 
 /**
  * Frees the memory allocated for the tensor data

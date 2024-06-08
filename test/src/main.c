@@ -54,7 +54,7 @@ int main() {
     cycles = READ_CSR("mcycle");
     NN_matmul_F32_RVV(actual, A, B);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
     // NN_printf(golden);
     // NN_printf(actual);
@@ -86,7 +86,7 @@ int main() {
     cycles = READ_CSR("mcycle");
     NN_matmul_F32_RVV(actual_vec, H, V);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", compare_2d(golden_vec->data, actual_vec->data, N, 1) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", compare_2d(golden_vec->data, actual_vec->data, N, 1) ? "PASS" : "FAIL", cycles);
 
     printf("matvec_t:\t");
     NN_transpose_F32(H, H);
@@ -97,7 +97,7 @@ int main() {
     cycles = READ_CSR("mcycle");
     NN_matmul_F32_RVV(actual_vec, W, H);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", compare_2d(golden_vec->data, actual_vec->data, N, 1) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", compare_2d(golden_vec->data, actual_vec->data, N, 1) ? "PASS" : "FAIL", cycles);
 
     NN_freeTensorData(H);
     NN_deleteTensor(H);
@@ -116,14 +116,14 @@ int main() {
     cycles = READ_CSR("mcycle");
     float max_actual = NN_max_F32_RVV(A);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", float_eq(max_cpu, max_actual, 1e-6) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", float_eq(max_cpu, max_actual, 1e-6) ? "PASS" : "FAIL", cycles);
 
     printf("min:\t\t");
     float min_cpu = NN_min_F32(A);
     cycles = READ_CSR("mcycle");
     float min_actual =  NN_min_F32_RVV(A);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", float_eq(min_cpu, min_actual, 1e-6) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", float_eq(min_cpu, min_actual, 1e-6) ? "PASS" : "FAIL", cycles);
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);
@@ -140,7 +140,7 @@ int main() {
     cycles = READ_CSR("mcycle");
     NN_mul_F32_RVV(D, A, 10.0f);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", compare_2d(C->data, D->data, M, N) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", compare_2d(C->data, D->data, M, N) ? "PASS" : "FAIL", cycles);
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);
@@ -162,7 +162,7 @@ int main() {
     cycles = READ_CSR("mcycle");
     NN_sub_F32_RVV(actual, A, B);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);
@@ -187,7 +187,7 @@ int main() {
     cycles = READ_CSR("mcycle");
     NN_add_F32_RVV(actual, A, B);
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "pass" : "fail", cycles);
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
     NN_freeTensorData(A);
     NN_deleteTensor(A);
@@ -240,14 +240,30 @@ int main() {
 
   }
 
-  // matnorm
+  // matNOrm
   {
 
   }
 
   // transpose
   {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *B = NN_tensor(2, (size_t[]){N, M}, DTYPE_F32, NULL);
 
+    printf("transpose:\t");
+    
+    cycles = READ_CSR("mcycle");
+    NN_transpose_F32(B, A);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", (B->shape[0] == N && B->shape[1] == M) ? "PASS" : "FAIL", cycles);
+
+    printf("  A is contiguous: %s\n", NN_isContiguous(A) ? "YES" : "NO");
+    printf("  B is contiguous: %s\n", NN_isContiguous(B) ? "YES" : "NO");
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+    NN_freeTensorData(B);
+    NN_deleteTensor(B);
   }
 
 
@@ -267,7 +283,7 @@ int main() {
 
     Tensor *y = NN_tensor(2, (size_t[]){batch, out_features}, DTYPE_F32, NULL);
 
-    // NN_linear_F32(y, x, w, b);
+    NN_linear_F32(y, x, w, b);
     NN_linear_F32_RVV(y, x, w, b);
 
     printf("linear:\t\t");
