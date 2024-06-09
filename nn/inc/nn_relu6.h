@@ -10,6 +10,8 @@
  * 
  * y = ReLU6(x) = min(max(0, x), 6)
  * 
+ * @param y: the output tensor
+ * @param x: the input tensor
  */
 void NN_ReLU6_F32(Tensor *y, Tensor *x);
 

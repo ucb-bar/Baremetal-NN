@@ -10,6 +10,8 @@
  * 
  * y = max(0, x)
  * 
+ * @param y: the output tensor
+ * @param x: the input tensor
  */
 void NN_ReLU_F32(Tensor *y, Tensor *x);
 

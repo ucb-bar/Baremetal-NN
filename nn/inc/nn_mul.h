@@ -10,7 +10,9 @@
 /**
  * Returns the element-wise multiplication of the input tensor with a scalar.
  * 
- * @param t: input tensor
+ * @param out: the output tensor
+ * @param in: the input tensor
+ * @param scalar: scalar value
  */
 void NN_mul(Tensor *out, Tensor *in, float scalar);
 

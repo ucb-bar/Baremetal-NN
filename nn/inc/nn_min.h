@@ -10,7 +10,7 @@
 /**
  * Returns the minimum value of all elements in the input tensor.
  * 
- * @param tensor: input tensor
+ * @param tensor: the input tensor
  */
 float NN_min(Tensor *tensor);
 

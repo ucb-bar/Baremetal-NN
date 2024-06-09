@@ -11,8 +11,8 @@
  * 
  * @warning this is not an in-place operation, the output tensor should be different from the input tensor
  * 
- * @param out: output tensor of shape (n, m)
- * @param a: input tensor of shape (m, n)
+ * @param out: the output tensor of shape (n, m)
+ * @param a: the input tensor of shape (m, n)
  */
 void NN_transpose(Tensor *out, Tensor *a);
 

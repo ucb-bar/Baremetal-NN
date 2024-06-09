@@ -10,9 +10,9 @@
 /**
  * Applies a 2D max pooling over an input signal composed of several input planes.
  * 
- * @param out - output tensor of shape (batch_size, channels, height, width)
- * @param in - input tensor of shape (batch_size, channels, pooled_height, pooled_width)
- * @param kernel_size - size of the pooling window
+ * @param out: the output tensor of shape (batch_size, channels, height, width)
+ * @param in: the input tensor of shape (batch_size, channels, pooled_height, pooled_width)
+ * @param kernel_size: size of the pooling window
  */
 void NN_MaxPool2d_F32(Tensor *out, Tensor *in, size_t *kernel_size);
 
