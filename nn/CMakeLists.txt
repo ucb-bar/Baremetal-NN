@@ -19,6 +19,7 @@ set(SOURCES
   src/min/nn_min.c
   src/mul/nn_mul.c
   src/relu/nn_relu.c
+  src/relu6/nn_relu6.c
   src/sub/nn_sub.c
   src/sum/nn_sum.c
   src/transpose/nn_transpose.c

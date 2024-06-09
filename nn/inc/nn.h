@@ -15,6 +15,7 @@
 #include "nn_min.h"
 #include "nn_mul.h"
 #include "nn_relu.h"
+#include "nn_relu6.h"
 #include "nn_sub.h"
 #include "nn_sum.h"
 
