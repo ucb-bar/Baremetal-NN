@@ -17,6 +17,8 @@ extern uint8_t weights_data[];
 extern size_t weights_start[];
 extern size_t weights_end[];
 
+#define DIM   3
+
 
 // Tensors can be defined either globally or locally
 Tensor A;

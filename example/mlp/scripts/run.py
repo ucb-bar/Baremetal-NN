@@ -47,14 +47,13 @@ with open("model.bin", "wb") as f:
 # Test model
 test_input = np.array([
     [1.0, 2.0, 3.0],
-    [1.0, 2.0, 3.0],
-    [1.0, 2.0, 3.0]
     ], dtype=np.float32)
 test_tensor = torch.tensor(test_input, dtype=torch.float32)
 
 output = model.forward(test_tensor)
-print("model result:")
-print(output)
+print("input:")
+print(test_input)
 
-print("raw result:")
-print(test_input @ w1.T + b1)
+print("output:")
+# print(test_input @ w1.T + b1)
+print(output)

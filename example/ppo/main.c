@@ -9,21 +9,7 @@
 // extern char _binary_test_end[];
 
 
-// http://elm-chan.org/junk/32bit/binclude.html
-#define IMPORT_BIN(section, filename, symbol) asm (\
-    ".section "#section"\n"                   /* Change section */\
-    ".balign 4\n"                             /* Word alignment */\
-    ".global "#symbol"\n"                     /* Export the object address */\
-    ".global "#symbol"_start\n"               /* Export the object address */\
-    #symbol"_start:\n"                         /* Define the object label */\
-    #symbol":\n"                              /* Define the object label */\
-    ".incbin \""filename"\"\n"                /* Import the file */\
-    ".global "#symbol"_end\n"                 /* Export the object address */\
-    #symbol"_end:\n"                          /* Define the object label */\
-    ".balign 4\n"                             /* Word alignment */\
-    ".section \".text\"\n")                   /* Restore section */
-
-IMPORT_BIN(".rodata", "../hack_policy.bin", externdata);
+INCLUDE_FILE(".rodata", "../hack_policy.bin", externdata);
 
 
 
