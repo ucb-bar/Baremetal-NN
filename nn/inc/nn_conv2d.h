@@ -2,6 +2,7 @@
 #define __NN_CONV2D_H
 
 #include <assert.h>
+#include <string.h>
 
 #include "nn_tensor.h"
 
