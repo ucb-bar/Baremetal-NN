@@ -4,7 +4,7 @@
 void NN_BatchNorm2d_F32(
   Tensor *out, Tensor *in, 
   Tensor *weight, Tensor *bias,
-  float eps, float momentum, Tensor *running_mean, Tensor *running_var) {
+  float eps, Tensor *running_mean, Tensor *running_var) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);

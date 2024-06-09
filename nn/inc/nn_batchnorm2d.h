@@ -15,14 +15,13 @@
  * @param weight: the learnable weights of the module of shape (channels), or NULL if no weight is applied
  * @param bias: the learnable bias of the module of shape (channels), or NULL if no bias is applied
  * @param eps: a value added to the denominator for numerical stability
- * @param momentum: the value used for the running_mean and running_var computation
  * @param running_mean: the running mean of the module of shape (channels), or NULL if no running mean is applied
  * @param running_var: the running variance of the module of shape (channels), or NULL if no running variance is applied
  */
 void NN_BatchNorm2d_F32(
     Tensor *out, Tensor *in,
     Tensor *weight, Tensor *bias,
-    float eps, float momentum, Tensor *running_mean, Tensor *running_va
+    float eps, Tensor *running_mean, Tensor *running_va
     );
 
 
