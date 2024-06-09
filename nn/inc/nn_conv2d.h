@@ -18,8 +18,13 @@
  * @param kernel_size: size of the convolution kernel
  * @param stride: stride for the cross-correlation
  * @param padding: the amount of padding applied to the input
+ * @param groups: number of blocked connections from input channels to output channels
  */
-void NN_Conv2d_F32(Tensor *out, Tensor *in, Tensor *weight, Tensor *bias, size_t *kernel_size, size_t *stride, size_t *padding);
+void NN_Conv2d_F32(
+  Tensor *out, Tensor *in, 
+  Tensor *weight, Tensor *bias, 
+  size_t *kernel_size, size_t *stride, size_t *padding, size_t groups
+  );
 
 
 #endif // __NN_CONV2D_H

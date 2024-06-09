@@ -68,7 +68,7 @@ void forward(Model *model) {
   NN_Conv2d_F32(
     model->conv1_out, model->input,
     model->conv1_weight, NULL,
-    (size_t[]){3, 3}, (size_t[]){1, 1}, (size_t[]){1, 1}
+    (size_t[]){3, 3}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1
     );
   NN_BatchNorm2d_F32(
     model->batchnorm1_out, model->conv1_out,
