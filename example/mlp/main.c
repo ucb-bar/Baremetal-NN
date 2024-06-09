@@ -11,7 +11,7 @@
 
 #include "nn.h"
 
-#define DIM   3
+#define DIM   16
 
 
 // load the weight data block from the model.bin file
@@ -24,6 +24,12 @@ typedef struct {
   Tensor *input;
   Tensor *fc1_weight;
   Tensor *fc1_bias;
+  Tensor *fc1_out;
+  Tensor *fc2_weight;
+  Tensor *fc2_bias;
+  Tensor *fc2_out;
+  Tensor *fc3_weight;
+  Tensor *fc3_bias;
   Tensor *output;
 } Model;
 
@@ -32,27 +38,43 @@ typedef struct {
  */
 void init(Model *model) {
   uint8_t *array_pointer = weights_data;
+  
+  model->input = NN_ones(2, (size_t[]){1, DIM}, DTYPE_F32);
 
-  model->input = NN_tensor(2, (size_t[]){1, DIM}, DTYPE_F32, NULL);
   model->fc1_weight = NN_tensor(2, (size_t[]){DIM, DIM}, DTYPE_F32, array_pointer);
   array_pointer += DIM * DIM * sizeof(float);
   model->fc1_bias = NN_tensor(2, (size_t[]){1, DIM}, DTYPE_F32, array_pointer);
   array_pointer += DIM * sizeof(float);
+  model->fc1_out = NN_tensor(2, (size_t[]){1, DIM}, DTYPE_F32, NULL);
+
+  model->fc2_weight = NN_tensor(2, (size_t[]){DIM, DIM}, DTYPE_F32, array_pointer);
+  array_pointer += DIM * DIM * sizeof(float);
+  model->fc2_bias = NN_tensor(2, (size_t[]){1, DIM}, DTYPE_F32, array_pointer);
+  array_pointer += DIM * sizeof(float);
+  model->fc2_out = NN_tensor(2, (size_t[]){1, DIM}, DTYPE_F32, NULL);
+
+  model->fc3_weight = NN_tensor(2, (size_t[]){DIM, DIM}, DTYPE_F32, array_pointer);
+  array_pointer += DIM * DIM * sizeof(float);
+  model->fc3_bias = NN_tensor(2, (size_t[]){1, DIM}, DTYPE_F32, array_pointer);
+  array_pointer += DIM * sizeof(float);
 
   model->output = NN_tensor(2, (size_t[]){1, DIM}, DTYPE_F32, NULL);
 
-  printf("fc1_weight: \n");
-  NN_printf(model->fc1_weight);
-  printf("fc1_bias: \n");
-  NN_printf(model->fc1_bias);
+  // printf("fc1_weight: \n");
+  // NN_printf(model->fc1_weight);
+  // printf("fc1_bias: \n");
+  // NN_printf(model->fc1_bias);
 }
 
 /**
  * Forward pass of the model
  */
 void forward(Model *model) {
-  NN_linear_F32(model->output, model->input, model->fc1_weight, model->fc1_bias);
-  NN_relu_F32(model->output, model->output);
+  NN_Linear_F32(model->fc1_out, model->input, model->fc1_weight, model->fc1_bias);
+  NN_ReLU_F32(model->fc1_out, model->fc1_out);
+  NN_Linear_F32(model->fc2_out, model->input, model->fc2_weight, model->fc2_bias);
+  NN_ReLU_F32(model->fc2_out, model->fc2_out);
+  NN_Linear_F32(model->output, model->input, model->fc3_weight, model->fc3_bias);
 }
 
 int main() {
@@ -62,10 +84,6 @@ int main() {
   Model *model = malloc(sizeof(Model));
   
   init(model);
-  
-  ((float *)model->input->data)[0] = 1.;
-  ((float *)model->input->data)[1] = 2.;
-  ((float *)model->input->data)[2] = 3.;
 
   forward(model);
   
