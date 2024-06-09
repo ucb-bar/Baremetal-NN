@@ -18,7 +18,7 @@
  * @param y: the output tensor of shape (1, out_features)
  * @param x: tnput tensor of shape (1, in_features)
  * @param w: weight tensor of shape (out_features, in_features)
- * @param b: bias tensor of shape (1, out_features)
+ * @param b: bias tensor of shape (1, out_features), or NULL if no bias is applied
  */
 void NN_Linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
 

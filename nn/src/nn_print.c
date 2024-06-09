@@ -129,46 +129,51 @@ void NN_printf(Tensor *tensor) {
       break;
 
     case 4:
-      for (size_t i=0; i<tensor->shape[0]; i+=1) {
-        if (i != 0) {
+      for (size_t n = 0; n < tensor->shape[0]; n += 1) {
+        if (n != 0) {
           printf("\n");
         }
         printf("[");
-        for (size_t j=0; j<tensor->shape[1]; j+=1) {
-          if (j != 0) {
+        for (size_t c = 0; c < tensor->shape[1]; c += 1) {
+          if (c != 0) {
             printf(" ");
           }
           printf("[");
-          for (size_t k=0; k<tensor->shape[2]; k+=1) {
-            if (k != 0) {
+          for (size_t h = 0; h < tensor->shape[2]; h += 1) {
+            if (h != 0) {
               printf(" ");
             }
             printf("[");
-            for (size_t l=0; l<tensor->shape[3]; l+=1) {
+            for (size_t w = 0; w < tensor->shape[3]; w += 1) {
               switch (tensor->dtype) {
                 case DTYPE_I8:
-                  printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + j*tensor->shape[2]*tensor->shape[3] + k*tensor->shape[3] + l));
+                  printf("%d", *((int8_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w));
                   break;
                 case DTYPE_I32:
-                  printf("%ld", *((int32_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + j*tensor->shape[2]*tensor->shape[3] + k*tensor->shape[3] + l));
+                  printf("%ld", *((int32_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w));
                   break;
                 case DTYPE_F32:
-                  NN_printFloat(*((float *)tensor->data + i*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + j*tensor->shape[2]*tensor->shape[3] + k*tensor->shape[3] + l), 4);
+                  NN_printFloat(*((float *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w), 4);
                   break;
               }
-              if (l < tensor->shape[3]-1) {
+              if (w < tensor->shape[3]-1) {
                 printf(" ");
               }
             }
             printf("]");
+            if (h < tensor->shape[2]-1) {
+              printf("\n");
+            }
           }
           printf("]");
+          if (c < tensor->shape[1]-1) {
+            printf("\n\n");
+          }
         }
         printf("]");
       }
       break;
   }
       
-  printf("]");
-  printf("\n");
+  printf("]\n");
 }

@@ -9,6 +9,7 @@ set(SOURCES
   src/nn_tensor.c
   src/nn_print.c
   src/add/nn_add.c
+  src/conv2d/nn_conv2d.c
   src/copy/nn_copy.c
   src/linear/nn_linear.c
   src/matmul/nn_matmul.c

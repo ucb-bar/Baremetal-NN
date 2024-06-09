@@ -6,6 +6,7 @@
 #include "nn_tensor.h"
 #include "nn_print.h"
 #include "nn_add.h"
+#include "nn_conv2d.h"
 #include "nn_copy.h"
 #include "nn_linear.h"
 #include "nn_matmul.h"
