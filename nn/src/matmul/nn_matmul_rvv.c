@@ -17,8 +17,8 @@ void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
 
   vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
 
-  for (size_t i = 0; i < a->shape[0]; i += 1) {
-    for (size_t j = 0; j < b->shape[1]; j += 1) {
+  for (size_t i = 0; i < out->shape[0]; i += 1) {
+    for (size_t j = 0; j < out->shape[1]; j += 1) {
       
       size_t k = a->shape[1];
       float *a_ptr = ((float *)a->data) + i * k;
@@ -42,7 +42,7 @@ void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
   }  
 }
 
-void NN_matmult_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
+void NN_matmulT_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
   // currently only support 2D matrix multiplication
   assert(a->ndim == 2);
   assert(b->ndim == 2);
@@ -57,8 +57,8 @@ void NN_matmult_F32_RVV(Tensor *out, Tensor *a, Tensor *b) {
 
   vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
 
-  for (size_t i = 0; i < a->shape[0]; i += 1) {
-    for (size_t j = 0; j < b->shape[1]; j += 1) {
+  for (size_t i = 0; i < out->shape[0]; i += 1) {
+    for (size_t j = 0; j < out->shape[1]; j += 1) {
       
       size_t k = a->shape[1];
       float *a_ptr = ((float *)a->data) + i * k;

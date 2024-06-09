@@ -28,8 +28,8 @@ void NN_matmul_F32(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0]);
   assert(out->shape[1] == b->shape[1]);
 
-  for (size_t i = 0; i < a->shape[0]; i += 1) {
-    for (size_t j = 0; j < b->shape[1]; j += 1) {
+  for (size_t i = 0; i < out->shape[0]; i += 1) {
+    for (size_t j = 0; j < out->shape[1]; j += 1) {
       float sum = 0;
       for (size_t k = 0; k < a->shape[1]; k += 1) {
         sum += ((float *)a->data)[i * a->shape[1] + k] * ((float *)b->data)[k * b->shape[1] + j];
@@ -39,7 +39,7 @@ void NN_matmul_F32(Tensor *out, Tensor *a, Tensor *b) {
   }
 }
 
-void NN_matmult_F32(Tensor *out, Tensor *a, Tensor *b) {
+void NN_matmulT_F32(Tensor *out, Tensor *a, Tensor *b) {
   // currently only support 2D matrix multiplication
   assert(a->ndim == 2);
   assert(b->ndim == 2);
@@ -50,8 +50,8 @@ void NN_matmult_F32(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0]);
   assert(out->shape[1] == b->shape[0]);
 
-  for (size_t i = 0; i < a->shape[0]; i += 1) {
-    for (size_t j = 0; j < b->shape[1]; j += 1) {
+  for (size_t i = 0; i < out->shape[0]; i += 1) {
+    for (size_t j = 0; j < out->shape[1]; j += 1) {
       float sum = 0;
       for (size_t k = 0; k < a->shape[1]; k += 1) {
         sum += ((float *)a->data)[i * a->shape[1] + k] * ((float *)b->data)[j * b->shape[1] + k];
@@ -72,8 +72,8 @@ void NN_matmul_I8_I8_I32(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0]);
   assert(out->shape[1] == b->shape[1]);
   
-  for (size_t i = 0; i < a->shape[0]; i += 1) {
-    for (size_t j = 0; j < b->shape[1]; j += 1) {
+  for (size_t i = 0; i < out->shape[0]; i += 1) {
+    for (size_t j = 0; j < out->shape[1]; j += 1) {
       int32_t sum = 0;
       for (size_t k = 0; k < a->shape[1]; k += 1) {
         sum += ((int8_t *)a->data)[i * a->shape[1] + k] * ((int8_t *)b->data)[k * b->shape[1] + j];
@@ -94,8 +94,8 @@ void NN_matmul_I32(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0]);
   assert(out->shape[1] == b->shape[1]);
   
-  for (size_t i = 0; i < a->shape[0]; i += 1) {
-    for (size_t j = 0; j < b->shape[1]; j += 1) {
+  for (size_t i = 0; i < out->shape[0]; i += 1) {
+    for (size_t j = 0; j < out->shape[1]; j += 1) {
       int32_t sum = 0;
       for (size_t k = 0; k < a->shape[1]; k += 1) {
         sum += ((int32_t *)a->data)[i * a->shape[1] + k] * ((int32_t *)b->data)[k * b->shape[1] + j];

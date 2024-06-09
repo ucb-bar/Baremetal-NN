@@ -1,5 +1,5 @@
-#ifndef __NN_LINEAR_H
-#define __NN_LINEAR_H
+#ifndef __NN_Linear_H
+#define __NN_Linear_H
 
 #include <assert.h>
 
@@ -20,8 +20,8 @@
  * @param w Weight tensor of shape (out_features, in_features)
  * @param b Bias tensor of shape (1, out_features)
  */
-void NN_linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
+void NN_Linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
 
-void NN_linear_F32_RVV(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
+void NN_Linear_F32_RVV(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
 
-#endif // __NN_LINEAR_H
+#endif // __NN_Linear_H
