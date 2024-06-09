@@ -24,11 +24,11 @@ void NN_BatchNorm2d_F32(
   float *var = (float *)malloc(channels * sizeof(float));
 
   // Calculate mean
-  for (size_t c = 0; c < channels; ++c) {
+  for (size_t c = 0; c < channels; c += 1) {
     mean[c] = 0.0;
-    for (size_t b = 0; b < batch_size; ++b) {
-      for (size_t h = 0; h < height; ++h) {
-        for (size_t w = 0; w < width; ++w) {
+    for (size_t b = 0; b < batch_size; b += 1) {
+      for (size_t h = 0; h < height; h += 1) {
+        for (size_t w = 0; w < width; w += 1) {
           size_t index = b * channels * height * width + c * height * width + h * width + w;
           mean[c] += ((float *)in->data)[index];
         }
@@ -38,11 +38,11 @@ void NN_BatchNorm2d_F32(
   }
 
   // Calculate variance
-  for (size_t c = 0; c < channels; ++c) {
+  for (size_t c = 0; c < channels; c += 1) {
     var[c] = 0.0;
-    for (size_t b = 0; b < batch_size; ++b) {
-      for (size_t h = 0; h < height; ++h) {
-        for (size_t w = 0; w < width; ++w) {
+    for (size_t b = 0; b < batch_size; b += 1) {
+      for (size_t h = 0; h < height; h += 1) {
+        for (size_t w = 0; w < width; w += 1) {
           size_t index = b * channels * height * width + c * height * width + h * width + w;
           var[c] += pow(((float *)in->data)[index] - mean[c], 2);
         }
@@ -52,16 +52,16 @@ void NN_BatchNorm2d_F32(
   }
 
   // Update running mean and variance
-  for (size_t c = 0; c < channels; ++c) {
+  for (size_t c = 0; c < channels; c += 1) {
     ((float *)running_mean->data)[c] = momentum * ((float *)running_mean->data)[c] + (1 - momentum) * mean[c];
     ((float *)running_var->data)[c] = momentum * ((float *)running_var->data)[c] + (1 - momentum) * var[c];
   }
 
   // Normalize, scale, and shift
-  for (size_t b = 0; b < batch_size; ++b) {
-    for (size_t c = 0; c < channels; ++c) {
-      for (size_t h = 0; h < height; ++h) {
-        for (size_t w = 0; w < width; ++w) {
+  for (size_t b = 0; b < batch_size; b += 1) {
+    for (size_t c = 0; c < channels; c += 1) {
+      for (size_t h = 0; h < height; h += 1) {
+        for (size_t w = 0; w < width; w += 1) {
           size_t index = b * channels * height * width + c * height * width + h * width + w;
           ((float *)out->data)[index] = ((float *)weight->data)[c] * 
                                         (((float *)in->data)[index] - mean[c]) / 
