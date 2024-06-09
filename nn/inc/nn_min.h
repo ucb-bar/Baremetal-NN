@@ -16,6 +16,7 @@ float NN_min(Tensor *tensor);
 
 float NN_min_F32(Tensor *tensor);
 
+
 float NN_min_F32_RVV(Tensor *tensor);
 
 

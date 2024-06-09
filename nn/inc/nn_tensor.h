@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #define MAX_DIMS            4
 
@@ -74,28 +75,57 @@ static inline const char *NN_getDataTypeName(DataType dtype) {
   }
 }
 
+/**
+ * Returns if the tensor is a scalar
+ * 
+ * A scalar is a 1D tensor with a single element, i.e., shape = (1, )
+ * 
+ * @param tensor: the target tensor
+ */
 static inline uint8_t NN_isScalar(Tensor *tensor) {
   return tensor->ndim == 1 && tensor->shape[0] == 1;
 }
 
+/**
+ * Returns if the tensor is a vector
+ * 
+ * @param tensor: the target tensor
+ */
 static inline uint8_t NN_isVector(Tensor *tensor) {
   return tensor->ndim == 1;
 }
 
+/**
+ * Returns if the tensor is a matrix
+ * 
+ * @param tensor: the target tensor
+ */
 static inline uint8_t NN_isMatrix(Tensor *tensor) {
   return tensor->ndim == 2;
 }
 
+/**
+ * Returns if the tensor is a 3D tensor
+ * 
+ * @param tensor: the target tensor
+ */
 static inline uint8_t NN_is3D(Tensor *tensor) {
   return tensor->ndim == 3;
 }
 
+/**
+ * Returns if the tensor is a 4D tensor
+ * 
+ * @param tensor: the target tensor
+ */
 static inline uint8_t NN_is4D(Tensor *tensor) {
   return tensor->ndim == 4;
 }
 
 /**
  * Frees the memory allocated for the tensor data
+ * 
+ * @param tensor: the target tensor
  */
 static inline void NN_freeTensorData(Tensor *tensor) {
   free(tensor->data);
@@ -103,10 +133,43 @@ static inline void NN_freeTensorData(Tensor *tensor) {
 
 /**
  * Frees the memory allocated for the tensor
+ * 
+ * @param tensor: the target tensor
  */
 static inline void NN_deleteTensor(Tensor *tensor) {
   free(tensor);
 }
+
+/**
+ * Fills the tensor with the specified value.
+ * 
+ * @param tensor: the input tensor
+ * @param value: scalar value
+ */
+static inline void NN_fill_F32(Tensor *tensor, float value) {
+  assert(tensor->dtype == DTYPE_F32);
+  
+  for (size_t i = 0; i < tensor->size; i += 1) {
+    ((float *)tensor->data)[i] = value;
+  }
+}
+
+static inline void NN_fill_I32(Tensor *tensor, int32_t value) {
+  assert(tensor->dtype == DTYPE_I32);
+  
+  for (size_t i = 0; i < tensor->size; i += 1) {
+    ((int32_t *)tensor->data)[i] = value;
+  }
+}
+
+static inline void NN_fill_I8(Tensor *tensor, int8_t value) {
+  assert(tensor->dtype == DTYPE_I8);
+  
+  for (size_t i = 0; i < tensor->size; i += 1) {
+    ((int8_t *)tensor->data)[i] = value;
+  }
+}
+
 
 /**
  * Initialize a given tensor

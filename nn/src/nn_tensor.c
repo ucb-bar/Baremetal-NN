@@ -38,19 +38,13 @@ Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype) {
 
   switch (dtype) {
     case DTYPE_I8:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((int8_t *)t->data)[i] = 0;
-      }
+      NN_fill_I8(t, 0);
       break;
     case DTYPE_I32:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((int32_t *)t->data)[i] = 0;
-      }
+      NN_fill_I32(t, 0);
       break;
     case DTYPE_F32:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((float *)t->data)[i] = 0;
-      }
+      NN_fill_F32(t, 0);
       break;
     default:
       printf("[WARNING] Unsupported data type: %d\n", dtype);
@@ -64,19 +58,13 @@ Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype) {
 
   switch (dtype) {
     case DTYPE_I8:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((int8_t *)t->data)[i] = 1;
-      }
+      NN_fill_I8(t, 1);
       break;
     case DTYPE_I32:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((int32_t *)t->data)[i] = 1;
-      }
+      NN_fill_I32(t, 1);
       break;
     case DTYPE_F32:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((float *)t->data)[i] = 1;
-      }
+      NN_fill_F32(t, 1);
       break;
     default:
       printf("[WARNING] Unsupported data type: %d\n", dtype);

@@ -144,9 +144,9 @@ int main() {
     Tensor *D = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
     
     printf("mulf:\t\t");
-    NN_mul_F32(C, A, 10.0f);
+    NN_multiply_F32(C, A, 10.0f);
     cycles = READ_CSR("mcycle");
-    NN_mul_F32_RVV(D, A, 10.0f);
+    NN_multiply_F32_RVV(D, A, 10.0f);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(C->data, D->data, M, N) ? "PASS" : "FAIL", cycles);
 
@@ -210,7 +210,24 @@ int main() {
 
   // matneg
   {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
+    printf("cwiseneg:\t");
+    NN_neg_F32(golden, A);
+    cycles = READ_CSR("mcycle");
+    NN_neg_F32_RVV(actual, A);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
   }
 
   // matcopy
@@ -220,22 +237,99 @@ int main() {
 
   // cwiseabs
   {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
+    printf("cwiseabs:\t");
+    NN_abs_F32(golden, A);
+    cycles = READ_CSR("mcycle");
+    NN_abs_F32_RVV(actual, A);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
   }
 
   // cwisemin
   {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *B = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
+    printf("cwiseminimum:\t");
+    NN_minimum_F32(golden, A, B);
+    cycles = READ_CSR("mcycle");
+    NN_minimum_F32_RVV(actual, A, B);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+    NN_freeTensorData(B);
+    NN_deleteTensor(B);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
   }
 
   // cwisemax
   {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *B = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
+    printf("cwisemaximum:\t");
+    NN_maximum_F32(golden, A, B);
+    cycles = READ_CSR("mcycle");
+    NN_maximum_F32_RVV(actual, A, B);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+    NN_freeTensorData(B);
+    NN_deleteTensor(B);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
   }
 
   // cwisemul
   {
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *B = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    Tensor *golden = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
+    Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
+    printf("matadd:\t\t");
+    NN_mul_F32(golden, A, B);
+    cycles = READ_CSR("mcycle");
+    NN_mul_F32_RVV(actual, A, B);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
+
+    NN_freeTensorData(A);
+    NN_deleteTensor(A);
+    NN_freeTensorData(B);
+    NN_deleteTensor(B);
+
+    NN_freeTensorData(golden);
+    NN_deleteTensor(golden);
+    NN_freeTensorData(actual);
+    NN_deleteTensor(actual);
   }
 
   // matset
@@ -248,9 +342,15 @@ int main() {
 
   }
 
-  // matNOrm
+  // matnorm
   {
-
+    Tensor *A = NN_rand(2, (size_t[]){M, N}, DTYPE_F32);
+    printf("matnorm:\t");
+    float norm_cpu = NN_matrixNorm_F32(A);
+    cycles = READ_CSR("mcycle");
+    float norm_actual = NN_matrixNorm_F32_RVV(A);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", float_eq(norm_cpu, norm_actual, 1e-6) ? "PASS" : "FAIL", cycles);
   }
 
   // transpose

@@ -8,16 +8,22 @@ set(INCLUDES
 set(SOURCES
   src/nn_tensor.c
   src/nn_print.c
+  src/abs/nn_abs.c
   src/add/nn_add.c
   src/batchnorm2d/nn_batchnorm2d.c
   src/conv2d/nn_conv2d.c
   src/copy/nn_copy.c
   src/linear/nn_linear.c
   src/matmul/nn_matmul.c
+  src/matrixnorm/nn_matrixnorm.c
   src/max/nn_max.c
+  src/maximum/nn_maximum.c
   src/maxpool2d/nn_maxpool2d.c
   src/min/nn_min.c
+  src/minimum/nn_minimum.c
   src/mul/nn_mul.c
+  src/multiply/nn_multiply.c
+  src/neg/nn_neg.c
   src/relu/nn_relu.c
   src/relu6/nn_relu6.c
   src/sub/nn_sub.c
@@ -26,12 +32,18 @@ set(SOURCES
 )
 
 set(RVV_SOURCE
+  src/abs/nn_abs_rvv.c
   src/add/nn_add_rvv.c
   src/linear/nn_linear_rvv.c
   src/matmul/nn_matmul_rvv.c
+  src/matrixnorm/nn_matrixnorm_rvv.c
   src/max/nn_max_rvv.c
+  src/maximum/nn_maximum_rvv.c
   src/min/nn_min_rvv.c
+  src/minimum/nn_minimum_rvv.c
   src/mul/nn_mul_rvv.c
+  src/multiply/nn_multiply_rvv.c
+  src/neg/nn_neg_rvv.c
   src/sub/nn_sub_rvv.c
 )
 

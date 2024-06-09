@@ -1,7 +1,8 @@
 
-#include "nn_mul.h"
+#include "nn_maximum.h"
 
-void NN_mul_F32(Tensor *out, Tensor *a, Tensor *b) {
+
+void NN_maximum_F32(Tensor *out, Tensor *a, Tensor *b) {
   assert(b->ndim == a->ndim);
   assert(out->ndim == a->ndim);
   assert(a->dtype == DTYPE_F32);
@@ -11,7 +12,8 @@ void NN_mul_F32(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->size == a->size);
   
   for (size_t i = 0; i < out->size; i += 1) {
-    ((float *)out->data)[i] = ((float *)a->data)[i] * ((float *)b->data)[i];
+    float a_val = ((float *)a->data)[i];
+    float b_val = ((float *)b->data)[i];
+    ((float *)out->data)[i] = a_val > b_val ? a_val : b_val;
   }
 }
-
