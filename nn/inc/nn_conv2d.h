@@ -1,10 +1,9 @@
-#ifndef __NN_MAXPOOL2D_H
-#define __NN_MAXPOOL2D_H
+#ifndef __NN_CONV2D_H
+#define __NN_CONV2D_H
 
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "nn_max.h"
 
 
 /**
@@ -23,4 +22,4 @@
 void NN_Conv2d_F32(Tensor *out, Tensor *in, Tensor *weight, Tensor *bias, size_t *kernel_size, size_t *stride, size_t *padding);
 
 
-#endif // __NN_MAXPOOL2D_H
+#endif // __NN_CONV2D_H
