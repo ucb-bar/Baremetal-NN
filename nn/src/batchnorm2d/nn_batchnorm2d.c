@@ -23,16 +23,14 @@ void NN_BatchNorm2d_F32(
   float *var;
 
   // Temporary tensors to hold mean and variance for each channel
-  if (running_mean == NULL) {
-    mean = malloc(channels * sizeof(float));
-    var = malloc(channels * sizeof(float));
-  }
-  else {
+  if (running_mean != NULL) {
     mean = running_mean->data;
     var = running_var->data;
   }
+  else {
+    mean = malloc(channels * sizeof(float));
+    var = malloc(channels * sizeof(float));
 
-  if (running_mean == NULL) {
     // Calculate mean
     for (size_t c = 0; c < channels; c += 1) {
       mean[c] = 0.0;
