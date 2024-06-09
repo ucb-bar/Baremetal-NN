@@ -14,7 +14,7 @@
  * @param in - input tensor of shape (batch_size, channels, pooled_height, pooled_width)
  * @param kernel_size - size of the pooling window
  */
-void NN_maxpool2D_F32(Tensor *out, Tensor *in, size_t *kernel_size);
+void NN_MaxPool2d_F32(Tensor *out, Tensor *in, size_t *kernel_size);
 
 
 #endif // __NN_MAXPOOL2D_H
