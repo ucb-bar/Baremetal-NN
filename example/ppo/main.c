@@ -78,13 +78,13 @@ void init(Model *model) {
 }
 
 void forward(Model *model) {
-  NN_linear_F32(&model->fc1_out, &model->input, &model->fc1_weight, &model->fc1_bias);
+  NN_Linear_F32(&model->fc1_out, &model->input, &model->fc1_weight, &model->fc1_bias);
   NN_elu_F32(&model->fc1_out, &model->fc1_out, 1.0);
-  NN_linear_F32(&model->fc2_out, &model->fc1_out, &model->fc2_weight, &model->fc2_bias);
+  NN_Linear_F32(&model->fc2_out, &model->fc1_out, &model->fc2_weight, &model->fc2_bias);
   NN_elu_F32(&model->fc2_out, &model->fc2_out, 1.0);
-  NN_linear_F32(&model->fc3_out, &model->fc2_out, &model->fc3_weight, &model->fc3_bias);
+  NN_Linear_F32(&model->fc3_out, &model->fc2_out, &model->fc3_weight, &model->fc3_bias);
   NN_elu_F32(&model->fc3_out, &model->fc3_out, 1.0);
-  NN_linear_F32(&model->output, &model->fc3_out, &model->fc4_weight, &model->fc4_bias);
+  NN_Linear_F32(&model->output, &model->fc3_out, &model->fc4_weight, &model->fc4_bias);
 }
 
 int main() {

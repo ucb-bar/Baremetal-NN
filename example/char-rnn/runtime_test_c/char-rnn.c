@@ -57,7 +57,7 @@ int main() {
     
     for (int j=1; j<strlen(str); j+=1) {
       encodeOneHot(&input, str[j]);
-      NN_linear(&hidden, &i2h_weight_transposed, &i2h_bias, &input);
+      NN_Linear(&hidden, &i2h_weight_transposed, &i2h_bias, &input);
 
       forward(&output, &hidden, &input);
     }

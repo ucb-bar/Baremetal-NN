@@ -55,7 +55,7 @@ Tensor {self.name}_bias = NN_tensor(2, (size_t[]){{ 1, {self.output_size} }}, {s
 
     def getCForward(self, last_layer):
         # return f"NN_forward_linear({self.name}_out, {self.name}_in, {self.name}_weight, {self.name}_bias);"
-        return f"NN_linear_F32(&{self.name}_out, &{last_layer}, &{self.name}_weight, &{self.name}_bias);"
+        return f"NN_Linear_F32(&{self.name}_out, &{last_layer}, &{self.name}_weight, &{self.name}_bias);"
 
 
 

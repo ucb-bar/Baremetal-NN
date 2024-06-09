@@ -180,10 +180,10 @@ class CodeConverter:
 
                 if target == CodeConverter.Target.Numpy:
                     model_code += INDENT+"# Linear\n"
-                    model_code += INDENT+"{layer_name}_out = nn_linear({prev_layer_name}_out, {layer_name}_weight_transposed, {layer_name}_bias)\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
+                    model_code += INDENT+"{layer_name}_out = NN_Linear({prev_layer_name}_out, {layer_name}_weight_transposed, {layer_name}_bias)\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
                 elif target == CodeConverter.Target.C:
                     model_code += INDENT+"// Linear\n"
-                    model_code += INDENT+"NN_linear({layer_name}_out, {layer_name}_weight_transposed, {layer_name}_bias, {prev_layer_name}_out);\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
+                    model_code += INDENT+"NN_Linear({layer_name}_out, {layer_name}_weight_transposed, {layer_name}_bias, {prev_layer_name}_out);\n".format(layer_name=layer_name, prev_layer_name=prev_layer_name)
                 
             if type(module) == torch.nn.LogSoftmax:
                 if target == CodeConverter.Target.Numpy:

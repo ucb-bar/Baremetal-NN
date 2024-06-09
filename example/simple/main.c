@@ -50,7 +50,7 @@ void deinit(Tensor *A, Tensor *B, Tensor *C, Tensor *D) {
  * Forward pass of the model
  */
 void forward(Tensor *C, Tensor *A, Tensor *B, Tensor *D) {
-  NN_linear_F32(C, A, B, D);
+  NN_Linear_F32(C, A, B, D);
 }
 
 

@@ -28,9 +28,9 @@ Tensor fc3_out = NN_tensor(2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)fc3_out_da
 Tensor fc3_weight = NN_tensor(2, (size_t[]){ 20, 5 }, DTYPE_F32, (float *)fc3_weight_data);
 Tensor fc3_bias = NN_tensor(2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)fc3_bias_data);
 
-  // NN_linear_F32(&fc1_out, &input, &fc1_weight, &fc1_bias);
-  // NN_linear_F32(&fc2_out, &fc1_out, &fc2_weight, &fc2_bias);
-  // NN_linear_F32(&fc3_out, &fc2_out, &fc3_weight, &fc3_bias);
+  // NN_Linear_F32(&fc1_out, &input, &fc1_weight, &fc1_bias);
+  // NN_Linear_F32(&fc2_out, &fc1_out, &fc2_weight, &fc2_bias);
+  // NN_Linear_F32(&fc3_out, &fc2_out, &fc3_weight, &fc3_bias);
   return fc3_out;
 }
 
