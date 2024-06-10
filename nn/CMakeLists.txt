@@ -1,4 +1,5 @@
 
+option(AVX "Use AVX implementation" OFF)
 option(RVV "Use RISCV vector extension implementation" OFF)
 
 set(INCLUDES
@@ -31,6 +32,10 @@ set(SOURCES
   src/transpose/nn_transpose.c
 )
 
+set(AVX_SOURCE
+  src/abs/nn_abs_avx.c
+)
+
 set(RVV_SOURCE
   src/abs/nn_abs_rvv.c
   src/add/nn_add_rvv.c
@@ -46,6 +51,11 @@ set(RVV_SOURCE
   src/neg/nn_neg_rvv.c
   src/sub/nn_sub_rvv.c
 )
+
+if(AVX)
+  set(SOURCES ${SOURCES} ${AVX_SOURCE})
+  message(STATUS "Using AVX implementation")
+endif(AVX)
 
 if(RVV)
   set(SOURCES ${SOURCES} ${RVV_SOURCE})

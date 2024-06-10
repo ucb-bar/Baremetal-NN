@@ -20,6 +20,8 @@ void NN_abs(Tensor *out, Tensor *input);
 void NN_abs_F32(Tensor *out, Tensor *input);
 
 
+void NN_abs_F32_AVX(Tensor *out, Tensor *input);
+
 void NN_abs_F32_RVV(Tensor *out, Tensor *input);
 
 
