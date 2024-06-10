@@ -24,7 +24,6 @@ int main() {
   
   init(model);
 
-
   // NN_fill_F32(&model->x, 0.0);
   memcpy((uint8_t *)model->x.data, (uint8_t *)model_input_data, (size_t)model_input_end - (size_t)model_input_start);
 
@@ -32,11 +31,6 @@ int main() {
 
   forward(model);
   
-  // printf("input:\n");
-  // NN_printShape(model->input);
-  // printf("\n");
-  // NN_printf(model->input);
-
   printf("output:\n");
   NN_printf(&model->decode_conv6_2);
 
