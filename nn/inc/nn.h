@@ -10,6 +10,7 @@
 #include "nn_batchnorm2d.h"
 #include "nn_conv2d.h"
 #include "nn_copy.h"
+#include "nn_interpolate.h"
 #include "nn_linear.h"
 #include "nn_matmul.h"
 #include "nn_matrixnorm.h"

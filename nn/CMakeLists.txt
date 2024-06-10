@@ -14,6 +14,7 @@ set(SOURCES
   src/batchnorm2d/nn_batchnorm2d.c
   src/conv2d/nn_conv2d.c
   src/copy/nn_copy.c
+  src/interpolate/nn_interpolate.c
   src/linear/nn_linear.c
   src/matmul/nn_matmul.c
   src/matrixnorm/nn_matrixnorm.c

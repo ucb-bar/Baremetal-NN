@@ -1,3 +1,5 @@
+import operator
+
 import numpy as np
 import torch
 import torch.nn
@@ -30,11 +32,14 @@ class TorchConverter(torch.fx.Interpreter):
         self.model: torch.nn.Module = model
         self.gm: torch.fx.GraphModule = gm
 
+        # self.node_specs = [[n.op, n.name, n.target, n.args, n.kwargs] for n in self.graph.nodes]
+        self.node_info = {n.name: (n.args, n.kwargs) for n in self.graph.nodes}
+
         self.env = jinja2.Environment(
             loader=jinja2.FileSystemLoader("templates")
         )
 
-        self.model_template = self.env.get_template("model.c.in")
+        self.model_template = self.env.get_template("model.h.in")
 
         self.output_directory = "."
 
@@ -42,15 +47,10 @@ class TorchConverter(torch.fx.Interpreter):
         self.model_init = ""
         self.model_forward = ""
         self.weight_content = b""
-        self.model_struct += INDENT + "Tensor input;\n"
-        
-        self.prev_layer_out_name = "input"
-        
-        self.model_init += INDENT + "NN_initTensor(&model->{prev_layer_out_name}, {dim}, (size_t[]){shape}, DTYPE_F32, NULL);\n".format(
-            prev_layer_out_name=self.prev_layer_out_name,
-            dim=2,
-            shape=(1, 28*28)
-        )
+
+        # this is sooooo hacky
+        self.functional_counter = {}
+
         
     def print(self):
         self.gm.graph.print_tabular()
@@ -97,40 +97,72 @@ class TorchConverter(torch.fx.Interpreter):
             dim=len(shape),
             shape=", ".join(str(x) for x in shape)
         )
-        self.prev_layer_out_name = tensor_name
     
-    def addReLU(self, tensor_name):
-        self.model_forward += INDENT + "NN_ReLUInplace_F32(&model->{tensor_name});\n".format(
-            tensor_name=tensor_name,
-        )
-    
-    def addReLU6(self, tensor_name):
-        self.model_forward += INDENT + "NN_ReLU6Inplace_F32(&model->{tensor_name});\n".format(
-            tensor_name=tensor_name,
+    def placeholder(self, target, args, kwargs):
+        print("placeholder:", target)
+
+        # this is also hacky
+        
+        self.model_struct += INDENT + "Tensor {target};\n".format(target=target)
+        
+        self.model_init += INDENT + "NN_initTensor(&model->{target}, {dim}, (size_t[]){{{shape}}}, DTYPE_F32, NULL);\n".format(
+            target=target,
+            dim=len(self.example_input.shape),
+            shape=", ".join(str(x) for x in self.example_input.shape)
         )
 
+        return super().placeholder(target, args, kwargs)
+    
     def call_function(self, target, args, kwargs):
         # print("call function:", target)
 
-        if target == torch.nn.functional.relu:
-            self.model_forward += INDENT + "// F.relu\n"
-            self.addReLU(self.prev_layer_out_name)
+        count = self.functional_counter.get(target, 0)
+        self.functional_counter[target] = count + 1
+
+        if target == operator.__add__:
+            layer_name = "add_{count}".format(count=count) if count > 0 else "add"
+            self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
+            self.model_forward += INDENT + "NN_add_F32(&model->{layer_name}, &model->{input_names[0]}, &model->{input_names[1]});\n".format(
+                layer_name=layer_name,
+                input_names=self.node_info[layer_name][0]
+            )
+            self.addOutputTensor(layer_name, args[0].shape)
+        
+        elif target == torch.nn.functional.interpolate:
+            layer_name = "interpolate_{count}".format(count=count) if count > 0 else "interpolate"
+            self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
+            self.model_forward += INDENT + "NN_interpolate_F32(&model->{layer_name}, &model->{input_names[0]}, {scale_factor});\n".format(
+                layer_name=layer_name,
+                input_names=self.node_info[layer_name][0],
+                scale_factor=kwargs.get("scale_factor")
+            )
+            input_shape = args[0].shape
+            self.addOutputTensor(
+                layer_name, 
+                (
+                    input_shape[0], input_shape[1], 
+                    input_shape[2]*kwargs.get("scale_factor"), input_shape[3]*kwargs.get("scale_factor")
+                )
+            )
+        
+        elif target == torch.nn.functional.relu:
+            layer_name = "relu_{count}".format(count=count) if count > 0 else "relu"
+            self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
+            self.model_forward += INDENT + "NN_ReLU_F32(&model->{layer_name}, &model->{input_names[0]});\n".format(
+                layer_name=layer_name,
+                input_names=self.node_info[layer_name][0]
+            )
             
         elif target == torch.nn.functional.relu6:
-            self.model_forward += INDENT + "// F.relu6\n"
-            self.addReLU6(self.prev_layer_out_name)
-        
-        # elif target == torch.nn.functional.max_pool2d:
-        #     self.model_forward += INDENT + "// F.max_pool2d\n"
-        #     print("max_pool2d")
-        
-        # elif target == torch.flatten:
-        #     self.model_forward += INDENT + "// torch.flatten\n"
-        
+            layer_name = "relu6_{count}".format(count=count) if count > 0 else "relu6"
+            self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
+            self.model_forward += INDENT + "NN_ReLU6_F32(&model->{layer_name}, &model->{input_names[0]});\n".format(
+                layer_name=layer_name,
+                input_names=self.node_info[layer_name][0]
+            )
         else:
             print("[WARNING] Unsupported function call:", target)
             
-        
         self.model_forward += "\n"
 
         return super().call_function(target, args, kwargs)
@@ -144,6 +176,7 @@ class TorchConverter(torch.fx.Interpreter):
 
         module = self.getModule(target)
         layer_name = target.replace(".", "_")
+        input_names = self.node_info[layer_name][0]
         
         self.model_init += "\n"
         self.model_init += INDENT + "// {module}: {layer_name}\n".format(
@@ -165,13 +198,13 @@ class TorchConverter(torch.fx.Interpreter):
             
             batch_size = int(args[0].shape[0])
             self.addOutputTensor(
-                "{layer_name}_out".format(layer_name=layer_name), 
+                layer_name,
                 (batch_size, module.out_features)
                 )
             
-            self.model_forward += INDENT + "NN_Linear_F32(&model->{layer_name}_out, &model->{prev_layer_out_name}, {weight}, {bias});\n".format(
-                prev_layer_out_name=self.prev_layer_out_name,
+            self.model_forward += INDENT + "NN_Linear_F32(&model->{layer_name}, &model->{input_names}, {weight}, {bias});\n".format(
                 layer_name=layer_name,
+                input_names=input_names,
                 weight="&model->{layer_name}_weight".format(layer_name=layer_name),
                 bias="&model->{layer_name}_bias".format(layer_name=layer_name) if module.bias is not None else "NULL"
             )
@@ -200,13 +233,16 @@ class TorchConverter(torch.fx.Interpreter):
                 
             batch_size = int(args[0].shape[0])
             self.addOutputTensor(
-                "{layer_name}_out".format(layer_name=layer_name), 
+                layer_name, 
                 (batch_size, module.num_features, args[0].shape[2], args[0].shape[3])
                 )
             
-            self.model_forward += INDENT + "NN_BatchNorm2D_F32(&model->{layer_name}_out, &model->{prev_layer_out_name}, {weight}, {bias}, {running_mean}, {running_var}, {eps});\n".format(
-                prev_layer_out_name=self.prev_layer_out_name,
+            self.model_forward += INDENT + """NN_BatchNorm2d_F32(
+    &model->{layer_name}, &model->{input_name[0]},
+    {weight}, {bias}, 
+    {eps}, {running_mean}, {running_var});\n""".format(
                 layer_name=layer_name,
+                input_name=input_names,
                 weight="&model->{layer_name}_weight".format(layer_name=layer_name) if module.weight is not None else "NULL",
                 bias="&model->{layer_name}_bias".format(layer_name=layer_name) if module.bias is not None else "NULL",
                 running_mean="&model->{layer_name}_running_mean".format(layer_name=layer_name) if module.running_mean is not None else "NULL",
@@ -228,27 +264,36 @@ class TorchConverter(torch.fx.Interpreter):
             
             batch_size = int(args[0].shape[0])
             self.addOutputTensor(
-                "{layer_name}_out".format(layer_name=layer_name), 
-                (batch_size, module.out_channels, module.kernel_size[0], module.kernel_size[1])
+                layer_name, 
+                (batch_size, module.out_channels, args[0].shape[2]//module.stride[0], args[0].shape[3]//module.stride[1])
                 )
         
-            self.model_forward += INDENT + """NN_Conv2D_F32(
-    &model->{layer_name}_out, &model->{prev_layer_out_name},
-    {weight}, {bias}, (size_t[]){{{kernel_size}}}, (size_t[]){{{stride}}}, {groups});\n""".format(
-                prev_layer_out_name=self.prev_layer_out_name,
+            self.model_forward += INDENT + """NN_Conv2d_F32(
+    &model->{layer_name}, &model->{input_names[0]},
+    {weight}, {bias}, (size_t[]){{{stride}}}, (size_t[]){{{padding}}}, {groups});\n""".format(
                 layer_name=layer_name,
+                input_names=input_names,
                 weight="&model->{layer_name}_weight".format(layer_name=layer_name) if module.weight is not None else "NULL",
                 bias="&model->{layer_name}_bias".format(layer_name=layer_name) if module.bias is not None else "NULL",
-                kernel_size=", ".join(str(x) for x in module.kernel_size),
                 stride=", ".join(str(x) for x in module.stride),
+                padding=", ".join(str(x) for x in module.padding),
                 groups=module.groups
             )
+            self.prev_layer_name = "{layer_name}".format(layer_name=layer_name)
         
         elif type(module) == torch.nn.ReLU:
-            self.addReLU(self.prev_layer_out_name)
+            self.model_forward += INDENT + "NN_ReLU_F32(&model->{layer_name}, &model->{input_names[0]});\n".format(
+                layer_name=layer_name,
+                input_names=input_names
+            )
+            self.addOutputTensor(layer_name, args[0].shape)
         
         elif type(module) == torch.nn.ReLU6:
-            self.addReLU6(self.prev_layer_out_name)
+            self.model_forward += INDENT + "NN_ReLU6_F32(&model->{layer_name}, &model->{input_names[0]});\n".format(
+                layer_name=layer_name,
+                input_names=input_names
+            )
+            self.addOutputTensor(layer_name, args[0].shape)
 
         else:
             print("[WARNING] Unsupported module call:", target)
@@ -257,52 +302,238 @@ class TorchConverter(torch.fx.Interpreter):
         return super().call_module(target, args, kwargs)
 
     def convert(self, example_input):
+        self.example_input = example_input
         output = self.run(example_input)
 
         print("finished tracing the model")
         
-        with open("model.c", "w") as f:
+        with open("model.h", "w") as f:
             f.write(self.model_template.render(
                 model_struct=self.model_struct, 
                 model_init=self.model_init,
                 model_forward=self.model_forward
             ))
         
-        with open("weights.bin", "wb") as f:
+        with open("model.bin", "wb") as f:
             f.write(self.weight_content)
         
-
-
         return output
 
 
 
 
 if __name__ == "__main__":
+    import torch
     import torch.nn as nn
     import torch.nn.functional as F
+
+    torch.manual_seed(0)
 
 
     class MobileNetSkipAdd(nn.Module):
         def __init__(self):
-
-            convlayer = nn.Sequential(
-                    nn.Conv2d(3, 32, 3, 2, 1, bias=False),
-                    nn.BatchNorm2d(32),
-                    nn.ReLU6(inplace=True)
-                )
-
             super(MobileNetSkipAdd, self).__init__()
             self.conv0 = nn.Sequential(
-                convlayer
+                nn.Conv2d(3, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False),
+                nn.BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv1 = nn.Sequential(
+                nn.Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16, bias=False),
+                nn.BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(16, 56, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(56, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True)
+            )
+            self.conv2 = nn.Sequential(
+                nn.Conv2d(56, 56, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=56, bias=False),
+                nn.BatchNorm2d(56, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(56, 88, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(88, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv3 = nn.Sequential(
+                nn.Conv2d(88, 88, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=88, bias=False),
+                nn.BatchNorm2d(88, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(88, 120, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(120, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv4 = nn.Sequential(
+                nn.Conv2d(120, 120, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=120, bias=False),
+                nn.BatchNorm2d(120, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(120, 144, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv5 = nn.Sequential(
+                nn.Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False),
+                nn.BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(144, 256, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv6 = nn.Sequential(
+                nn.Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=256, bias=False),
+                nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(256, 408, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(408, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv7 = nn.Sequential(
+                nn.Conv2d(408, 408, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=408, bias=False),
+                nn.BatchNorm2d(408, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(408, 376, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(376, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv8 = nn.Sequential(
+                nn.Conv2d(376, 376, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=376, bias=False),
+                nn.BatchNorm2d(376, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(376, 272, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(272, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv9 = nn.Sequential(
+                nn.Conv2d(272, 272, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=272, bias=False),
+                nn.BatchNorm2d(272, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(272, 288, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(288, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv10 = nn.Sequential(
+                nn.Conv2d(288, 288, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=288, bias=False),
+                nn.BatchNorm2d(288, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(288, 296, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(296, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv11 = nn.Sequential(
+                nn.Conv2d(296, 296, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=296, bias=False),
+                nn.BatchNorm2d(296, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(296, 328, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(328, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv12 = nn.Sequential(
+                nn.Conv2d(328, 328, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=328, bias=False),
+                nn.BatchNorm2d(328, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(328, 480, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.conv13 = nn.Sequential(
+                nn.Conv2d(480, 480, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=480, bias=False),
+                nn.BatchNorm2d(480, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+                nn.Conv2d(480, 512, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU6(inplace=True),
+            )
+            self.decode_conv1 = nn.Sequential(
+                nn.Sequential(
+                    nn.Conv2d(512, 512, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=512, bias=False),
+                    nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+                nn.Sequential(
+                    nn.Conv2d(512, 200, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                    nn.BatchNorm2d(200, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+            )
+            self.decode_conv2 = nn.Sequential(
+                nn.Sequential(
+                    nn.Conv2d(200, 200, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=200, bias=False),
+                    nn.BatchNorm2d(200, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+                nn.Sequential(
+                    nn.Conv2d(200, 256, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                    nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+            )
+            self.decode_conv3 = nn.Sequential(
+                nn.Sequential(
+                    nn.Conv2d(256, 256, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=256, bias=False),
+                    nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+                nn.Sequential(
+                    nn.Conv2d(256, 120, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                    nn.BatchNorm2d(120, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+            )
+            self.decode_conv4 = nn.Sequential(
+                nn.Sequential(
+                    nn.Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False),
+                    nn.BatchNorm2d(120, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+                nn.Sequential(
+                    nn.Conv2d(120, 56, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                    nn.BatchNorm2d(56, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+            )
+            self.decode_conv5 = nn.Sequential(
+                nn.Sequential(
+                    nn.Conv2d(56, 56, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=56, bias=False),
+                    nn.BatchNorm2d(56, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+                nn.Sequential(
+                    nn.Conv2d(56, 16, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                    nn.BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                    nn.ReLU(inplace=True),
+                ),
+            )
+            self.decode_conv6 = nn.Sequential(
+                nn.Conv2d(16, 1, kernel_size=(1, 1), stride=(1, 1), bias=False),
+                nn.BatchNorm2d(1, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                nn.ReLU(inplace=True),
             )
 
         def forward(self, x):
-            x = self.conv0(x)
+            # skip connections: dec4: enc1
+            # dec 3: enc2 or enc3
+            # dec 2: enc4 or enc5
+            for i in range(14):
+                layer = getattr(self, 'conv{}'.format(i))
+                x = layer(x)
+                if i==1:
+                    x1 = x
+                elif i==3:
+                    x2 = x
+                elif i==5:
+                    x3 = x
+            for i in range(1,6):
+                layer = getattr(self, 'decode_conv{}'.format(i))
+                x = layer(x)
+                x = F.interpolate(x, scale_factor=2, mode='nearest')
+                if i==4:
+                    x = x + x1
+                elif i==3:
+                    x = x + x2
+                elif i==2:
+                    x = x + x3
+            x = self.decode_conv6(x)
             return x
         
-
-
     class Net(nn.Module):
         def __init__(self):
             super(Net, self).__init__()
@@ -346,8 +577,31 @@ if __name__ == "__main__":
     # Tracing the module
     m = MobileNetSkipAdd()
 
-    m.forward(torch.ones(1, 3, 32, 32))
+    m.load_state_dict(torch.load("mobilenet_skip_add.pth", map_location=torch.device('cpu')))
+    m.eval()
 
-    TorchConverter(m).print()
 
-    TorchConverter(m).convert(torch.ones(1, 3, 32, 32))
+
+    # TorchConverter(m).print()
+
+    # test_input = torch.zeros(1, 3, 224, 224)
+
+    import cv2
+
+    input_file = "../../example/cnn/visual_1.png"
+    img = cv2.imread(input_file)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    # convert to tensor
+    img = img.transpose((2, 0, 1)).astype(np.float32) / 255.0
+
+    test_input = torch.tensor(img).unsqueeze(0)
+
+    print(test_input)
+    
+    with torch.no_grad():
+        output = m.forward(test_input)
+        print(output)
+
+    output = TorchConverter(m).convert(test_input)
+    # print(output)
