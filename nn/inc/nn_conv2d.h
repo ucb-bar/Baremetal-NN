@@ -23,7 +23,7 @@
 void NN_Conv2d_F32(
   Tensor *out, Tensor *in, 
   Tensor *weight, Tensor *bias, 
-  size_t *stride, size_t *padding, size_t groups
+  const size_t *stride, const size_t *padding, size_t groups
   );
 
 

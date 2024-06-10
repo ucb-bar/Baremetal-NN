@@ -1,7 +1,7 @@
 
 #include "nn_interpolate.h"
 
-void NN_interpolate_F32(Tensor *out, Tensor *in, float *scale_factor/*const char* mode*/) {
+void NN_interpolate_F32(Tensor *out, Tensor *in, const float *scale_factor/*const char* mode*/) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);
