@@ -131,7 +131,7 @@ class TorchConverter(torch.fx.Interpreter):
         elif target == torch.nn.functional.interpolate:
             layer_name = "interpolate_{count}".format(count=count) if count > 0 else "interpolate"
             self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
-            self.model_forward += INDENT + "NN_interpolate_F32(&model->{layer_name}, &model->{input_names[0]}, {scale_factor});\n".format(
+            self.model_forward += INDENT + "NN_interpolate_F32(&model->{layer_name}, &model->{input_names[0]}, (float []){{{scale_factor}, {scale_factor}}});\n".format(
                 layer_name=layer_name,
                 input_names=self.node_info[layer_name][0],
                 scale_factor=kwargs.get("scale_factor")
