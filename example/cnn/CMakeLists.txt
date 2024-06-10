@@ -12,6 +12,9 @@ set(PROJECT_SOURCES
 
 project(${PROJECT_NAME})
 
+# add all warnings
+add_compile_options(-Wall -Wextra -Wpedantic)
+add_compile_options(-Wno-unused-parameter -Wno-unused-variable -Wno-unused-function)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})

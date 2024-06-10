@@ -181,7 +181,7 @@ static inline void NN_fill_I8(Tensor *tensor, int8_t value) {
  * @param dtype: data type
  * @param data: pointer to data, if NULL, the data will be allocated
  */
-void NN_initTensor(Tensor *tensor, size_t ndim, size_t *shape, DataType dtype, void *data);
+void NN_initTensor(Tensor *tensor, size_t ndim, const size_t *shape, DataType dtype, void *data);
 
 /**
  * Create a new tensor
@@ -192,7 +192,7 @@ void NN_initTensor(Tensor *tensor, size_t ndim, size_t *shape, DataType dtype, v
  * @param data: pointer to data, if NULL, the data will be allocated
  * @return Tensor
 */
-Tensor *NN_tensor(size_t ndim, size_t *shape, DataType dtype, void *data);
+Tensor *NN_tensor(size_t ndim, const size_t *shape, DataType dtype, void *data);
 
 /**
  * Returns a tensor filled with the scalar value 0.
@@ -202,7 +202,7 @@ Tensor *NN_tensor(size_t ndim, size_t *shape, DataType dtype, void *data);
  * @param dtype: data type
  * @return Tensor
  */
-Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype);
+Tensor *NN_zeros(size_t ndim, const size_t *shape, DataType dtype);
 
 /**
  * Returns a tensor filled with the scalar value 1.
@@ -212,7 +212,7 @@ Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype);
  * @param dtype: data type
  * @return Tensor
  */
-Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype);
+Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype);
 
 /**
  * Returns a tensor filled with random numbers from a uniform distribution.
@@ -227,7 +227,7 @@ Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype);
  * @param dtype: data type
  * @return Tensor
  */
-Tensor *NN_rand(size_t ndim, size_t *shape, DataType dtype);
+Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype);
 
 /**
  * Returns this tensor cast to the type of the given tensor.

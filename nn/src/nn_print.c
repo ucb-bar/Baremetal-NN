@@ -54,7 +54,7 @@ void NN_printf(Tensor *tensor) {
             printf("%d", *((int8_t *)tensor->data + i));
             break;
           case DTYPE_I32:
-            printf("%ld", *((int32_t *)tensor->data + i));
+            printf("%ld", (size_t)(*((int32_t *)tensor->data + i)));
             break;
           case DTYPE_F32:
             NN_printFloat(*((float *)tensor->data + i), 4);
@@ -78,7 +78,7 @@ void NN_printf(Tensor *tensor) {
               printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1] + j));
               break;
             case DTYPE_I32:
-              printf("%ld", *((int32_t *)tensor->data + i*tensor->shape[1] + j));
+              printf("%ld", (size_t)(*((int32_t *)tensor->data + i*tensor->shape[1] + j)));
               break;
             case DTYPE_F32:
               NN_printFloat(*((float *)tensor->data + i*tensor->shape[1] + j), 4);
@@ -112,7 +112,7 @@ void NN_printf(Tensor *tensor) {
                 printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k));
                 break;
               case DTYPE_I32:
-                printf("%ld", *((int32_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k));
+                printf("%ld", (size_t)(*((int32_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k)));
                 break;
               case DTYPE_F32:
                 NN_printFloat(*((float *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k), 4);
@@ -150,7 +150,7 @@ void NN_printf(Tensor *tensor) {
                   printf("%d", *((int8_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w));
                   break;
                 case DTYPE_I32:
-                  printf("%ld", *((int32_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w));
+                  printf("%ld", (size_t)(*((int32_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w)));
                   break;
                 case DTYPE_F32:
                   NN_printFloat(*((float *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w), 4);

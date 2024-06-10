@@ -2,7 +2,7 @@
 #include "nn_tensor.h"
 
 
-void NN_initTensor(Tensor *tensor, size_t ndim, size_t *shape, DataType dtype, void *data) {
+void NN_initTensor(Tensor *tensor, size_t ndim, const size_t *shape, DataType dtype, void *data) {
   tensor->ndim = ndim;
   tensor->dtype = dtype;
 
@@ -27,13 +27,13 @@ void NN_initTensor(Tensor *tensor, size_t ndim, size_t *shape, DataType dtype, v
   }
 }
 
-Tensor *NN_tensor(size_t ndim, size_t *shape, DataType dtype, void *data) {
+Tensor *NN_tensor(size_t ndim, const size_t *shape, DataType dtype, void *data) {
   Tensor *t = (Tensor *)malloc(sizeof(Tensor));
   NN_initTensor(t, ndim, shape, dtype, data);
   return t;
 }
 
-Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype) {
+Tensor *NN_zeros(size_t ndim, const size_t *shape, DataType dtype) {
   Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
 
   switch (dtype) {
@@ -53,7 +53,7 @@ Tensor *NN_zeros(size_t ndim, size_t *shape, DataType dtype) {
   return t;
 }
 
-Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype) {
+Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype) {
   Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
 
   switch (dtype) {
@@ -73,7 +73,7 @@ Tensor *NN_ones(size_t ndim, size_t *shape, DataType dtype) {
   return t;
 }
 
-Tensor *NN_rand(size_t ndim, size_t *shape, DataType dtype) {
+Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype) {
   Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
 
   switch (dtype) {

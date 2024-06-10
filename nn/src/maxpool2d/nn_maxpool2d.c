@@ -25,8 +25,8 @@ void NN_MaxPool2d_F32(Tensor *out, Tensor *in, size_t *kernel_size) {
   size_t kernel_height = kernel_size[0];
   size_t kernel_width = kernel_size[1];
 
-  int output_height = (input_height - kernel_height) + 1;
-  int output_width = (input_width - kernel_width) + 1;
+  size_t output_height = (input_height - kernel_height) + 1;
+  size_t output_width = (input_width - kernel_width) + 1;
 
   size_t stride = kernel_size[0];
 

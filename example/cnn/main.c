@@ -30,8 +30,8 @@ float brightness_map[] = {0, 0.0751, 0.0829, 0.0848, 0.1227, 0.1403, 0.1559, 0.1
 void showASCIIImage(Tensor *tensor) {
   float min = 1000;
   float max = -1000;
-  for (int h = 0; h < tensor->shape[2]; h += 1) {
-    for (int w = 0; w < tensor->shape[3]; w += 1) {
+  for (size_t h = 0; h < tensor->shape[2]; h += 1) {
+    for (size_t w = 0; w < tensor->shape[3]; w += 1) {
       float pixel_value = ((float *)tensor->data)[h * tensor->shape[3] + w];
       if (pixel_value < min) {
         min = pixel_value;
@@ -42,16 +42,16 @@ void showASCIIImage(Tensor *tensor) {
     }
   }
 
-  for (int h = 0; h < tensor->shape[2]; h += 1) {
-    for (int w = 0; w < tensor->shape[3]; w += 1) {
+  for (size_t h = 0; h < tensor->shape[2]; h += 1) {
+    for (size_t w = 0; w < tensor->shape[3]; w += 1) {
       float pixel_value = ((float *)tensor->data)[h * tensor->shape[3] + w];
       
       // normalize the pixel value to the range [0, 1]
       pixel_value = (pixel_value - min) / (max - min);
 
       // find the closest brightness value in the brightness_map
-      int brightness_index = 0;
-      for (int i = 0; i < n_mapping; i += 1) {
+      size_t brightness_index = 0;
+      for (size_t i = 0; i < n_mapping; i += 1) {
         if (pixel_value < brightness_map[i]) {
           break;
         }
@@ -80,7 +80,7 @@ int main() {
 
   forward(model);
 
-  Tensor *img = NN_tensor(4, (size_t[]){1, 1, model->decode_conv6_2.shape[2] / 8, model->decode_conv6_2.shape[3] / 4}, DTYPE_F32, NULL);
+  Tensor *img = NN_tensor(4, (const size_t[]){1, 1, model->decode_conv6_2.shape[2] / 8, model->decode_conv6_2.shape[3] / 4}, DTYPE_F32, NULL);
 
   NN_interpolate_F32(img, &model->decode_conv6_2, (float []){0.125, 0.25});
   
