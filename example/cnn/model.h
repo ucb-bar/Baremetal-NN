@@ -1310,7 +1310,7 @@ void forward(Model *model) {
     1e-05, &model->decode_conv1_1_1_running_mean, &model->decode_conv1_1_1_running_var);
   NN_ReLU_F32(&model->decode_conv1_1_2, &model->decode_conv1_1_1);
   // F.interpolate
-  NN_interpolate_F32(&model->interpolate, &model->decode_conv1_1_2, 2);
+  NN_interpolate_F32(&model->interpolate, &model->decode_conv1_1_2, (float []){2, 2});
 
   NN_Conv2d_F32(
     &model->decode_conv2_0_0, &model->interpolate,
@@ -1329,7 +1329,7 @@ void forward(Model *model) {
     1e-05, &model->decode_conv2_1_1_running_mean, &model->decode_conv2_1_1_running_var);
   NN_ReLU_F32(&model->decode_conv2_1_2, &model->decode_conv2_1_1);
   // F.interpolate_1
-  NN_interpolate_F32(&model->interpolate_1, &model->decode_conv2_1_2, 2);
+  NN_interpolate_F32(&model->interpolate_1, &model->decode_conv2_1_2, (float []){2, 2});
 
   // F.add
   NN_add_F32(&model->add, &model->interpolate_1, &model->conv5_5);
@@ -1351,7 +1351,7 @@ void forward(Model *model) {
     1e-05, &model->decode_conv3_1_1_running_mean, &model->decode_conv3_1_1_running_var);
   NN_ReLU_F32(&model->decode_conv3_1_2, &model->decode_conv3_1_1);
   // F.interpolate_2
-  NN_interpolate_F32(&model->interpolate_2, &model->decode_conv3_1_2, 2);
+  NN_interpolate_F32(&model->interpolate_2, &model->decode_conv3_1_2, (float []){2, 2});
 
   // F.add_1
   NN_add_F32(&model->add_1, &model->interpolate_2, &model->conv3_5);
@@ -1373,7 +1373,7 @@ void forward(Model *model) {
     1e-05, &model->decode_conv4_1_1_running_mean, &model->decode_conv4_1_1_running_var);
   NN_ReLU_F32(&model->decode_conv4_1_2, &model->decode_conv4_1_1);
   // F.interpolate_3
-  NN_interpolate_F32(&model->interpolate_3, &model->decode_conv4_1_2, 2);
+  NN_interpolate_F32(&model->interpolate_3, &model->decode_conv4_1_2, (float []){2, 2});
 
   // F.add_2
   NN_add_F32(&model->add_2, &model->interpolate_3, &model->conv1_5);
@@ -1395,7 +1395,7 @@ void forward(Model *model) {
     1e-05, &model->decode_conv5_1_1_running_mean, &model->decode_conv5_1_1_running_var);
   NN_ReLU_F32(&model->decode_conv5_1_2, &model->decode_conv5_1_1);
   // F.interpolate_4
-  NN_interpolate_F32(&model->interpolate_4, &model->decode_conv5_1_2, 2);
+  NN_interpolate_F32(&model->interpolate_4, &model->decode_conv5_1_2, (float []){2, 2});
 
   NN_Conv2d_F32(
     &model->decode_conv6_0, &model->interpolate_4,
