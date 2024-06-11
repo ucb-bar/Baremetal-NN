@@ -67,16 +67,16 @@ void showASCIIImage(Tensor *tensor) {
   }
 }
 
-static void enable_vector_operations() {
-    unsigned long mstatus;
-    asm volatile("csrr %0, mstatus" : "=r"(mstatus));
-    mstatus |= 0x00000600 | 0x00006000 | 0x00018000;
-    asm volatile("csrw mstatus, %0"::"r"(mstatus));
-}
+// static void enable_vector_operations() {
+//     unsigned long mstatus;
+//     asm volatile("csrr %0, mstatus" : "=r"(mstatus));
+//     mstatus |= 0x00000600 | 0x00006000 | 0x00018000;
+//     asm volatile("csrw mstatus, %0"::"r"(mstatus));
+// }
 
 int main() {
 
-  enable_vector_operations();
+  // enable_vector_operations();
   
   Model *model = malloc(sizeof(Model));
 
@@ -89,9 +89,9 @@ int main() {
   // NN_fill_F32(&model->x, 0.0);
   memcpy((uint8_t *)model->x.data, (uint8_t *)model_input_data, (size_t)model_input_end - (size_t)model_input_start);
 
-  cycles = READ_CSR("mcycle");
+  // cycles = READ_CSR("mcycle");
   forward(model);
-  cycles = READ_CSR("mcycle") - cycles;
+  // cycles = READ_CSR("mcycle") - cycles;
 
   printf("cycles: %lu\n", cycles);
 
