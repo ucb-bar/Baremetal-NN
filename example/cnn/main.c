@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rv.h"
 #include "nn.h"
 #include "model.h"
 
@@ -66,19 +67,33 @@ void showASCIIImage(Tensor *tensor) {
   }
 }
 
-
+static void enable_vector_operations() {
+    unsigned long mstatus;
+    asm volatile("csrr %0, mstatus" : "=r"(mstatus));
+    mstatus |= 0x00000600 | 0x00006000 | 0x00018000;
+    asm volatile("csrw mstatus, %0"::"r"(mstatus));
+}
 
 int main() {
-  Model *model = malloc(sizeof(Model));
+
+  enable_vector_operations();
   
+  Model *model = malloc(sizeof(Model));
+
+  size_t cycles;
+  
+  printf("initalizing model...\n");
   init(model);
 
+  printf("setting input data...\n");
   // NN_fill_F32(&model->x, 0.0);
   memcpy((uint8_t *)model->x.data, (uint8_t *)model_input_data, (size_t)model_input_end - (size_t)model_input_start);
 
-  // NN_printf(&model->x);
-
+  cycles = READ_CSR("mcycle");
   forward(model);
+  cycles = READ_CSR("mcycle") - cycles;
+
+  printf("cycles: %lu\n", cycles);
 
   Tensor *img = NN_tensor(4, (const size_t[]){1, 1, model->decode_conv6_2.shape[2] / 8, model->decode_conv6_2.shape[3] / 4}, DTYPE_F32, NULL);
 

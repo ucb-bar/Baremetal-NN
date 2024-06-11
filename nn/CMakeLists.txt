@@ -40,6 +40,7 @@ set(AVX_SOURCE
 set(RVV_SOURCE
   src/abs/nn_abs_rvv.c
   src/add/nn_add_rvv.c
+  src/conv2d/nn_conv2d_rvv.c
   src/linear/nn_linear_rvv.c
   src/matmul/nn_matmul_rvv.c
   src/matrixnorm/nn_matrixnorm_rvv.c

@@ -24,6 +24,8 @@ The script will generate a `model.pth` file and a `model.bin` file.
 ```bash
 cd ./example/mlp/build/
 cmake --build . && ./mlp
+
+spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 fast-depth
 ```
 
 

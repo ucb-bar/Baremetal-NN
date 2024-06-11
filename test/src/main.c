@@ -408,6 +408,56 @@ int main() {
     NN_printf(y_golden);
   }
 
+  // conv2d
+  {
+    int batch = 1;
+    int in_channels = 1;
+    int out_channels = 1;
+    int in_height = 3;
+    int in_width = 3;
+    int kernel_height = 2;
+    int kernel_width = 2;
+    int stride_height = 1;
+    int stride_width = 1;
+    int padding_height = 0;
+    int padding_width = 0;
+
+    float weights[] = {0.0, 1.0, 2.0, 3.0};
+    float bias[] = {0.0};
+
+    Tensor *x = NN_ones(4, (size_t[]){batch, in_channels, in_height, in_width}, DTYPE_F32);
+    Tensor *w = NN_tensor(4, (size_t[]){out_channels, in_channels, kernel_height, kernel_width}, DTYPE_F32, weights);
+    Tensor *b = NN_tensor(1, (size_t[]){out_channels}, DTYPE_F32, bias);
+
+    Tensor *y_golden = NN_tensor(4, (size_t[]){batch, out_channels, in_height - kernel_height + 1, in_width - kernel_width + 1}, DTYPE_F32, NULL);
+    Tensor *y_actual = NN_tensor(4, (size_t[]){batch, out_channels, in_height - kernel_height + 1, in_width - kernel_width + 1}, DTYPE_F32, NULL);
+
+    printf("conv2d:\t\t");
+
+    NN_Conv2d_F32(y_golden, x, w, b, (size_t[]){stride_height, stride_width}, (size_t[]){padding_height, padding_width}, 1);
+    cycles = READ_CSR("mcycle");
+    NN_Conv2d_F32_RVV(y_actual, x, w, b, (size_t[]){stride_height, stride_width}, (size_t[]){padding_height, padding_width}, 1);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s (%lu)\n", compare_2d(y_golden->data, y_actual->data, in_width - kernel_width + 1, in_height - kernel_height + 1) ? "PASS" : "FAIL", cycles);
+
+    printf("weights:\n");
+    NN_printf(w);
+    printf("bias:\n");
+    NN_printf(b);
+    printf("input:\n");
+    NN_printf(x);
+    printf("output:\n");
+    NN_printf(y_golden);
+
+    NN_freeTensorData(x);
+    NN_deleteTensor(x);
+    NN_freeTensorData(w);
+    NN_deleteTensor(w);
+    NN_freeTensorData(b);
+    NN_deleteTensor(b);
+
+  }
+
 
 
   // sum
