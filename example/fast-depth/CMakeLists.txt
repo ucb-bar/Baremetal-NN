@@ -1,18 +1,18 @@
 # the CMake files are still very hacky
 # TODO: organize the build system properly
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
 project(fast-depth LANGUAGES C)
 
 
 # Options
-option(BUILD_SHARED_LIBS    "Build using shared libraries"      OFF )
-option(CMAKE_BUILD_TYPE     "Build type"                        Debug)
-option(STATIC_LINKING       "Link statically"                   ON  )
+option(BUILD_SHARED_LIBS    "Build using shared libraries"      OFF     )
+option(CMAKE_BUILD_TYPE     "Build type"                        Debug   )
+option(STATIC_LINKING       "Link statically"                   TRUE    )
 
-option(X86                  "Build for x86"                     OFF )
-option(RISCV                "Build for RISC-V"                  OFF )
+option(X86                  "Build for x86"                     OFF     )
+option(RISCV                "Build for RISC-V"                  OFF     )
 
 
 add_executable(fast-depth main.c)
@@ -27,8 +27,10 @@ set(CMAKE_C_FLAGS_RELEASE   "-O3")
 set(CMAKE_EXE_LINKER_FLAGS  "-static")
 
 if (X86)
+    message("Building for x86")
     set(CMAKE_C_FLAGS       "${CMAKE_C_FLAGS} -march=native")
 elseif (RISCV)
+    message("Building for RISC-V")
     # CMake toolchain definition for RISC-V GCC toolchain
     set(CMAKE_SYSTEM_NAME "Generic" CACHE STRING "")
     set(CMAKE_SYSTEM_PROCESSOR "riscv" CACHE STRING "")
@@ -58,7 +60,7 @@ target_compile_options(fast-depth PRIVATE -u _printf_float)
 
 
 message("Compiler Flags: ${CMAKE_C_FLAGS}")
-message("Linker Flags: ${CMAKE_C_FLAGS}")
+message("Linker Flags: ${CMAKE_EXE_LINKER_FLAGS}")
 
 
 add_subdirectory(../../nn ./build/nn)
