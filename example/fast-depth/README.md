@@ -28,9 +28,20 @@ The script will generate a `input.bin` file.
 
 ## Compiling and running the program
 
+Building for x86 CPU:
 ```bash
 cd ./example/fast-depth/build/
-cmake --build . && ./fast-depth
+cmake .. -D X86=ON
+cmake --build .
+./fast-depth
+```
+
+Building for spike:
+
+```bash
+cd ./example/fast-depth/build/
+cmake .. -D RISCV=ON
+cmake --build .
 spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./fast-depth
 ```
 
