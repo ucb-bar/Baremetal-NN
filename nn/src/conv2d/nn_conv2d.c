@@ -3,8 +3,8 @@
 
 
 void NN_Conv2d_F32(
-  Tensor *out, Tensor *in, 
-  Tensor *weight, Tensor *bias, 
+  Tensor *out, const Tensor *in, 
+  const Tensor *weight, const Tensor *bias, 
   const size_t *stride, const size_t *padding, size_t groups) {
   const size_t dilation[2] = {1, 1};
 
@@ -49,7 +49,10 @@ void NN_Conv2d_F32(
       for (size_t oc = 0; oc < out_channels / groups; oc += 1) {
         for (size_t oh = 0; oh < output_height; oh += 1) {
           for (size_t ow = 0; ow < output_width; ow += 1) {
-            float sum = 0.0;
+            float sum = 0.f;
+            if (bias != NULL) {
+              sum = ((float *)bias->data)[g * (out_channels / groups) + oc];
+            }
             for (size_t ic = 0; ic < in_channels / groups; ic += 1) {
               for (size_t kh = 0; kh < kernel_height; kh += 1) {
                 for (size_t kw = 0; kw < kernel_width; kw += 1) {
@@ -70,9 +73,6 @@ void NN_Conv2d_F32(
                   }
                 }
               }
-            }
-            if (bias != NULL) {
-              sum += ((float *)bias->data)[g * (out_channels / groups) + oc];
             }
             size_t out_idx = n * out_channels * output_height * output_width
                                + (g * (out_channels / groups) + oc) * output_height * output_width
