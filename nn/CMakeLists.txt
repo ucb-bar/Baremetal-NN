@@ -24,7 +24,6 @@ set(SOURCES
   src/min/nn_min.c
   src/minimum/nn_minimum.c
   src/mul/nn_mul.c
-  src/multiply/nn_multiply.c
   src/neg/nn_neg.c
   src/relu/nn_relu.c
   src/relu6/nn_relu6.c
@@ -49,7 +48,6 @@ set(RVV_SOURCE
   src/min/nn_min_rvv.c
   src/minimum/nn_minimum_rvv.c
   src/mul/nn_mul_rvv.c
-  src/multiply/nn_multiply_rvv.c
   src/neg/nn_neg_rvv.c
   src/sub/nn_sub_rvv.c
 )
