@@ -14,6 +14,8 @@ typedef union {
 } float_uint32_union_t;
 
 
+// from https://github.com/AcademySoftwareFoundation/Imath/blob/main/src/Imath/half.h
+
 static inline float NN_halfToFloat(float16_t h) {
   #if defined(__F16C__)
     // NB: The intel implementation does seem to treat NaN slightly

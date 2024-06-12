@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include "nn_float16.h"
+
 #define MAX_DIMS            4
 
 // #define F32(ptr)              (*((float *)(ptr)))
@@ -232,12 +234,12 @@ Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype);
 /**
  * Returns this tensor cast to the type of the given tensor.
  * 
- * This is a no-op if the tensor is already of the correct type. 
+ * This is equivalent to NN_copy() if the data types are the same.
  * 
- * @param t: input tensor
- * @param dtype: target data type
+ * @param out: the output tensor
+ * @param in: the input tensor
  */
-void NN_asType(Tensor *t, DataType dtype);
+void NN_asType(Tensor *out, Tensor *in);
 
 
 #endif // __NN_TENSOR

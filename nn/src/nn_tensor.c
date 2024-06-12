@@ -43,6 +43,9 @@ Tensor *NN_zeros(size_t ndim, const size_t *shape, DataType dtype) {
     case DTYPE_I32:
       NN_fill_I32(t, 0);
       break;
+    case DTYPE_F16:
+      NN_fill_F16(t, 0);
+      break;
     case DTYPE_F32:
       NN_fill_F32(t, 0);
       break;
@@ -62,6 +65,9 @@ Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype) {
       break;
     case DTYPE_I32:
       NN_fill_I32(t, 1);
+      break;
+    case DTYPE_F16:
+      NN_fill_F16(t, 1);
       break;
     case DTYPE_F32:
       NN_fill_F32(t, 1);
@@ -87,6 +93,11 @@ Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype) {
         ((int32_t *)t->data)[i] = rand();
       }
       break;
+    case DTYPE_F16:
+      for (size_t i = 0; i < t->size; i += 1) {
+        ((float16_t *)t->data)[i] = NN_floatToHalf((float)rand() / RAND_MAX);
+      }
+      break;
     case DTYPE_F32:
       for (size_t i = 0; i < t->size; i += 1) {
         ((float *)t->data)[i] = (float)rand() / RAND_MAX;
@@ -99,32 +110,69 @@ Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype) {
   return t;
 }
 
-void NN_asType(Tensor *t, DataType dtype) {
-  if (t->dtype == dtype) {
-    return;
-  }
-  if (t->dtype == DTYPE_I32 && dtype == DTYPE_F32) {
-    for (size_t i = 0; i < t->size; i += 1) {
-      ((float *)t->data)[i] = (float)((int32_t *)t->data)[i];
-    }
-    t->dtype = DTYPE_F32;
-    return;
-  }
-  if (t->dtype == DTYPE_I32 && dtype == DTYPE_I8) {
-    for (size_t i = 0; i < t->size; i += 1) {
-      ((int8_t *)t->data)[i] = (int8_t)((int32_t *)t->data)[i];
-    }
-    t->dtype = DTYPE_I8;
+void NN_asType(Tensor *out, Tensor *in) {
+  assert(out->size == in->size);
+
+  if (out->dtype == in->dtype) {
+    NN_copy(out, in);
     return;
   }
 
-  if (t->dtype == DTYPE_F32 && dtype == DTYPE_I32) {
-    for (size_t i = 0; i < t->size; i += 1) {
-      ((int32_t *)t->data)[i] = (int32_t)((float *)t->data)[i];
-    }
-    t->dtype = DTYPE_I32;
-    return;
+  switch (in->dtype) {
+    case DTYPE_I8:
+      switch (out->dtype) {
+        case DTYPE_I32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((int32_t *)out->data)[i] = (int32_t)((int8_t *)in->data)[i];
+          }
+          return;
+        case DTYPE_F32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((float *)out->data)[i] = (float)((int8_t *)in->data)[i];
+          }
+          return;
+      }
+      break;
+  
+    case DTYPE_I32:
+      switch (out->dtype) {
+        case DTYPE_I8:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((int8_t *)out->data)[i] = (int8_t)((int32_t *)in->data)[i];
+          }
+          return;
+        case DTYPE_F32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((float *)out->data)[i] = (float)((int32_t *)in->data)[i];
+          }
+          return;
+      }
+      break;
+    
+    case DTYPE_F16:
+      switch (out->dtype) {
+        case DTYPE_F32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((float *)out->data)[i] = NN_halfToFloat(((float16_t *)in->data)[i]);
+          }
+          return;
+      }
+      break;
+    
+    case DTYPE_F32:
+      switch (out->dtype) {
+        case DTYPE_I32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((int32_t *)out->data)[i] = (int32_t)((float *)in->data)[i];
+          }
+          return;
+        case DTYPE_F16:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((float16_t *)out->data)[i] = NN_floatToHalf(((float *)in->data)[i]);
+          }
+          return;
+      }
+      break;
   }
-
-  printf("[ERROR] Cannot convert data type from %s to %s\n", NN_getDataTypeName(t->dtype), NN_getDataTypeName(dtype));
+  printf("[ERROR] Cannot convert data type from %s to %s\n", NN_getDataTypeName(in->dtype), NN_getDataTypeName(out->dtype));
 }

@@ -28,6 +28,10 @@ void NN_matmul_F32(Tensor *out, Tensor *a, Tensor *b);
  * @param a: the input tensor of shape (m, k)
  * @param b: the input tensor of shape (n, k)
  */
+void NN_matmulT(Tensor *out, Tensor *a, Tensor *b);
+
+void NN_matmulT_F16(Tensor *out, Tensor *a, Tensor *b);
+
 void NN_matmulT_F32(Tensor *out, Tensor *a, Tensor *b);
 
 void NN_matmul_I8_I8_I32(Tensor *out, Tensor *a, Tensor *b);

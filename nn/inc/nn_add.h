@@ -21,6 +21,8 @@
  */
 void NN_add(Tensor *out, Tensor *a, Tensor *b);
 
+void NN_add_F16(Tensor *out, Tensor *a, Tensor *b);
+
 void NN_add_F32(Tensor *out, Tensor *a, Tensor *b);
 
 void NN_add_INT(Tensor *out, Tensor *a, Tensor *b);

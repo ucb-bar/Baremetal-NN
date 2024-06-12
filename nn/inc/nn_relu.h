@@ -13,9 +13,14 @@
  * @param y: the output tensor
  * @param x: the input tensor
  */
+void NN_ReLU(Tensor *y, Tensor *x);
+
+void NN_ReLU_F16(Tensor *y, Tensor *x);
+
+void NN_ReLUInplace_F16(Tensor *x);
+
 void NN_ReLU_F32(Tensor *y, Tensor *x);
 
 void NN_ReLUInplace_F32(Tensor *x);
-
 
 #endif // __NN_RELU_H

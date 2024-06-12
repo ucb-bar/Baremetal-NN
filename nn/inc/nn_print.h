@@ -1,6 +1,7 @@
 #ifndef __NN_PRINT_H
 #define __NN_PRINT_H
 
+#include "nn_float16.h"
 #include "nn_tensor.h"
 
 
