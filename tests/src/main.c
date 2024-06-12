@@ -4,7 +4,7 @@
 #include <rv.h>
 
 #include "nn.h"
-#include "riscv_vector.h"
+// #include "riscv_vector.h"
 
 
 void print_bits_half(float16_t x) {
@@ -46,8 +46,11 @@ uint8_t compareResult(float golden, float actual) {
 }
 
 int main() {
-  for (size_t i = 0; i < 100; i += 1) {
-    float x = rand() / (float)RAND_MAX * 1000.0f;
+  // for (size_t i = 0; i < 100; i += 1) {
+    // float x = rand() / (float)RAND_MAX * 1000.0f;
+
+    float x = (float)(0x47ca9334);
+
     float16_t x_compressed = NN_floatToHalf(x);
     float x_decompressed = NN_halfToFloat(x_compressed);
     
@@ -55,7 +58,10 @@ int main() {
     print_bits_half(x_compressed);
     print_bits(x_decompressed);
 
+    printf("%f\t", x);
+    printf("%f\n", x_decompressed);
+
     compareResult(x, x_decompressed);
-  }
+  // }
   return 0;
 }
