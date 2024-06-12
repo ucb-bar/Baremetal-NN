@@ -144,9 +144,9 @@ int main() {
     Tensor *D = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
     
     printf("mulf:\t\t");
-    NN_multiply_F32(C, A, 10.0f);
+    NN_mulF_F32(C, A, 10.0f);
     cycles = READ_CSR("mcycle");
-    NN_multiply_F32_RVV(D, A, 10.0f);
+    NN_mulF_F32_RVV(D, A, 10.0f);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(C->data, D->data, M, N) ? "PASS" : "FAIL", cycles);
 
