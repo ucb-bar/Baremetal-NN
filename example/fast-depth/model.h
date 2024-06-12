@@ -1093,318 +1093,318 @@ void forward(Model *model) {
     &model->conv1_1_weight, &model->conv1_1_bias, 
     1e-05, &model->conv1_1_running_mean, &model->conv1_1_running_var);
   NN_ReLU6_F32(&model->conv1_2, &model->conv1_1);
-  NN_Conv2d_F32(
-    &model->conv1_3, &model->conv1_2,
-    &model->conv1_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv1_4, &model->conv1_3,
-    &model->conv1_4_weight, &model->conv1_4_bias, 
-    1e-05, &model->conv1_4_running_mean, &model->conv1_4_running_var);
-  NN_ReLU6_F32(&model->conv1_5, &model->conv1_4);
-  NN_Conv2d_F32(
-    &model->conv2_0, &model->conv1_5,
-    &model->conv2_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 56);
-  NN_BatchNorm2d_F32(
-    &model->conv2_1, &model->conv2_0,
-    &model->conv2_1_weight, &model->conv2_1_bias, 
-    1e-05, &model->conv2_1_running_mean, &model->conv2_1_running_var);
-  NN_ReLU6_F32(&model->conv2_2, &model->conv2_1);
-  NN_Conv2d_F32(
-    &model->conv2_3, &model->conv2_2,
-    &model->conv2_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv2_4, &model->conv2_3,
-    &model->conv2_4_weight, &model->conv2_4_bias, 
-    1e-05, &model->conv2_4_running_mean, &model->conv2_4_running_var);
-  NN_ReLU6_F32(&model->conv2_5, &model->conv2_4);
-  NN_Conv2d_F32(
-    &model->conv3_0, &model->conv2_5,
-    &model->conv3_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 88);
-  NN_BatchNorm2d_F32(
-    &model->conv3_1, &model->conv3_0,
-    &model->conv3_1_weight, &model->conv3_1_bias, 
-    1e-05, &model->conv3_1_running_mean, &model->conv3_1_running_var);
-  NN_ReLU6_F32(&model->conv3_2, &model->conv3_1);
-  NN_Conv2d_F32(
-    &model->conv3_3, &model->conv3_2,
-    &model->conv3_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv3_4, &model->conv3_3,
-    &model->conv3_4_weight, &model->conv3_4_bias, 
-    1e-05, &model->conv3_4_running_mean, &model->conv3_4_running_var);
-  NN_ReLU6_F32(&model->conv3_5, &model->conv3_4);
-  NN_Conv2d_F32(
-    &model->conv4_0, &model->conv3_5,
-    &model->conv4_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 120);
-  NN_BatchNorm2d_F32(
-    &model->conv4_1, &model->conv4_0,
-    &model->conv4_1_weight, &model->conv4_1_bias, 
-    1e-05, &model->conv4_1_running_mean, &model->conv4_1_running_var);
-  NN_ReLU6_F32(&model->conv4_2, &model->conv4_1);
-  NN_Conv2d_F32(
-    &model->conv4_3, &model->conv4_2,
-    &model->conv4_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv4_4, &model->conv4_3,
-    &model->conv4_4_weight, &model->conv4_4_bias, 
-    1e-05, &model->conv4_4_running_mean, &model->conv4_4_running_var);
-  NN_ReLU6_F32(&model->conv4_5, &model->conv4_4);
-  NN_Conv2d_F32(
-    &model->conv5_0, &model->conv4_5,
-    &model->conv5_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 144);
-  NN_BatchNorm2d_F32(
-    &model->conv5_1, &model->conv5_0,
-    &model->conv5_1_weight, &model->conv5_1_bias, 
-    1e-05, &model->conv5_1_running_mean, &model->conv5_1_running_var);
-  NN_ReLU6_F32(&model->conv5_2, &model->conv5_1);
-  NN_Conv2d_F32(
-    &model->conv5_3, &model->conv5_2,
-    &model->conv5_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv5_4, &model->conv5_3,
-    &model->conv5_4_weight, &model->conv5_4_bias, 
-    1e-05, &model->conv5_4_running_mean, &model->conv5_4_running_var);
-  NN_ReLU6_F32(&model->conv5_5, &model->conv5_4);
-  NN_Conv2d_F32(
-    &model->conv6_0, &model->conv5_5,
-    &model->conv6_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 256);
-  NN_BatchNorm2d_F32(
-    &model->conv6_1, &model->conv6_0,
-    &model->conv6_1_weight, &model->conv6_1_bias, 
-    1e-05, &model->conv6_1_running_mean, &model->conv6_1_running_var);
-  NN_ReLU6_F32(&model->conv6_2, &model->conv6_1);
-  NN_Conv2d_F32(
-    &model->conv6_3, &model->conv6_2,
-    &model->conv6_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv6_4, &model->conv6_3,
-    &model->conv6_4_weight, &model->conv6_4_bias, 
-    1e-05, &model->conv6_4_running_mean, &model->conv6_4_running_var);
-  NN_ReLU6_F32(&model->conv6_5, &model->conv6_4);
-  NN_Conv2d_F32(
-    &model->conv7_0, &model->conv6_5,
-    &model->conv7_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 408);
-  NN_BatchNorm2d_F32(
-    &model->conv7_1, &model->conv7_0,
-    &model->conv7_1_weight, &model->conv7_1_bias, 
-    1e-05, &model->conv7_1_running_mean, &model->conv7_1_running_var);
-  NN_ReLU6_F32(&model->conv7_2, &model->conv7_1);
-  NN_Conv2d_F32(
-    &model->conv7_3, &model->conv7_2,
-    &model->conv7_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv7_4, &model->conv7_3,
-    &model->conv7_4_weight, &model->conv7_4_bias, 
-    1e-05, &model->conv7_4_running_mean, &model->conv7_4_running_var);
-  NN_ReLU6_F32(&model->conv7_5, &model->conv7_4);
-  NN_Conv2d_F32(
-    &model->conv8_0, &model->conv7_5,
-    &model->conv8_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 376);
-  NN_BatchNorm2d_F32(
-    &model->conv8_1, &model->conv8_0,
-    &model->conv8_1_weight, &model->conv8_1_bias, 
-    1e-05, &model->conv8_1_running_mean, &model->conv8_1_running_var);
-  NN_ReLU6_F32(&model->conv8_2, &model->conv8_1);
-  NN_Conv2d_F32(
-    &model->conv8_3, &model->conv8_2,
-    &model->conv8_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv8_4, &model->conv8_3,
-    &model->conv8_4_weight, &model->conv8_4_bias, 
-    1e-05, &model->conv8_4_running_mean, &model->conv8_4_running_var);
-  NN_ReLU6_F32(&model->conv8_5, &model->conv8_4);
-  NN_Conv2d_F32(
-    &model->conv9_0, &model->conv8_5,
-    &model->conv9_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 272);
-  NN_BatchNorm2d_F32(
-    &model->conv9_1, &model->conv9_0,
-    &model->conv9_1_weight, &model->conv9_1_bias, 
-    1e-05, &model->conv9_1_running_mean, &model->conv9_1_running_var);
-  NN_ReLU6_F32(&model->conv9_2, &model->conv9_1);
-  NN_Conv2d_F32(
-    &model->conv9_3, &model->conv9_2,
-    &model->conv9_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv9_4, &model->conv9_3,
-    &model->conv9_4_weight, &model->conv9_4_bias, 
-    1e-05, &model->conv9_4_running_mean, &model->conv9_4_running_var);
-  NN_ReLU6_F32(&model->conv9_5, &model->conv9_4);
-  NN_Conv2d_F32(
-    &model->conv10_0, &model->conv9_5,
-    &model->conv10_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 288);
-  NN_BatchNorm2d_F32(
-    &model->conv10_1, &model->conv10_0,
-    &model->conv10_1_weight, &model->conv10_1_bias, 
-    1e-05, &model->conv10_1_running_mean, &model->conv10_1_running_var);
-  NN_ReLU6_F32(&model->conv10_2, &model->conv10_1);
-  NN_Conv2d_F32(
-    &model->conv10_3, &model->conv10_2,
-    &model->conv10_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv10_4, &model->conv10_3,
-    &model->conv10_4_weight, &model->conv10_4_bias, 
-    1e-05, &model->conv10_4_running_mean, &model->conv10_4_running_var);
-  NN_ReLU6_F32(&model->conv10_5, &model->conv10_4);
-  NN_Conv2d_F32(
-    &model->conv11_0, &model->conv10_5,
-    &model->conv11_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 296);
-  NN_BatchNorm2d_F32(
-    &model->conv11_1, &model->conv11_0,
-    &model->conv11_1_weight, &model->conv11_1_bias, 
-    1e-05, &model->conv11_1_running_mean, &model->conv11_1_running_var);
-  NN_ReLU6_F32(&model->conv11_2, &model->conv11_1);
-  NN_Conv2d_F32(
-    &model->conv11_3, &model->conv11_2,
-    &model->conv11_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv11_4, &model->conv11_3,
-    &model->conv11_4_weight, &model->conv11_4_bias, 
-    1e-05, &model->conv11_4_running_mean, &model->conv11_4_running_var);
-  NN_ReLU6_F32(&model->conv11_5, &model->conv11_4);
-  NN_Conv2d_F32(
-    &model->conv12_0, &model->conv11_5,
-    &model->conv12_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 328);
-  NN_BatchNorm2d_F32(
-    &model->conv12_1, &model->conv12_0,
-    &model->conv12_1_weight, &model->conv12_1_bias, 
-    1e-05, &model->conv12_1_running_mean, &model->conv12_1_running_var);
-  NN_ReLU6_F32(&model->conv12_2, &model->conv12_1);
-  NN_Conv2d_F32(
-    &model->conv12_3, &model->conv12_2,
-    &model->conv12_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv12_4, &model->conv12_3,
-    &model->conv12_4_weight, &model->conv12_4_bias, 
-    1e-05, &model->conv12_4_running_mean, &model->conv12_4_running_var);
-  NN_ReLU6_F32(&model->conv12_5, &model->conv12_4);
-  NN_Conv2d_F32(
-    &model->conv13_0, &model->conv12_5,
-    &model->conv13_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 480);
-  NN_BatchNorm2d_F32(
-    &model->conv13_1, &model->conv13_0,
-    &model->conv13_1_weight, &model->conv13_1_bias, 
-    1e-05, &model->conv13_1_running_mean, &model->conv13_1_running_var);
-  NN_ReLU6_F32(&model->conv13_2, &model->conv13_1);
-  NN_Conv2d_F32(
-    &model->conv13_3, &model->conv13_2,
-    &model->conv13_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->conv13_4, &model->conv13_3,
-    &model->conv13_4_weight, &model->conv13_4_bias, 
-    1e-05, &model->conv13_4_running_mean, &model->conv13_4_running_var);
-  NN_ReLU6_F32(&model->conv13_5, &model->conv13_4);
-  NN_Conv2d_F32(
-    &model->decode_conv1_0_0, &model->conv13_5,
-    &model->decode_conv1_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 512);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv1_0_1, &model->decode_conv1_0_0,
-    &model->decode_conv1_0_1_weight, &model->decode_conv1_0_1_bias, 
-    1e-05, &model->decode_conv1_0_1_running_mean, &model->decode_conv1_0_1_running_var);
-  NN_ReLU_F32(&model->decode_conv1_0_2, &model->decode_conv1_0_1);
-  NN_Conv2d_F32(
-    &model->decode_conv1_1_0, &model->decode_conv1_0_2,
-    &model->decode_conv1_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv1_1_1, &model->decode_conv1_1_0,
-    &model->decode_conv1_1_1_weight, &model->decode_conv1_1_1_bias, 
-    1e-05, &model->decode_conv1_1_1_running_mean, &model->decode_conv1_1_1_running_var);
-  NN_ReLU_F32(&model->decode_conv1_1_2, &model->decode_conv1_1_1);
-  // F.interpolate
-  NN_interpolate_F32(&model->interpolate, &model->decode_conv1_1_2, (float []){2, 2});
+  // NN_Conv2d_F32(
+  //   &model->conv1_3, &model->conv1_2,
+  //   &model->conv1_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv1_4, &model->conv1_3,
+  //   &model->conv1_4_weight, &model->conv1_4_bias, 
+  //   1e-05, &model->conv1_4_running_mean, &model->conv1_4_running_var);
+  // NN_ReLU6_F32(&model->conv1_5, &model->conv1_4);
+  // NN_Conv2d_F32(
+  //   &model->conv2_0, &model->conv1_5,
+  //   &model->conv2_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 56);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv2_1, &model->conv2_0,
+  //   &model->conv2_1_weight, &model->conv2_1_bias, 
+  //   1e-05, &model->conv2_1_running_mean, &model->conv2_1_running_var);
+  // NN_ReLU6_F32(&model->conv2_2, &model->conv2_1);
+  // NN_Conv2d_F32(
+  //   &model->conv2_3, &model->conv2_2,
+  //   &model->conv2_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv2_4, &model->conv2_3,
+  //   &model->conv2_4_weight, &model->conv2_4_bias, 
+  //   1e-05, &model->conv2_4_running_mean, &model->conv2_4_running_var);
+  // NN_ReLU6_F32(&model->conv2_5, &model->conv2_4);
+  // NN_Conv2d_F32(
+  //   &model->conv3_0, &model->conv2_5,
+  //   &model->conv3_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 88);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv3_1, &model->conv3_0,
+  //   &model->conv3_1_weight, &model->conv3_1_bias, 
+  //   1e-05, &model->conv3_1_running_mean, &model->conv3_1_running_var);
+  // NN_ReLU6_F32(&model->conv3_2, &model->conv3_1);
+  // NN_Conv2d_F32(
+  //   &model->conv3_3, &model->conv3_2,
+  //   &model->conv3_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv3_4, &model->conv3_3,
+  //   &model->conv3_4_weight, &model->conv3_4_bias, 
+  //   1e-05, &model->conv3_4_running_mean, &model->conv3_4_running_var);
+  // NN_ReLU6_F32(&model->conv3_5, &model->conv3_4);
+  // NN_Conv2d_F32(
+  //   &model->conv4_0, &model->conv3_5,
+  //   &model->conv4_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 120);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv4_1, &model->conv4_0,
+  //   &model->conv4_1_weight, &model->conv4_1_bias, 
+  //   1e-05, &model->conv4_1_running_mean, &model->conv4_1_running_var);
+  // NN_ReLU6_F32(&model->conv4_2, &model->conv4_1);
+  // NN_Conv2d_F32(
+  //   &model->conv4_3, &model->conv4_2,
+  //   &model->conv4_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv4_4, &model->conv4_3,
+  //   &model->conv4_4_weight, &model->conv4_4_bias, 
+  //   1e-05, &model->conv4_4_running_mean, &model->conv4_4_running_var);
+  // NN_ReLU6_F32(&model->conv4_5, &model->conv4_4);
+  // NN_Conv2d_F32(
+  //   &model->conv5_0, &model->conv4_5,
+  //   &model->conv5_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 144);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv5_1, &model->conv5_0,
+  //   &model->conv5_1_weight, &model->conv5_1_bias, 
+  //   1e-05, &model->conv5_1_running_mean, &model->conv5_1_running_var);
+  // NN_ReLU6_F32(&model->conv5_2, &model->conv5_1);
+  // NN_Conv2d_F32(
+  //   &model->conv5_3, &model->conv5_2,
+  //   &model->conv5_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv5_4, &model->conv5_3,
+  //   &model->conv5_4_weight, &model->conv5_4_bias, 
+  //   1e-05, &model->conv5_4_running_mean, &model->conv5_4_running_var);
+  // NN_ReLU6_F32(&model->conv5_5, &model->conv5_4);
+  // NN_Conv2d_F32(
+  //   &model->conv6_0, &model->conv5_5,
+  //   &model->conv6_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 256);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv6_1, &model->conv6_0,
+  //   &model->conv6_1_weight, &model->conv6_1_bias, 
+  //   1e-05, &model->conv6_1_running_mean, &model->conv6_1_running_var);
+  // NN_ReLU6_F32(&model->conv6_2, &model->conv6_1);
+  // NN_Conv2d_F32(
+  //   &model->conv6_3, &model->conv6_2,
+  //   &model->conv6_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv6_4, &model->conv6_3,
+  //   &model->conv6_4_weight, &model->conv6_4_bias, 
+  //   1e-05, &model->conv6_4_running_mean, &model->conv6_4_running_var);
+  // NN_ReLU6_F32(&model->conv6_5, &model->conv6_4);
+  // NN_Conv2d_F32(
+  //   &model->conv7_0, &model->conv6_5,
+  //   &model->conv7_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 408);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv7_1, &model->conv7_0,
+  //   &model->conv7_1_weight, &model->conv7_1_bias, 
+  //   1e-05, &model->conv7_1_running_mean, &model->conv7_1_running_var);
+  // NN_ReLU6_F32(&model->conv7_2, &model->conv7_1);
+  // NN_Conv2d_F32(
+  //   &model->conv7_3, &model->conv7_2,
+  //   &model->conv7_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv7_4, &model->conv7_3,
+  //   &model->conv7_4_weight, &model->conv7_4_bias, 
+  //   1e-05, &model->conv7_4_running_mean, &model->conv7_4_running_var);
+  // NN_ReLU6_F32(&model->conv7_5, &model->conv7_4);
+  // NN_Conv2d_F32(
+  //   &model->conv8_0, &model->conv7_5,
+  //   &model->conv8_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 376);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv8_1, &model->conv8_0,
+  //   &model->conv8_1_weight, &model->conv8_1_bias, 
+  //   1e-05, &model->conv8_1_running_mean, &model->conv8_1_running_var);
+  // NN_ReLU6_F32(&model->conv8_2, &model->conv8_1);
+  // NN_Conv2d_F32(
+  //   &model->conv8_3, &model->conv8_2,
+  //   &model->conv8_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv8_4, &model->conv8_3,
+  //   &model->conv8_4_weight, &model->conv8_4_bias, 
+  //   1e-05, &model->conv8_4_running_mean, &model->conv8_4_running_var);
+  // NN_ReLU6_F32(&model->conv8_5, &model->conv8_4);
+  // NN_Conv2d_F32(
+  //   &model->conv9_0, &model->conv8_5,
+  //   &model->conv9_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 272);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv9_1, &model->conv9_0,
+  //   &model->conv9_1_weight, &model->conv9_1_bias, 
+  //   1e-05, &model->conv9_1_running_mean, &model->conv9_1_running_var);
+  // NN_ReLU6_F32(&model->conv9_2, &model->conv9_1);
+  // NN_Conv2d_F32(
+  //   &model->conv9_3, &model->conv9_2,
+  //   &model->conv9_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv9_4, &model->conv9_3,
+  //   &model->conv9_4_weight, &model->conv9_4_bias, 
+  //   1e-05, &model->conv9_4_running_mean, &model->conv9_4_running_var);
+  // NN_ReLU6_F32(&model->conv9_5, &model->conv9_4);
+  // NN_Conv2d_F32(
+  //   &model->conv10_0, &model->conv9_5,
+  //   &model->conv10_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 288);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv10_1, &model->conv10_0,
+  //   &model->conv10_1_weight, &model->conv10_1_bias, 
+  //   1e-05, &model->conv10_1_running_mean, &model->conv10_1_running_var);
+  // NN_ReLU6_F32(&model->conv10_2, &model->conv10_1);
+  // NN_Conv2d_F32(
+  //   &model->conv10_3, &model->conv10_2,
+  //   &model->conv10_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv10_4, &model->conv10_3,
+  //   &model->conv10_4_weight, &model->conv10_4_bias, 
+  //   1e-05, &model->conv10_4_running_mean, &model->conv10_4_running_var);
+  // NN_ReLU6_F32(&model->conv10_5, &model->conv10_4);
+  // NN_Conv2d_F32(
+  //   &model->conv11_0, &model->conv10_5,
+  //   &model->conv11_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 296);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv11_1, &model->conv11_0,
+  //   &model->conv11_1_weight, &model->conv11_1_bias, 
+  //   1e-05, &model->conv11_1_running_mean, &model->conv11_1_running_var);
+  // NN_ReLU6_F32(&model->conv11_2, &model->conv11_1);
+  // NN_Conv2d_F32(
+  //   &model->conv11_3, &model->conv11_2,
+  //   &model->conv11_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv11_4, &model->conv11_3,
+  //   &model->conv11_4_weight, &model->conv11_4_bias, 
+  //   1e-05, &model->conv11_4_running_mean, &model->conv11_4_running_var);
+  // NN_ReLU6_F32(&model->conv11_5, &model->conv11_4);
+  // NN_Conv2d_F32(
+  //   &model->conv12_0, &model->conv11_5,
+  //   &model->conv12_0_weight, NULL, (size_t[]){2, 2}, (size_t[]){1, 1}, 328);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv12_1, &model->conv12_0,
+  //   &model->conv12_1_weight, &model->conv12_1_bias, 
+  //   1e-05, &model->conv12_1_running_mean, &model->conv12_1_running_var);
+  // NN_ReLU6_F32(&model->conv12_2, &model->conv12_1);
+  // NN_Conv2d_F32(
+  //   &model->conv12_3, &model->conv12_2,
+  //   &model->conv12_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv12_4, &model->conv12_3,
+  //   &model->conv12_4_weight, &model->conv12_4_bias, 
+  //   1e-05, &model->conv12_4_running_mean, &model->conv12_4_running_var);
+  // NN_ReLU6_F32(&model->conv12_5, &model->conv12_4);
+  // NN_Conv2d_F32(
+  //   &model->conv13_0, &model->conv12_5,
+  //   &model->conv13_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){1, 1}, 480);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv13_1, &model->conv13_0,
+  //   &model->conv13_1_weight, &model->conv13_1_bias, 
+  //   1e-05, &model->conv13_1_running_mean, &model->conv13_1_running_var);
+  // NN_ReLU6_F32(&model->conv13_2, &model->conv13_1);
+  // NN_Conv2d_F32(
+  //   &model->conv13_3, &model->conv13_2,
+  //   &model->conv13_3_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->conv13_4, &model->conv13_3,
+  //   &model->conv13_4_weight, &model->conv13_4_bias, 
+  //   1e-05, &model->conv13_4_running_mean, &model->conv13_4_running_var);
+  // NN_ReLU6_F32(&model->conv13_5, &model->conv13_4);
+  // NN_Conv2d_F32(
+  //   &model->decode_conv1_0_0, &model->conv13_5,
+  //   &model->decode_conv1_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 512);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv1_0_1, &model->decode_conv1_0_0,
+  //   &model->decode_conv1_0_1_weight, &model->decode_conv1_0_1_bias, 
+  //   1e-05, &model->decode_conv1_0_1_running_mean, &model->decode_conv1_0_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv1_0_2, &model->decode_conv1_0_1);
+  // NN_Conv2d_F32(
+  //   &model->decode_conv1_1_0, &model->decode_conv1_0_2,
+  //   &model->decode_conv1_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv1_1_1, &model->decode_conv1_1_0,
+  //   &model->decode_conv1_1_1_weight, &model->decode_conv1_1_1_bias, 
+  //   1e-05, &model->decode_conv1_1_1_running_mean, &model->decode_conv1_1_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv1_1_2, &model->decode_conv1_1_1);
+  // // F.interpolate
+  // NN_interpolate_F32(&model->interpolate, &model->decode_conv1_1_2, (float []){2, 2});
 
-  NN_Conv2d_F32(
-    &model->decode_conv2_0_0, &model->interpolate,
-    &model->decode_conv2_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 200);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv2_0_1, &model->decode_conv2_0_0,
-    &model->decode_conv2_0_1_weight, &model->decode_conv2_0_1_bias, 
-    1e-05, &model->decode_conv2_0_1_running_mean, &model->decode_conv2_0_1_running_var);
-  NN_ReLU_F32(&model->decode_conv2_0_2, &model->decode_conv2_0_1);
-  NN_Conv2d_F32(
-    &model->decode_conv2_1_0, &model->decode_conv2_0_2,
-    &model->decode_conv2_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv2_1_1, &model->decode_conv2_1_0,
-    &model->decode_conv2_1_1_weight, &model->decode_conv2_1_1_bias, 
-    1e-05, &model->decode_conv2_1_1_running_mean, &model->decode_conv2_1_1_running_var);
-  NN_ReLU_F32(&model->decode_conv2_1_2, &model->decode_conv2_1_1);
-  // F.interpolate_1
-  NN_interpolate_F32(&model->interpolate_1, &model->decode_conv2_1_2, (float []){2, 2});
+  // NN_Conv2d_F32(
+  //   &model->decode_conv2_0_0, &model->interpolate,
+  //   &model->decode_conv2_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 200);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv2_0_1, &model->decode_conv2_0_0,
+  //   &model->decode_conv2_0_1_weight, &model->decode_conv2_0_1_bias, 
+  //   1e-05, &model->decode_conv2_0_1_running_mean, &model->decode_conv2_0_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv2_0_2, &model->decode_conv2_0_1);
+  // NN_Conv2d_F32(
+  //   &model->decode_conv2_1_0, &model->decode_conv2_0_2,
+  //   &model->decode_conv2_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv2_1_1, &model->decode_conv2_1_0,
+  //   &model->decode_conv2_1_1_weight, &model->decode_conv2_1_1_bias, 
+  //   1e-05, &model->decode_conv2_1_1_running_mean, &model->decode_conv2_1_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv2_1_2, &model->decode_conv2_1_1);
+  // // F.interpolate_1
+  // NN_interpolate_F32(&model->interpolate_1, &model->decode_conv2_1_2, (float []){2, 2});
 
-  // F.add
-  NN_add_F32(&model->add, &model->interpolate_1, &model->conv5_5);
+  // // F.add
+  // NN_add_F32(&model->add, &model->interpolate_1, &model->conv5_5);
 
-  NN_Conv2d_F32(
-    &model->decode_conv3_0_0, &model->add,
-    &model->decode_conv3_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 256);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv3_0_1, &model->decode_conv3_0_0,
-    &model->decode_conv3_0_1_weight, &model->decode_conv3_0_1_bias, 
-    1e-05, &model->decode_conv3_0_1_running_mean, &model->decode_conv3_0_1_running_var);
-  NN_ReLU_F32(&model->decode_conv3_0_2, &model->decode_conv3_0_1);
-  NN_Conv2d_F32(
-    &model->decode_conv3_1_0, &model->decode_conv3_0_2,
-    &model->decode_conv3_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv3_1_1, &model->decode_conv3_1_0,
-    &model->decode_conv3_1_1_weight, &model->decode_conv3_1_1_bias, 
-    1e-05, &model->decode_conv3_1_1_running_mean, &model->decode_conv3_1_1_running_var);
-  NN_ReLU_F32(&model->decode_conv3_1_2, &model->decode_conv3_1_1);
-  // F.interpolate_2
-  NN_interpolate_F32(&model->interpolate_2, &model->decode_conv3_1_2, (float []){2, 2});
+  // NN_Conv2d_F32(
+  //   &model->decode_conv3_0_0, &model->add,
+  //   &model->decode_conv3_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 256);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv3_0_1, &model->decode_conv3_0_0,
+  //   &model->decode_conv3_0_1_weight, &model->decode_conv3_0_1_bias, 
+  //   1e-05, &model->decode_conv3_0_1_running_mean, &model->decode_conv3_0_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv3_0_2, &model->decode_conv3_0_1);
+  // NN_Conv2d_F32(
+  //   &model->decode_conv3_1_0, &model->decode_conv3_0_2,
+  //   &model->decode_conv3_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv3_1_1, &model->decode_conv3_1_0,
+  //   &model->decode_conv3_1_1_weight, &model->decode_conv3_1_1_bias, 
+  //   1e-05, &model->decode_conv3_1_1_running_mean, &model->decode_conv3_1_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv3_1_2, &model->decode_conv3_1_1);
+  // // F.interpolate_2
+  // NN_interpolate_F32(&model->interpolate_2, &model->decode_conv3_1_2, (float []){2, 2});
 
-  // F.add_1
-  NN_add_F32(&model->add_1, &model->interpolate_2, &model->conv3_5);
+  // // F.add_1
+  // NN_add_F32(&model->add_1, &model->interpolate_2, &model->conv3_5);
 
-  NN_Conv2d_F32(
-    &model->decode_conv4_0_0, &model->add_1,
-    &model->decode_conv4_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 120);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv4_0_1, &model->decode_conv4_0_0,
-    &model->decode_conv4_0_1_weight, &model->decode_conv4_0_1_bias, 
-    1e-05, &model->decode_conv4_0_1_running_mean, &model->decode_conv4_0_1_running_var);
-  NN_ReLU_F32(&model->decode_conv4_0_2, &model->decode_conv4_0_1);
-  NN_Conv2d_F32(
-    &model->decode_conv4_1_0, &model->decode_conv4_0_2,
-    &model->decode_conv4_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv4_1_1, &model->decode_conv4_1_0,
-    &model->decode_conv4_1_1_weight, &model->decode_conv4_1_1_bias, 
-    1e-05, &model->decode_conv4_1_1_running_mean, &model->decode_conv4_1_1_running_var);
-  NN_ReLU_F32(&model->decode_conv4_1_2, &model->decode_conv4_1_1);
-  // F.interpolate_3
-  NN_interpolate_F32(&model->interpolate_3, &model->decode_conv4_1_2, (float []){2, 2});
+  // NN_Conv2d_F32(
+  //   &model->decode_conv4_0_0, &model->add_1,
+  //   &model->decode_conv4_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 120);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv4_0_1, &model->decode_conv4_0_0,
+  //   &model->decode_conv4_0_1_weight, &model->decode_conv4_0_1_bias, 
+  //   1e-05, &model->decode_conv4_0_1_running_mean, &model->decode_conv4_0_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv4_0_2, &model->decode_conv4_0_1);
+  // NN_Conv2d_F32(
+  //   &model->decode_conv4_1_0, &model->decode_conv4_0_2,
+  //   &model->decode_conv4_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv4_1_1, &model->decode_conv4_1_0,
+  //   &model->decode_conv4_1_1_weight, &model->decode_conv4_1_1_bias, 
+  //   1e-05, &model->decode_conv4_1_1_running_mean, &model->decode_conv4_1_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv4_1_2, &model->decode_conv4_1_1);
+  // // F.interpolate_3
+  // NN_interpolate_F32(&model->interpolate_3, &model->decode_conv4_1_2, (float []){2, 2});
 
-  // F.add_2
-  NN_add_F32(&model->add_2, &model->interpolate_3, &model->conv1_5);
+  // // F.add_2
+  // NN_add_F32(&model->add_2, &model->interpolate_3, &model->conv1_5);
 
-  NN_Conv2d_F32(
-    &model->decode_conv5_0_0, &model->add_2,
-    &model->decode_conv5_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 56);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv5_0_1, &model->decode_conv5_0_0,
-    &model->decode_conv5_0_1_weight, &model->decode_conv5_0_1_bias, 
-    1e-05, &model->decode_conv5_0_1_running_mean, &model->decode_conv5_0_1_running_var);
-  NN_ReLU_F32(&model->decode_conv5_0_2, &model->decode_conv5_0_1);
-  NN_Conv2d_F32(
-    &model->decode_conv5_1_0, &model->decode_conv5_0_2,
-    &model->decode_conv5_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv5_1_1, &model->decode_conv5_1_0,
-    &model->decode_conv5_1_1_weight, &model->decode_conv5_1_1_bias, 
-    1e-05, &model->decode_conv5_1_1_running_mean, &model->decode_conv5_1_1_running_var);
-  NN_ReLU_F32(&model->decode_conv5_1_2, &model->decode_conv5_1_1);
-  // F.interpolate_4
-  NN_interpolate_F32(&model->interpolate_4, &model->decode_conv5_1_2, (float []){2, 2});
+  // NN_Conv2d_F32(
+  //   &model->decode_conv5_0_0, &model->add_2,
+  //   &model->decode_conv5_0_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){2, 2}, 56);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv5_0_1, &model->decode_conv5_0_0,
+  //   &model->decode_conv5_0_1_weight, &model->decode_conv5_0_1_bias, 
+  //   1e-05, &model->decode_conv5_0_1_running_mean, &model->decode_conv5_0_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv5_0_2, &model->decode_conv5_0_1);
+  // NN_Conv2d_F32(
+  //   &model->decode_conv5_1_0, &model->decode_conv5_0_2,
+  //   &model->decode_conv5_1_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv5_1_1, &model->decode_conv5_1_0,
+  //   &model->decode_conv5_1_1_weight, &model->decode_conv5_1_1_bias, 
+  //   1e-05, &model->decode_conv5_1_1_running_mean, &model->decode_conv5_1_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv5_1_2, &model->decode_conv5_1_1);
+  // // F.interpolate_4
+  // NN_interpolate_F32(&model->interpolate_4, &model->decode_conv5_1_2, (float []){2, 2});
 
-  NN_Conv2d_F32(
-    &model->decode_conv6_0, &model->interpolate_4,
-    &model->decode_conv6_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
-  NN_BatchNorm2d_F32(
-    &model->decode_conv6_1, &model->decode_conv6_0,
-    &model->decode_conv6_1_weight, &model->decode_conv6_1_bias, 
-    1e-05, &model->decode_conv6_1_running_mean, &model->decode_conv6_1_running_var);
-  NN_ReLU_F32(&model->decode_conv6_2, &model->decode_conv6_1);
+  // NN_Conv2d_F32(
+  //   &model->decode_conv6_0, &model->interpolate_4,
+  //   &model->decode_conv6_0_weight, NULL, (size_t[]){1, 1}, (size_t[]){0, 0}, 1);
+  // NN_BatchNorm2d_F32(
+  //   &model->decode_conv6_1, &model->decode_conv6_0,
+  //   &model->decode_conv6_1_weight, &model->decode_conv6_1_bias, 
+  //   1e-05, &model->decode_conv6_1_running_mean, &model->decode_conv6_1_running_var);
+  // NN_ReLU_F32(&model->decode_conv6_2, &model->decode_conv6_1);
 
 }
 

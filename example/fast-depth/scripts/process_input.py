@@ -19,5 +19,5 @@ assert len(input_bin) == 1 * 3 * 224 * 224 * 4
 img = np.frombuffer(input_bin, dtype=np.float32)
 print(img.reshape(1, 3, 224, 224))
 
-with open("input.bin", "wb") as f:
+with open("./input.bin", "wb") as f:
     f.write(input_bin)
