@@ -3,8 +3,8 @@
 
 
 void NN_Conv2d_F32(
-  Tensor *out, const Tensor *in, 
-  const Tensor *weight, const Tensor *bias, 
+  Tensor *out, Tensor *in, 
+  Tensor *weight, Tensor *bias, 
   const size_t *stride, const size_t *padding, size_t groups) {
   const size_t dilation[2] = {1, 1};
 
