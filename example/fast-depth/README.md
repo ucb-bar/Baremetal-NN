@@ -29,6 +29,7 @@ The script will generate a `input.bin` file.
 ## Compiling and running the program
 
 Building for x86 CPU:
+
 ```bash
 cd ./example/fast-depth/build/
 cmake .. -D X86=ON
