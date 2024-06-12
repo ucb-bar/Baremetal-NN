@@ -17,7 +17,6 @@
 #include "nn_max.h"
 #include "nn_min.h"
 #include "nn_mul.h"
-#include "nn_multiply.h"
 #include "nn_neg.h"
 #include "nn_relu.h"
 #include "nn_relu6.h"
