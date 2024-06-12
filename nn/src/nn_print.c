@@ -3,6 +3,15 @@
 
 
 void NN_printFloat(float v, int16_t num_digits) {
+  if (isinf(v)) {
+    if (signbit(v)) {
+      printf("-inf");
+    } else {
+      printf("inf");
+    }
+    return;
+  }
+  
   if (v < 0) {
     printf("-");  // Print the minus sign for negative numbers
     v = -v;        // Make the number positive for processing

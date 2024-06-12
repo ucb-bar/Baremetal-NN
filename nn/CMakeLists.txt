@@ -2,10 +2,6 @@
 option(AVX "Use AVX implementation" OFF)
 option(RVV "Use RISCV vector extension implementation" OFF)
 
-set(INCLUDES
-  inc
-)
-
 set(SOURCES
   src/nn_tensor.c
   src/nn_print.c
@@ -63,9 +59,19 @@ if(RVV)
 endif(RVV)
 
 add_library(nn ${SOURCES})
+target_include_directories(nn PUBLIC inc)
+
+if (X86)
+    message("NN: Building for x86")
+    target_link_libraries(nn target-x86)
+    
+elseif (RISCV)
+    message("NN: Building for RISC-V")
+    target_link_libraries(nn target-riscv)
+endif ()
+
 
 target_link_libraries(nn m)
 
 
-target_include_directories(nn PUBLIC ${INCLUDES})
 
