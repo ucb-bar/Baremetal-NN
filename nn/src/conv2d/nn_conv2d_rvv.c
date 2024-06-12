@@ -30,8 +30,8 @@ void NN_Conv2d_F32_RVV(
   size_t batch_size = in->shape[0];
   size_t out_channels = out->shape[1];
   size_t in_channels = in->shape[1];
-  size_t input_height = in->shape[2];
-  size_t input_width = in->shape[3];
+  size_t in_height = in->shape[2];
+  size_t in_width = in->shape[3];
   size_t kernel_height = weight->shape[2];
   size_t kernel_width = weight->shape[3];
   size_t stride_height = stride[0];
@@ -39,20 +39,20 @@ void NN_Conv2d_F32_RVV(
   size_t padding_height = padding[0];
   size_t padding_width = padding[1];
 
-  size_t output_height = (input_height + 2 * padding_height - kernel_height) / stride_height + 1;
-  size_t output_width = (input_width + 2 * padding_width - kernel_width) / stride_width + 1;
+  size_t out_height = (in_height + 2 * padding_height - kernel_height) / stride_height + 1;
+  size_t out_width = (in_width + 2 * padding_width - kernel_width) / stride_width + 1;
 
   // Initialize output tensor to zeros
-  memset(out->data, 0, batch_size * out_channels * output_height * output_width * sizeof(float));
+  memset(out->data, 0, batch_size * out_channels * out_height * out_width * sizeof(float));
 
   size_t vl;
   for (size_t n = 0; n < batch_size; n++) {
     for (size_t g = 0; g < groups; g++) {
       for (size_t oc = 0; oc < out_channels / groups; oc++) {
         size_t out_channel_idx = g * (out_channels / groups) + oc;
-        for (size_t oh = 0; oh < output_height; oh++) {
+        for (size_t oh = 0; oh < out_height; oh++) {
           size_t ih_base = oh * stride_height - padding_height;
-          for (size_t ow = 0; ow < output_width; ow++) {
+          for (size_t ow = 0; ow < out_width; ow++) {
             size_t iw_base = ow * stride_width - padding_width;
 
             vfloat32m1_t sum = __riscv_vfmv_v_f_f32m1(0.0, vl);
@@ -61,14 +61,14 @@ void NN_Conv2d_F32_RVV(
               size_t in_channel_idx = g * (in_channels / groups) + ic;
               for (size_t kh = 0; kh < kernel_height; kh++) {
                 size_t ih = ih_base + kh;
-                if (ih >= input_height) continue;
+                if (ih >= in_height) continue;
                 for (size_t kw = 0; kw < kernel_width; kw++) {
                   size_t iw = iw_base + kw;
-                  if (iw >= input_width) continue;
+                  if (iw >= in_width) continue;
 
-                  size_t in_idx = n * in_channels * input_height * input_width
-                                  + in_channel_idx * input_height * input_width
-                                  + ih * input_width
+                  size_t in_idx = n * in_channels * in_height * in_width
+                                  + in_channel_idx * in_height * in_width
+                                  + ih * in_width
                                   + iw;
                   size_t weight_idx = out_channel_idx * in_channels / groups * kernel_height * kernel_width
                                       + ic * kernel_height * kernel_width
@@ -88,9 +88,9 @@ void NN_Conv2d_F32_RVV(
               final_sum += ((float *)bias->data)[out_channel_idx];
             }
 
-            size_t out_idx = n * out_channels * output_height * output_width
-                             + out_channel_idx * output_height * output_width
-                             + oh * output_width
+            size_t out_idx = n * out_channels * out_height * out_width
+                             + out_channel_idx * out_height * out_width
+                             + oh * out_width
                              + ow;
             ((float *)out->data)[out_idx] = final_sum;
           }

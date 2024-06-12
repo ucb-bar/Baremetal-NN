@@ -48,15 +48,24 @@ set(RVV_SOURCE
   src/sub/nn_sub_rvv.c
 )
 
-if(AVX)
+set(GEMMINI_SOURCE
+  src/conv2d/nn_conv2d_gemmini.c
+)
+
+if (AVX)
   set(SOURCES ${SOURCES} ${AVX_SOURCE})
   message(STATUS "Using AVX implementation")
-endif(AVX)
+endif ()
 
-if(RVV)
+if (RVV)
   set(SOURCES ${SOURCES} ${RVV_SOURCE})
   message(STATUS "Using RVV implementation")
-endif(RVV)
+endif ()
+
+if (GEMMINI)
+  set(SOURCES ${SOURCES} ${GEMMINI_SOURCE})
+  message(STATUS "Using Gemmini implementation")
+endif ()
 
 add_library(nn ${SOURCES})
 target_include_directories(nn PUBLIC inc)

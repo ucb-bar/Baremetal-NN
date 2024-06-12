@@ -32,5 +32,17 @@ void NN_Conv2d_F32_RVV(
   const size_t *stride, const size_t *padding, size_t groups
   );
 
+void NN_Conv2dNHWC_F32(
+  Tensor *out, Tensor *in, 
+  Tensor *weight, Tensor *bias, 
+  const size_t *stride, const size_t *padding, size_t groups
+  );
+
+void NN_Conv2dNHWC_F32_Gemmini(
+  Tensor *out, Tensor *in, 
+  Tensor *weight, Tensor *bias, 
+  const size_t *stride, const size_t *padding, size_t groups
+  );
+
 
 #endif // __NN_CONV2D_H
