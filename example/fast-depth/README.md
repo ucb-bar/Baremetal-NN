@@ -20,7 +20,7 @@ The script will generate a `model.bin` file.
 ## Generating model inputs
 
 ```bash
-python process_input.py
+python ./scripts/process_input.py
 ```
 
 The script will generate a `input.bin` file.
