@@ -21,9 +21,7 @@ target_include_directories(fast-depth PUBLIC inc)
 target_compile_features(fast-depth INTERFACE c_std_11)
 
 
-set(CMAKE_C_FLAGS           "-Wall -Wextra")
-set(CMAKE_C_FLAGS_DEBUG     "-O2")
-set(CMAKE_C_FLAGS_RELEASE   "-O3")
+set(CMAKE_C_FLAGS           "-O3 -Wall -Wextra")
 set(CMAKE_EXE_LINKER_FLAGS  "-static")
 
 if (X86)
