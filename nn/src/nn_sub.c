@@ -24,7 +24,7 @@ void NN_sub(Tensor *out, Tensor *a, Tensor *b) {
       return;
     
     default:
-      printf("[ERROR] Unsupported tensor dimension: %d\n", out->ndim);
+      printf("[ERROR] Unsupported tensor dimension: %lu\n", out->ndim);
       return;
   }
 }
@@ -42,8 +42,8 @@ void NN_sub_1D(Tensor *out, Tensor *a, Tensor *b) {
     return;
   }
 
-  printf("[ERROR] Unsupported operation between tensor with dtype %s + %s -> %s\n", 
-    NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype), NN_getDataTypeName(out->dtype)
+  printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
+    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
   );
 }
 
@@ -79,8 +79,8 @@ void NN_sub_2D(Tensor *out, Tensor *a, Tensor *b) {
     return;
   }
 
-  printf("[ERROR] Unsupported operation between tensor with dtype %s + %s -> %s\n", 
-    NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype), NN_getDataTypeName(out->dtype)
+  printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
+    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
   );
 }
 
@@ -109,8 +109,8 @@ void NN_sub_3D(Tensor *out, Tensor *a, Tensor *b) {
     }
   }
   
-  printf("[ERROR] Unsupported operation between tensor with dtype %s + %s -> %s\n", 
-    NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype), NN_getDataTypeName(out->dtype)
+  printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
+    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
   );
 }
 
@@ -144,8 +144,8 @@ void NN_sub_4D(Tensor *out, Tensor *a, Tensor *b) {
     }
   }
 
-  printf("[ERROR] Unsupported operation between tensor with dtype %s + %s -> %s\n", 
-    NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype), NN_getDataTypeName(out->dtype)
+  printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
+    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
   );
 }
 

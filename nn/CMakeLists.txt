@@ -6,7 +6,7 @@ option(RVV "Use RISCV vector extension implementation" OFF)
 add_library(nn 
   src/nn_tensor.c
   src/nn_print.c
-  src/abs/nn_abs.c
+  src/nn_abs.c
   src/nn_add.c
   src/batchnorm2d/nn_batchnorm2d.c
   src/conv2d/nn_conv2d.c
@@ -16,11 +16,11 @@ add_library(nn
   src/nn_linear.c
   src/nn_matmul.c
   src/matrixnorm/nn_matrixnorm.c
-  src/max/nn_max.c
-  src/maximum/nn_maximum.c
+  src/nn_max.c
+  src/nn_maximum.c
   src/maxpool2d/nn_maxpool2d.c
-  src/min/nn_min.c
-  src/minimum/nn_minimum.c
+  src/nn_min.c
+  src/nn_minimum.c
   src/mul/nn_mul.c
   src/neg/nn_neg.c
   src/relu/nn_relu.c

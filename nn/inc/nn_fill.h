@@ -13,11 +13,7 @@
  * @param tensor: the input tensor
  * @param value: scalar value
  */
-void NN_fill_F32(Tensor *tensor, float value);
-
-void NN_fill_I32(Tensor *tensor, int32_t value);
-
-void NN_fill_I8(Tensor *tensor, int8_t value);
+void NN_fill(Tensor *tensor, float value);
 
 Tensor *NN_zeros(size_t ndim, const size_t *shape, DataType dtype);
 

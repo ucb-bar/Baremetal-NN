@@ -56,6 +56,33 @@ int main() {
 }
 """
 
+def generateImmTestPattern(op, function, inputs, detail=""):
+    result = function(*[value for name, value in inputs]).item()
+
+    test_template = env.from_string("""
+  {
+    printf("{{ (op + ":").ljust(24) }}");
+{% for name, value in inputs %}{% if (type(value) == torch.Tensor and name != "actual") %}
+    Tensor *{{ name }} = NN_tensor({{ len(value.shape) }}, (size_t[]){ {{ value.shape | join(", ") }} }, DTYPE_F32, (float[]){ {{ value.numpy().flatten() | join(", ") }} });
+{% elif str(type(value)) == "<class 'float'>" %}
+    float {{ name }} = {{ value }};{% endif %}{% endfor %}
+    
+    float golden = {{ result }};
+    float actual;
+
+    cycles = READ_CSR("mcycle");
+    actual = NN_{{ op }}({{ inputs[0][0] }});
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("%s  (%lu cycles)\\n", float_eq(golden, actual, 1e-6) ? "PASS" : "FAIL", cycles);
+
+{% for name, value in inputs %}{% if (type(value) == torch.Tensor and name != "actual") %}
+    NN_deleteTensor({{ name }});{% endif %}{% endfor %}
+    
+  }
+""")
+    
+    return test_template.render(op=op, inputs=inputs, result=result, detail=detail)
+
 
 def generateTestPattern(op, function, inputs, detail=""):
     result = function(*[value for name, value in inputs])
@@ -99,15 +126,15 @@ result = template.render(code="\n".join([
         "add",
         lambda a, b: a + b,
         (
-            ("a", torch.rand((3, 3))),
-            ("b", torch.rand((3, 3))),
+            ("a", torch.rand((7, 7))),
+            ("b", torch.rand((7, 7))),
         ),
     ),
     generateTestPattern(
-        "add1_F32",
+        "add1",
         lambda a, b: a + b,
         (
-            ("a", torch.rand((3, 3))),
+            ("a", torch.rand((7, 7))),
             ("v", random.random()),
         ),
     ),
@@ -115,23 +142,23 @@ result = template.render(code="\n".join([
         "sub",
         lambda a, b: a - b,
         (
-            ("a", torch.rand((3, 3))),
-            ("b", torch.rand((3, 3))),
+            ("a", torch.rand((7, 7))),
+            ("b", torch.rand((7, 7))),
         ),
     ),
     generateTestPattern(
         "addInplace",
         lambda a, b: a + b,
         (
-            ("actual", torch.zeros((3, 3))),
-            ("b", torch.rand((3, 3))),
+            ("actual", torch.zeros((7, 7))),
+            ("b", torch.rand((7, 7))),
         )
     ),
     generateTestPattern(
-        "fill_F32",
+        "fill",
         lambda a, v: a.fill_(v),
         (
-            ("actual", torch.zeros((3, 3))),
+            ("actual", torch.zeros((7, 7))),
             ("v", random.random()),
         ),
     ),
@@ -139,18 +166,49 @@ result = template.render(code="\n".join([
         "matmulT",
         lambda a, b: a @ b.T,
         (
-            ("a", torch.rand((6, 3))),
-            ("b", torch.rand((5, 3))),
+            ("a", torch.rand((6, 7))),
+            ("b", torch.rand((5, 7))),
         ),
     ),
     generateTestPattern(
         "matmul",
         lambda a, b: a @ b,
         (
-            ("a", torch.rand((6, 3))),
-            ("b", torch.rand((3, 5))),
+            ("a", torch.rand((6, 7))),
+            ("b", torch.rand((7, 5))),
         ),
     ),
+    generateTestPattern(
+        "maximum",
+        lambda a, b: torch.maximum(a, b),
+        (
+            ("a", torch.rand((7, 7))),
+            ("b", torch.rand((7, 7))),
+        ),
+    ),
+    generateTestPattern(
+        "minimum",
+        lambda a, b: torch.minimum(a, b),
+        (
+            ("a", torch.rand((7, 7))),
+            ("b", torch.rand((7, 7))),
+        ),
+    ),
+    generateImmTestPattern(
+        "max",
+        lambda a: torch.max(a),
+        (
+            ("a", torch.rand((7, 7))),
+        ),
+    ),
+    generateImmTestPattern(
+        "min",
+        lambda a: torch.min(a),
+        (
+            ("a", torch.rand((7, 7))),
+        ),
+    ),
+    
     ]
 ))
 

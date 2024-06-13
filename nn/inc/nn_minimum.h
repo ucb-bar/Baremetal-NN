@@ -2,6 +2,9 @@
 #define __NN_MINIMUM_H
 
 #include <assert.h>
+#ifdef RVV
+  #include <riscv_vector.h>
+#endif
 
 #include "nn_tensor.h"
 
@@ -14,11 +17,6 @@
  * @param b: the input tensor
  */
 void NN_minimum(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_minimum_F32(Tensor *out, Tensor *a, Tensor *b);
-
-
-void NN_minimum_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
 
 
 #endif // __NN_MINIMUM_H

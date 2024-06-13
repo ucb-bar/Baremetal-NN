@@ -6,7 +6,9 @@ void NN_matmul(Tensor *out, Tensor *a, Tensor *b) {
     NN_matmul_F32(out, a, b);
     return;
   }
-  printf("Unsupported operation: %s @ %s -> %s\n", NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype), NN_getDataTypeName(out->dtype));
+  printf("Unsupported operation: %s = %s @ %s\n", 
+    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+  );
 }
 
 void NN_matmul_F32(Tensor *out, Tensor *a, Tensor *b) {
@@ -36,7 +38,9 @@ void NN_matmulT(Tensor *out, Tensor *a, Tensor *b) {
     NN_matmulT_F32(out, a, b);
     return;
   }
-  printf("Unsupported operation: %s @ %s -> %s\n", NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype), NN_getDataTypeName(out->dtype));
+  printf("Unsupported operation: %s = %s @ %s\n", 
+    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+  );
 }
 
 void NN_matmulT_F32(Tensor *out, Tensor *a, Tensor *b) {

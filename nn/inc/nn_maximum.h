@@ -2,7 +2,9 @@
 #define __NN_MAXIMUM_H
 
 #include <assert.h>
-#include <float.h>
+#ifdef RVV
+  #include <riscv_vector.h>
+#endif
 
 #include "nn_tensor.h"
 
@@ -15,11 +17,6 @@
  * @param b: the input tensor
  */
 void NN_maximum(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_maximum_F32(Tensor *out, Tensor *a, Tensor *b);
-
-
-void NN_maximum_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
 
 
 #endif // __NN_MAXIMUM_H

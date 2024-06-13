@@ -5,6 +5,7 @@
 #include <float.h>
 
 #include "nn_tensor.h"
+#include "kernel/min.h"
 
 
 /**
@@ -13,11 +14,6 @@
  * @param tensor: the input tensor
  */
 float NN_min(Tensor *tensor);
-
-float NN_min_F32(Tensor *tensor);
-
-
-float NN_min_F32_RVV(Tensor *tensor);
 
 
 #endif // __NN_MIN_H

@@ -32,7 +32,7 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b);
  * @param in: the input tensor
  * @param scalar: scalar value
  */
-void NN_add1_F32(Tensor *out, Tensor *in, float scalar);
+void NN_add1(Tensor *out, Tensor *in, float scalar);
 
 /**
  * Element-wise addition
@@ -52,7 +52,7 @@ void NN_addInplace(Tensor *b, Tensor *a);
  * @param b: the target tensor
  * @param scalar: scalar value
  */
-void NN_addInplace1_F32(Tensor *b, float scalar);
+void NN_addInplace1(Tensor *b, float scalar);
 
 void NN_add_1D(Tensor *out, Tensor *a, Tensor *b);
 

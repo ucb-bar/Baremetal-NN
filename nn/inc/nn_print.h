@@ -1,6 +1,8 @@
 #ifndef __NN_PRINT_H
 #define __NN_PRINT_H
 
+#include <math.h>
+
 #include "nn_tensor.h"
 
 

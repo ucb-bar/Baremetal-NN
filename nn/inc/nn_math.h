@@ -12,7 +12,7 @@
 // fundamental operations
 //
 
-inline static void NN__cpy_F32 (const int n, float *y, const float *x)                  { for (int i = 0; i < n; i += 1) y[i]  = x[i];        }
+
 inline static void NN__neg_F32 (const int n, float *y, const float *x)                  { for (int i = 0; i < n; i += 1) y[i]  = -x[i];       }
 inline static void NN__mul_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i]*y[i];   }
 inline static void NN__div_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i]/y[i];   }
@@ -349,7 +349,7 @@ inline static void NN__div_F32 (const int n, float *z, const float *x, const flo
 // inline static void NN__sqr_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = x[i]*x[i];   }
 // inline static void NN__sqrt_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = sqrtf(x[i]); }
 // inline static void NN__log_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = logf(x[i]);   }
-// inline static void NN__abs_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = fabsf(x[i]); }
+
 // inline static void NN__sgn_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? 1.f : ((x[i] < 0.f) ? -1.f : 0.f); }
 // inline static void NN__step_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? 1.f : 0.f; }
 // inline static void NN__tanh_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = tanhf(x[i]);  }
@@ -752,18 +752,6 @@ inline static void NN__div_F32 (const int n, float *z, const float *x, const flo
 //         sum += GGML_BF16_TO_FP32(x[i]);
 //     }
 //     *s = sum;
-// }
-
-// inline static void NN__max_F32(const int n, float *s, const float *x) {
-// #ifndef GGML_USE_ACCELERATE
-//     float max = -INFINITY;
-//     for (int i = 0; i < n; i += 1) {
-//         max = MAX(max, x[i]);
-//     }
-//     *s = max;
-// #else
-//     vDSP_maxv(x, 1, s, n);
-// #endif
 // }
 
 // inline static void NN__norm_inv_F32(const int n, float *s, const float *x) {

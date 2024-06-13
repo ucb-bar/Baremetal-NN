@@ -5,6 +5,7 @@
 #include <float.h>
 
 #include "nn_tensor.h"
+#include "kernel/max.h"
 
 
 /**
@@ -13,10 +14,6 @@
  * @param tensor: the input tensor
  */
 float NN_max(Tensor *tensor);
-
-float NN_max_F32(Tensor *tensor);
-
-float NN_max_F32_RVV(Tensor *tensor);
 
 
 #endif // __NN_MAX_H
