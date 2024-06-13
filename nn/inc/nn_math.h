@@ -12,59 +12,12 @@
 // fundamental operations
 //
 
-inline static void NN__set_I8 (const int n, int8_t *x, const int8_t v)     { for (int i = 0; i < n; i += 1) x[i] = v; }
-inline static void NN__set_I16(const int n, int16_t *x, const int16_t v)   { for (int i = 0; i < n; i += 1) x[i] = v; }
-inline static void NN__set_I32(const int n, int32_t *x, const int32_t v)   { for (int i = 0; i < n; i += 1) x[i] = v; }
-inline static void NN__set_f16(const int n, float16_t *x, const int32_t v) { for (int i = 0; i < n; i += 1) x[i] = v; }
-// inline static void NN__set_bf16(const int n, bfloat16_t * x, const bfloat16_t v) { for (int i = 0; i < n; i += 1) x[i] = v; }
-
-inline static void NN__add_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i] + y[i]; }
-inline static void NN__add1_F32(const int n, float *z, const float *x, const float v)   { for (int i = 0; i < n; i += 1) z[i]  = x[i] + v;    }
-inline static void NN__acc_F32 (const int n, float *y, const float *x)                  { for (int i = 0; i < n; i += 1) y[i] += x[i];        }
-inline static void NN__acc1_F32(const int n, float *y, const float v)                   { for (int i = 0; i < n; i += 1) y[i] += v;           }
-inline static void NN__sub_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i] - y[i]; }
-inline static void NN__set_F32 (const int n, float *x, const float v)                   { for (int i = 0; i < n; i += 1) x[i]  = v;           }
 inline static void NN__cpy_F32 (const int n, float *y, const float *x)                  { for (int i = 0; i < n; i += 1) y[i]  = x[i];        }
 inline static void NN__neg_F32 (const int n, float *y, const float *x)                  { for (int i = 0; i < n; i += 1) y[i]  = -x[i];       }
 inline static void NN__mul_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i]*y[i];   }
 inline static void NN__div_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i]/y[i];   }
 
-static void NN__dot_F32(int n, float *s, const float *x, const float *y) {
-#if defined(GGML_SIMD)
-    float sumf = 0.0f;
-    const int np = (n & ~(GGML_F32_STEP - 1));
 
-    GGML_F32_VEC sum[GGML_F32_ARR] = { GGML_F32_VEC_ZERO };
-
-    GGML_F32_VEC ax[GGML_F32_ARR];
-    GGML_F32_VEC ay[GGML_F32_ARR];
-
-    for (int i = 0; i < np; i += GGML_F32_STEP) {
-        for (int j = 0; j < GGML_F32_ARR; j++) {
-            ax[j] = GGML_F32_VEC_LOAD(x + i + j*GGML_F32_EPR);
-            ay[j] = GGML_F32_VEC_LOAD(y + i + j*GGML_F32_EPR);
-
-            sum[j] = GGML_F32_VEC_FMA(sum[j], ax[j], ay[j]);
-        }
-    }
-
-    // reduce sum0..sum3 to sum0
-    GGML_F32_VEC_REDUCE(sumf, sum);
-
-    // leftovers
-    for (int i = np; i < n; i += 1) {
-        sumf += x[i]*y[i];
-    }
-#else
-    // scalar
-    float sumf = 0.0;
-    for (int i = 0; i < n; i += 1) {
-        sumf += (float)(x[i]*y[i]);
-    }
-#endif
-
-    *s = sumf;
-}
 
 // static void NN__dot_bf16(int n, float *s, bfloat16_t *x, bfloat16_t *y) {
 //     int i = 0;

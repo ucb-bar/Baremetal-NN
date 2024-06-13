@@ -5,9 +5,7 @@
 
 #include "nn_tensor.h"
 #include "nn_add.h"
-#include "nn_transpose.h"
 #include "nn_matmul.h"
-
 
 
 /**
@@ -22,6 +20,5 @@
  */
 void NN_Linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
 
-void NN_Linear_F32_RVV(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
 
 #endif // __NN_Linear_H

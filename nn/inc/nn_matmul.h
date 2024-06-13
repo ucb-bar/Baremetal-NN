@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
+#include "kernel/dot.h"
 
 
 /**
@@ -28,18 +29,9 @@ void NN_matmul_F32(Tensor *out, Tensor *a, Tensor *b);
  * @param a: the input tensor of shape (m, k)
  * @param b: the input tensor of shape (n, k)
  */
+void NN_matmulT(Tensor *out, Tensor *a, Tensor *b);
+
 void NN_matmulT_F32(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_matmul_I8_I8_I32(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_matmul_I32(Tensor *out, Tensor *a, Tensor *b);
-
-
-void NN_matmul_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_matmulT_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_matmul_I8_I8_I32_EAGLEX(Tensor *out, Tensor *a, Tensor *b);
 
 
 #endif // __NN_MATMUL_H
