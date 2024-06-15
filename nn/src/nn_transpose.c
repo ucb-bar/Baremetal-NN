@@ -2,7 +2,6 @@
 #include "nn_transpose.h"
 
 
-
 /**
  * Transpose a 2D tensor
  * 
@@ -12,24 +11,19 @@
  * @param a: input tensor of shape (m, n)
  */
 void NN_transpose(Tensor *out, Tensor *a) {
+  assert(a->ndim == 2);
+  assert(out->ndim == a->ndim);
+  assert(out->dtype == a->dtype);
+  assert(out->shape[0] == a->shape[1]);
+  assert(out->shape[1] == a->shape[0]);
+
   if (a->dtype == DTYPE_F32) {
-    NN_transpose_F32(out, a);
+    NN__transpose_F32(a->shape[0], a->shape[1], (float *)out->data, (float *)a->data);
     return;
   }
-  printf("Unsupported data type %s\n", NN_getDataTypeName(a->dtype));
-}
 
-void NN_transpose_F32(Tensor *out, Tensor *a) {
-  // currently only support 2D matrix transpose
-  assert(a->ndim == 2);
-  assert(a->dtype == DTYPE_F32);
-  assert(out->ndim == 2);
-  assert(out->dtype == DTYPE_F32);
-  
-  for (size_t i = 0; i < a->shape[0]; i += 1) {
-    for (size_t j = 0; j < a->shape[1]; j += 1) {
-      ((float *)out->data)[j * out->shape[1] + i] = ((float *)a->data)[i * a->shape[1] + j];
-    }
-  }
+  printf("[ERROR] Unsupported operation of tensor with dtype %s = %s.T\n", 
+    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype)
+  );
 }
 

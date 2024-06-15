@@ -13,9 +13,7 @@
 //
 
 
-inline static void NN__neg_F32 (const int n, float *y, const float *x)                  { for (int i = 0; i < n; i += 1) y[i]  = -x[i];       }
-inline static void NN__mul_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i]*y[i];   }
-inline static void NN__div_F32 (const int n, float *z, const float *x, const float *y)  { for (int i = 0; i < n; i += 1) z[i]  = x[i]/y[i];   }
+
 
 
 

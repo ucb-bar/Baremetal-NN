@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
+#include "kernel/neg.h"
 
 
 /**
@@ -16,10 +17,7 @@
  */
 void NN_neg(Tensor *out, Tensor *input);
 
-void NN_neg_F32(Tensor *out, Tensor *input);
-
-
-void NN_neg_F32_RVV(Tensor *out, Tensor *input);
+void NN_negInplace(Tensor *tensor);
 
 
 #endif // __NN_NEG_H

@@ -11,6 +11,7 @@ add_library(nn
   src/batchnorm2d/nn_batchnorm2d.c
   src/conv2d/nn_conv2d.c
   src/nn_copy.c
+  src/nn_div.c
   src/nn_fill.c
   src/interpolate/nn_interpolate.c
   src/nn_linear.c
@@ -21,8 +22,8 @@ add_library(nn
   src/maxpool2d/nn_maxpool2d.c
   src/nn_min.c
   src/nn_minimum.c
-  src/mul/nn_mul.c
-  src/neg/nn_neg.c
+  src/nn_mul.c
+  src/nn_neg.c
   src/nn_relu.c
   src/nn_relu6.c
   src/nn_sub.c

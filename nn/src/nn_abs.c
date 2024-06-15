@@ -14,6 +14,7 @@ void NN_abs(Tensor *out, Tensor *in) {
 
     default:
   }
+  
   printf("[ERROR] Unsupported operation of tensor with dtype %s = |%s|\n", 
     NN_getDataTypeName(out->dtype), NN_getDataTypeName(in->dtype)
   );

@@ -5,6 +5,7 @@
 #include <float.h>
 
 #include "nn_tensor.h"
+#include "kernel/mul.h"
 
 
 /**
@@ -18,8 +19,6 @@
  */
 void NN_mul(Tensor *out, Tensor *a, Tensor *b);
 
-void NN_mul_F32(Tensor *out, Tensor *a, Tensor *b);
-
 /**
  * Returns the element-wise multiplication of the input tensor with a scalar.
  * 
@@ -27,14 +26,7 @@ void NN_mul_F32(Tensor *out, Tensor *a, Tensor *b);
  * @param in: the input tensor
  * @param scalar: scalar value
  */
-void NN_mulF(Tensor *out, Tensor *in, float scalar);
-
-void NN_mulF_F32(Tensor *out, Tensor *in, float scalar);
-
-
-void NN_mul_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_mulF_F32_RVV(Tensor *out, Tensor *in, float scalar);
+void NN_mul1(Tensor *out, Tensor *in, float scalar);
 
 
 #endif // __NN_MUL_H
