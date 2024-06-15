@@ -3,7 +3,9 @@
 
 #include <assert.h>
 
-#include "nn_types.h"
+#include "nn_tensor.h"
+#include "ops/maximum1.h"
+#include "ops/minimum1.h"
 
 
 /**
@@ -17,7 +19,9 @@
  * @param min: lower-bound of the range to be clamped to
  * @param max: upper-bound of the range to be clamped to
  */
-void NN_clip(Tensor *t, float min, float max);
+void NN_clip(Tensor *y, Tensor *x, float min, float max);
+
+void NN_clipInplace(Tensor *x, float min, float max);
 
 
 #endif // __NN_CLIP_H

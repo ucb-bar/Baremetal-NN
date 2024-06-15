@@ -2,7 +2,7 @@
 #include "nn_clip.h"
 
 
-void NN_clip(Tensor *out, Tensor *in, float min, float max) {
+void NN_clip(Tensor *y, Tensor *x, float min, float max) {
   assert(y->ndim == x->ndim);
   assert(y->dtype == x->dtype);
   assert(y->size == x->size);
@@ -17,7 +17,7 @@ void NN_clip(Tensor *out, Tensor *in, float min, float max) {
   }
 
   printf("[ERROR] Unsupported operation for tensor with dtype %s = clip(%s, float, float)\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(in->dtype)
+    NN_getDataTypeName(y->dtype), NN_getDataTypeName(x->dtype)
   );
 }
 

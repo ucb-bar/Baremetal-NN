@@ -1,5 +1,5 @@
 
-#include "nn_relu.h"
+#include "nn_relu6.h"
 
 
 void NN_ReLU6(Tensor *y, Tensor *x) {

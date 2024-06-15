@@ -208,6 +208,20 @@ result = template.render(code="\n".join([
             ("a", torch.rand((7, 7))),
         ),
     ),
+    generateTestPattern(
+        "ReLU",
+        lambda a: torch.nn.functional.relu(a),
+        (
+            ("a", torch.rand((7, 7)) - 0.5),
+        ),
+    ),
+    generateTestPattern(
+        "ReLU6",
+        lambda a: torch.nn.functional.relu6(a),
+        (
+            ("a", torch.rand((7, 7)) - 0.5),
+        ),
+    ),
     
     ]
 ))

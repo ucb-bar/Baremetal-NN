@@ -12,9 +12,9 @@ static inline void NN__transpose_F32(size_t n, size_t m, float *y, float *x) {
     for (size_t i = 0; i < m; i += 1) {
       size_t k = n;
       while (k > 0) {
-        vl = __riscv_vsetvl_e32(k);
-        vfloat32_t vec_x = __riscv_vle32_v_f32(x, vl);
-        __riscv_vsse32(y, sizeof(float) * m, vec_x, vl);
+        size_t vl = __riscv_vsetvl_e32m1(k);
+        vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x, vl);
+        __riscv_vsse32_v_f32m1(y, sizeof(float) * m, vec_x, vl);
         x += vl;
         y += vl * m;
         k -= vl;

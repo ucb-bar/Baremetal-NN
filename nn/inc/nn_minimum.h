@@ -7,6 +7,7 @@
 #endif
 
 #include "nn_tensor.h"
+#include "ops/minimum.h"
 
 
 /**

@@ -4,6 +4,8 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
+#include "ops/maximum1.h"
+
 
 /**
  * Applies the rectified linear unit function element-wise

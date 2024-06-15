@@ -4,6 +4,9 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
+#include "ops/maximum1.h"
+#include "ops/minimum1.h"
+
 
 /**
  * Applies the ReLU6 function element-wise.
