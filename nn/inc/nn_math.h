@@ -342,15 +342,7 @@ inline static void NN__div_F32 (const int n, float *z, const float *x, const flo
 // #endif
 // }
 
-// inline static void NN__norm_F32 (const int n, float *s, const float *x) {
-//   NN__dot_F32(n, s, x, x);
-//   *s = sqrtf(*s);
-// }
-// inline static void NN__sqr_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = x[i]*x[i];   }
-// inline static void NN__sqrt_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = sqrtf(x[i]); }
-// inline static void NN__log_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = logf(x[i]);   }
 
-// inline static void NN__sgn_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? 1.f : ((x[i] < 0.f) ? -1.f : 0.f); }
 // inline static void NN__step_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? 1.f : 0.f; }
 // inline static void NN__tanh_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = tanhf(x[i]);  }
 // inline static void NN__elu_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? x[i] : expf(x[i])-1; }
@@ -718,17 +710,6 @@ inline static void NN__div_F32 (const int n, float *z, const float *x, const flo
 //     }
 // }
 
-// inline static void NN__sum_F32(const int n, float *s, const float *x) {
-// #ifndef GGML_USE_ACCELERATE
-//     float sum = 0.0;
-//     for (int i = 0; i < n; i += 1) {
-//         sum += (float)x[i];
-//     }
-//     *s = sum;
-// #else
-//     vDSP_sve(x, 1, s, n);
-// #endif
-// }
 
 // inline static void NN__sum_F32_ggf(const int n, float *s, const float *x) {
 //     float sum = 0.0;
@@ -752,11 +733,6 @@ inline static void NN__div_F32 (const int n, float *z, const float *x, const flo
 //         sum += GGML_BF16_TO_FP32(x[i]);
 //     }
 //     *s = sum;
-// }
-
-// inline static void NN__norm_inv_F32(const int n, float *s, const float *x) {
-//     NN__norm_F32(n, s, x);
-//     *s = 1.f/(*s);
 // }
 
 // inline static void NN__argmax_F32(const int n, int * s, const float *x) {

@@ -23,11 +23,11 @@ add_library(nn
   src/nn_minimum.c
   src/mul/nn_mul.c
   src/neg/nn_neg.c
-  src/relu/nn_relu.c
-  src/relu6/nn_relu6.c
+  src/nn_relu.c
+  src/nn_relu6.c
   src/nn_sub.c
-  src/sum/nn_sum.c
-  src/transpose/nn_transpose.c
+  src/nn_sum.c
+  src/nn_transpose.c
 )
 target_include_directories(nn PUBLIC inc)
 

@@ -14,8 +14,5 @@ void NN_ReLU_F32(Tensor *y, Tensor *x) {
 }
 
 void NN_ReLUInplace_F32(Tensor *x) {
-  for (size_t i = 0; i < x->size; i += 1) {
-    float val = ((float *)x->data)[i];
-    ((float *)x->data)[i] = val > 0 ? val : 0;
-  }
+  NN_ReLU_F32(x, x);
 }

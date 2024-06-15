@@ -14,8 +14,5 @@ void NN_ReLU6_F32(Tensor *y, Tensor *x) {
 }
 
 void NN_ReLU6Inplace_F32(Tensor *x) {
-  for (size_t i = 0; i < x->size; i += 1) {
-    float val = ((float *)x->data)[i];
-    ((float *)x->data)[i] = val > 0 ? (val < 6 ? val : 6) : 0;
-  }
+  NN_ReLU6_F32(x, x);
 }

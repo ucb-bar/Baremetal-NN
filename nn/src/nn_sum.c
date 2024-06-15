@@ -5,11 +5,9 @@
 float NN_sum_F32(Tensor *tensor) {
   assert(tensor->dtype == DTYPE_F32);
   
-  float sum = 0;
+  float sum;
 
-  for (size_t i = 0; i < tensor->size; i += 1) {
-    sum += ((float *)tensor->data)[i];
-  }
+  NN__sum_F32(tensor->size, &sum, (float *)tensor->data);
 
   return sum;
 }
