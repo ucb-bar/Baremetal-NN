@@ -1,10 +1,11 @@
 
 #include "nn_relu.h"
 
+
 void NN_ReLU6(Tensor *y, Tensor *x) {
   assert(y->ndim == x->ndim);
+  assert(y->dtype == x->dtype);
   assert(y->size == x->size);
-
   
   switch (y->dtype) {
     case DTYPE_F32:

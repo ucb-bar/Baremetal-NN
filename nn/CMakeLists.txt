@@ -10,6 +10,7 @@ add_library(nn
   src/nn_add.c
   src/batchnorm2d/nn_batchnorm2d.c
   src/conv2d/nn_conv2d.c
+  src/nn_clip.c
   src/nn_copy.c
   src/nn_div.c
   src/nn_fill.c

@@ -5,6 +5,8 @@
 void NN_maximum(Tensor *out, Tensor *a, Tensor *b) {
   assert(b->ndim == a->ndim);
   assert(out->ndim == a->ndim);
+  assert(b->dtype == a->dtype);
+  assert(out->dtype == a->dtype);
   assert(b->size == a->size);
   assert(out->size == a->size);
 

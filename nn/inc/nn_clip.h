@@ -19,11 +19,5 @@
  */
 void NN_clip(Tensor *t, float min, float max);
 
-void NN_clip_I8(Tensor *t, int8_t min, int8_t max);
-
-void NN_clip_I32(Tensor *t, int32_t min, int32_t max);
-
-void NN_clip_F32(Tensor *t, float min, float max);
-
 
 #endif // __NN_CLIP_H
