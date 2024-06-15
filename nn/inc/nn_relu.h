@@ -8,14 +8,14 @@
 /**
  * Applies the rectified linear unit function element-wise
  * 
- * y = max(0, x)
+ * y = ReLU(x) = max(x, 0)
  * 
  * @param y: the output tensor
  * @param x: the input tensor
  */
-void NN_ReLU_F32(Tensor *y, Tensor *x);
+void NN_ReLU(Tensor *y, Tensor *x);
 
-void NN_ReLUInplace_F32(Tensor *x);
+void NN_ReLUInplace(Tensor *x);
 
 
 #endif // __NN_RELU_H

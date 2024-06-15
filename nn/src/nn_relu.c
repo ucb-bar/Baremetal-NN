@@ -1,18 +1,24 @@
 
 #include "nn_relu.h"
 
-void NN_ReLU_F32(Tensor *y, Tensor *x) {
+void NN_ReLU(Tensor *y, Tensor *x) {
   assert(y->ndim == x->ndim);
-  assert(x->dtype == DTYPE_F32);
-  assert(y->dtype == DTYPE_F32);
   assert(y->size == x->size);
 
-  for (size_t i = 0; i < x->size; i += 1) {
-    float val = ((float *)x->data)[i];
-    ((float *)y->data)[i] = val > 0 ? val : 0;
+  
+  switch (y->dtype) {
+    case DTYPE_F32:
+      NN__maximum1_F32(y->size, (float *)y->data, (float *)x->data, 0.0f);
+      return;
+
+    default:
   }
+  
+  printf("[ERROR] Unsupported operation between tensor with dtype %s = ReLU(%s)\n", 
+    NN_getDataTypeName(y->dtype), NN_getDataTypeName(x->dtype)
+  );
 }
 
-void NN_ReLUInplace_F32(Tensor *x) {
-  NN_ReLU_F32(x, x);
+void NN_ReLUInplace(Tensor *x) {
+  NN_ReLU(x, x);
 }
