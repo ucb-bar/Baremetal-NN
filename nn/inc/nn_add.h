@@ -6,10 +6,10 @@
 
 #include "nn_tensor.h"
 #include "nn_print.h"
-#include "kernel/acc.h"
-#include "kernel/acc1.h"
-#include "kernel/add.h"
-#include "kernel/add1.h"
+#include "ops/acc.h"
+#include "ops/acc1.h"
+#include "ops/add.h"
+#include "ops/add1.h"
 
 
 /**

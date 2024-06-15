@@ -6,7 +6,7 @@
 
 #include "nn_tensor.h"
 #include "nn_print.h"
-#include "kernel/sub.h"
+#include "ops/sub.h"
 
 
 /**
