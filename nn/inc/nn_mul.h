@@ -6,6 +6,7 @@
 
 #include "nn_tensor.h"
 #include "ops/mul.h"
+#include "ops/mul1.h"
 
 
 /**

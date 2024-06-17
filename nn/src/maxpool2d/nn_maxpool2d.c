@@ -43,7 +43,7 @@ void NN_MaxPool2d_F32(Tensor *out, Tensor *in, const size_t *kernel_size) {
           // Create a tensor for the current pooling window
           Tensor *window = NN_tensor(2, (size_t[]){kernel_height, kernel_width}, DTYPE_F32, ((float *)in->data) + window_offset);
 
-          *(((float *)out->data) + window_offset) = NN_max(window);
+          NN_max((((float *)out->data) + window_offset), window);
         }
       }
     }

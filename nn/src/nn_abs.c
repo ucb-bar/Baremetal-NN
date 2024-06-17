@@ -9,7 +9,7 @@ void NN_abs(Tensor *out, Tensor *in) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN_abs_F32(out, in);
+      NN__abs_F32(out->size, (float *)out->data, (float *)in->data);
       return;
 
     default:

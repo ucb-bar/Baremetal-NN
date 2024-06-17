@@ -2,12 +2,12 @@
 #include "nn_max.h"
 
 
-float NN_max(Tensor *tensor) {
-  float max;
+void NN_max(Tensor *scalar, Tensor *tensor) {
+  assert(scalar->dtype == tensor->dtype);
 
   switch (tensor->dtype) {
     case DTYPE_F32:
-      NN__max_F32(tensor->size, &max, (float *)tensor->data);
+      NN__max_F32(tensor->size, (float *)scalar->data, (float *)tensor->data);
       break;
     
     default:
@@ -15,6 +15,4 @@ float NN_max(Tensor *tensor) {
         NN_getDataTypeName(tensor->dtype)
       );
   }
-  
-  return max;
 }

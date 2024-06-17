@@ -2,12 +2,12 @@
 #include "nn_min.h"
 
 
-float NN_min(Tensor *tensor) {
-  float min;
+void NN_min(Tensor *scalar, Tensor *tensor) {
+  assert(scalar->dtype == tensor->dtype);
 
   switch (tensor->dtype) {
     case DTYPE_F32:
-      NN__min_F32(tensor->size, &min, (float *)tensor->data);
+      NN__min_F32(tensor->size, (float *)scalar->data, (float *)tensor->data);
       break;
     
     default:
@@ -15,6 +15,4 @@ float NN_min(Tensor *tensor) {
         NN_getDataTypeName(tensor->dtype)
       );
   }
-  
-  return min;
 }

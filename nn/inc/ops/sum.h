@@ -11,7 +11,7 @@
 
 static inline void NN__sum_F32(size_t n, float *s, float *x) {
   float sum = 0.0;
-  for (int i = 0; i < n; i += 1) {
+  for (size_t i = 0; i < n; i += 1) {
     sum += (float)x[i];
   }
   *s = sum;

@@ -10,9 +10,10 @@
 /**
  * Returns the sum of all elements in the input tensor.
  * 
+ * @param out: the output scalar tensor
  * @param tensor: the input tensor
  */
-float NN_sum_F32(Tensor *tensor);
+void NN_sum(Tensor *out, Tensor *tensor);
 
 
 #endif // __NN_SUM_H

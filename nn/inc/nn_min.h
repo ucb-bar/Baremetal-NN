@@ -11,9 +11,10 @@
 /**
  * Returns the minimum value of all elements in the input tensor.
  * 
+ * @param out: the output scalar tensor
  * @param tensor: the input tensor
  */
-float NN_min(Tensor *tensor);
+void NN_min(Tensor *scalar, Tensor *tensor);
 
 
 #endif // __NN_MIN_H

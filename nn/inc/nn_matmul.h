@@ -18,8 +18,6 @@
  */
 void NN_matmul(Tensor *out, Tensor *a, Tensor *b);
 
-void NN_matmul_F32(Tensor *out, Tensor *a, Tensor *b);
-
 /**
  * Matrix multiplication with transposed B
  * 
@@ -30,8 +28,6 @@ void NN_matmul_F32(Tensor *out, Tensor *a, Tensor *b);
  * @param b: the input tensor of shape (n, k)
  */
 void NN_matmulT(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_matmulT_F32(Tensor *out, Tensor *a, Tensor *b);
 
 
 #endif // __NN_MATMUL_H

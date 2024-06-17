@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include "nn_float16.h"
+
 #define MAX_DIMS            4
 
 // #define F32(ptr)              (*((float *)(ptr)))
@@ -78,12 +80,12 @@ static inline const char *NN_getDataTypeName(DataType dtype) {
 /**
  * Returns if the tensor is a scalar
  * 
- * A scalar is a 1D tensor with a single element, i.e., shape = (1, )
+ * A scalar is a 0D tensor with a single element
  * 
  * @param tensor: the target tensor
  */
 static inline uint8_t NN_isScalar(Tensor *tensor) {
-  return tensor->ndim == 1 && tensor->shape[0] == 1;
+  return tensor->ndim == 0;
 }
 
 /**

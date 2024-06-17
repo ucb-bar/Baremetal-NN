@@ -4,8 +4,8 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "nn_add.h"
 #include "nn_matmul.h"
+#include "nn_add.h"
 
 
 /**
@@ -18,7 +18,7 @@
  * @param w: weight tensor of shape (out_features, in_features)
  * @param b: bias tensor of shape (1, out_features), or NULL if no bias is applied
  */
-void NN_Linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
+void NN_Linear(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
 
 
 #endif // __NN_Linear_H

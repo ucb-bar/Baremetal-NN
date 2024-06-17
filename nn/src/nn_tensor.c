@@ -20,11 +20,17 @@ void NN_initTensor(Tensor *tensor, size_t ndim, const size_t *shape, DataType dt
     tensor->size *= tensor->shape[i];
   }
   
-  if (data == NULL) {
-    tensor->data = malloc(NN_sizeof(dtype) * tensor->size);
-  } else {
+  if (data != NULL) {
     tensor->data = data;
+    return;
   }
+
+  if (tensor->ndim == 0) {
+    tensor->data = malloc(NN_sizeof(dtype));
+    return;
+  }
+  
+  tensor->data = malloc(NN_sizeof(dtype) * tensor->size);
 }
 
 Tensor *NN_tensor(size_t ndim, const size_t *shape, DataType dtype, void *data) {

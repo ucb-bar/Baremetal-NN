@@ -1,7 +1,8 @@
 
 #include "nn_linear.h"
 
-void NN_Linear_F32(Tensor *y, Tensor *x, Tensor *w, Tensor *b) {
+
+void NN_Linear(Tensor *y, Tensor *x, Tensor *w, Tensor *b) {
   NN_matmulT(y, x, w);
 
   if (b != NULL) {
