@@ -30,6 +30,7 @@ add_library(nn
   src/nn_sub.c
   src/nn_sum.c
   src/nn_transpose.c
+  src/nn_unfold.c
 )
 target_include_directories(nn PUBLIC inc)
 
