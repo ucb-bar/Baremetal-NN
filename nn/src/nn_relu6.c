@@ -14,6 +14,7 @@ void NN_ReLU6(Tensor *y, Tensor *x) {
       return;
 
     default:
+      break;
   }
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = ReLU(%s)\n", 

@@ -15,6 +15,7 @@ void NN_mul(Tensor *out, Tensor *a, Tensor *b) {
       return;
 
     default:
+      break;
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = %s * %s\n", 
@@ -34,6 +35,7 @@ void NN_mul1(Tensor *out, Tensor *in, float scalar) {
       return;
 
     default:
+      break;
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = %s * scalar\n", 

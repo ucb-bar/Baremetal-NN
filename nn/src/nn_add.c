@@ -40,6 +40,7 @@ void NN_add1(Tensor *out, Tensor *a, float b) {
       return;
 
     default:
+      break;
   }
   printf("[ERROR] Unsupported operation between tensor with dtype %s += %s\n", 
     NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype)
@@ -58,6 +59,7 @@ void NN_addInplace(Tensor *b, Tensor *a) {
       NN__acc_I8(b->size, (int8_t *)b->data, (int8_t *)a->data);
       return;
     default:
+      break;
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s += %s\n", 
@@ -71,6 +73,7 @@ void NN_addInplace1(Tensor *b, float scalar) {
       NN__acc1_F32(b->size, (float *)b->data, scalar);
       return;
     default:
+      break;
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s += float\n", 

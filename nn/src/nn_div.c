@@ -15,6 +15,7 @@ void NN_div(Tensor *out, Tensor *a, Tensor *b) {
       return;
 
     default:
+      break;
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = %s / %s\n", 

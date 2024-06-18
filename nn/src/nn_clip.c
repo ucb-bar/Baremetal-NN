@@ -14,6 +14,7 @@ void NN_clip(Tensor *y, Tensor *x, float min, float max) {
       return;
 
     default:
+      break;
   }
 
   printf("[ERROR] Unsupported operation for tensor with dtype %s = clip(%s, float, float)\n", 

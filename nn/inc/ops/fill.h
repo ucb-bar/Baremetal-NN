@@ -8,6 +8,8 @@
   #include <riscv_vector.h>
 #endif
 
+#include "nn_float16.h"
+
 inline static void NN__fill_I8(size_t n, int8_t *x, int8_t v) {
   for (size_t i = 0; i < n; i += 1) {
     x[i] = v;
@@ -26,11 +28,11 @@ inline static void NN__fill_I32(size_t n, int32_t *x, int32_t v) {
   }
 }
 
-// inline static void NN__fill_F16(size_t n, float16_t *x, int32_t v) {
-//   for (size_t i = 0; i < n; i += 1) {
-//     x[i] = v;
-//   }
-// }
+inline static void NN__fill_F16(size_t n, float16_t *x, float16_t v) {
+  for (size_t i = 0; i < n; i += 1) {
+    x[i] = v;
+  }
+}
 
 // inline static void NN__fill_BF16(size_t n, bfloat16_t * x, const bfloat16_t v) {
 //   for (size_t i = 0; i < n; i += 1) {

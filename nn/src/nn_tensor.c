@@ -39,25 +39,7 @@ Tensor *NN_tensor(size_t ndim, const size_t *shape, DataType dtype, void *data) 
   return t;
 }
 
-void NN_asType(Tensor *t, DataType dtype) {
-  if (t->dtype == dtype) {
-    return;
-  }
-  if (t->dtype == DTYPE_I32 && dtype == DTYPE_F32) {
-    for (size_t i = 0; i < t->size; i += 1) {
-      ((float *)t->data)[i] = (float)((int32_t *)t->data)[i];
-    }
-    t->dtype = DTYPE_F32;
-    return;
-  }
-  if (t->dtype == DTYPE_I32 && dtype == DTYPE_I8) {
-    for (size_t i = 0; i < t->size; i += 1) {
-      ((int8_t *)t->data)[i] = (int8_t)((int32_t *)t->data)[i];
-    }
-    t->dtype = DTYPE_I8;
-    return;
-  }
-
+void NN_asType(Tensor *out, Tensor *in) {
   if (out->dtype == in->dtype) {
     NN_copy(out, in);
     return;

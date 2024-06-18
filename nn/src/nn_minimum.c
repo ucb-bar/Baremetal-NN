@@ -16,6 +16,7 @@ void NN_minimum(Tensor *out, Tensor *a, Tensor *b) {
       return;
 
     default:
+      break;
   }
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = max(%s, %s)\n", 

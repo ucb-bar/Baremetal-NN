@@ -13,6 +13,12 @@
   #include <riscv_vector.h>
 #endif
 
+static inline void NN__abs_F16(size_t n, float16_t *y, float16_t *x) {
+  for (size_t i = 0; i < n; i += 1) {
+    y[i] = NN_floatToHalf(fabsf(NN_halfToFloat(x[i])));
+  }
+}
+
 static inline void NN__abs_F32(size_t n, float *y, float *x) {
   #if defined(AVX)
     // Mask to clear the sign bit

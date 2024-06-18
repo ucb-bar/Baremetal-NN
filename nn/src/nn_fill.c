@@ -10,6 +10,9 @@ void NN_fill(Tensor *tensor, float value) {
     case DTYPE_I32:
       NN__fill_I32(tensor->size, (int32_t *)tensor->data, (int32_t)value);
       return;
+    case DTYPE_F16:
+      NN__fill_F16(tensor->size, (float16_t *)tensor->data, NN_floatToHalf(value));
+      return;
     case DTYPE_F32:
       NN__fill_F32(tensor->size, (float *)tensor->data, value);
       return;

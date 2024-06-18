@@ -10,9 +10,11 @@ option(RISCV                "Build for RISC-V"                  OFF     )
 
 add_library(target-riscv INTERFACE)
 target_compile_features(target-riscv INTERFACE c_std_11)
+target_compile_definitions(target-riscv INTERFACE RISCV)
 
 add_library(target-x86 INTERFACE)
 target_compile_features(target-x86 INTERFACE c_std_11)
+target_compile_definitions(target-x86 INTERFACE X86)
 
 target_link_options(target-x86 INTERFACE -static)
 target_link_options(target-riscv INTERFACE -static)

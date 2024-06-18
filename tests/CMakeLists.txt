@@ -30,7 +30,7 @@ elseif (RISCV)
     set(CMAKE_STRIP         "${TOOLCHAIN_PREFIX}ld")
     
     target_link_libraries(test PUBLIC target-riscv)
-endif ()
+endif()
 
 add_compile_options(-O3 -Wall -Wextra)
 

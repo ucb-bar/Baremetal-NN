@@ -14,6 +14,7 @@ void NN_neg(Tensor *out, Tensor *in) {
       return;
 
     default:
+      break;
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = -%s\n", 

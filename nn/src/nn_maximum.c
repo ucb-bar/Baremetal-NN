@@ -15,6 +15,7 @@ void NN_maximum(Tensor *out, Tensor *a, Tensor *b) {
       NN__maximum_F32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
       return;
     default:
+      break;
   }
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = max(%s, %s)\n", 

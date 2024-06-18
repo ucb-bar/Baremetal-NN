@@ -24,7 +24,7 @@ typedef enum {
   // DTYPE_I64,
   // DTYPE_I128,
   // DTYPE_F8,
-  // DTYPE_F16,
+  DTYPE_F16,
   DTYPE_F32,
   // DTYPE_F64,
 } DataType;
@@ -48,6 +48,8 @@ static inline size_t NN_sizeof(DataType dtype) {
       return sizeof(int32_t);
     // case DTYPE_I64:
     //   return sizeof(int64_t);
+    case DTYPE_F16:
+      return sizeof(float16_t);
     case DTYPE_F32:
       return sizeof(float);
     // case DTYPE_F64:
@@ -68,6 +70,8 @@ static inline const char *NN_getDataTypeName(DataType dtype) {
       return "INT32";
     // case DTYPE_I64:
     //   return "INT64";
+    case DTYPE_F16:
+      return "FLOAT16";
     case DTYPE_F32:
       return "FLOAT32";
     // case DTYPE_F64:
