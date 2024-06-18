@@ -12,10 +12,9 @@
  * 
  * @param tensor: the input tensor of shape (m, n)
  */
-float NN_matrixNorm_F32(Tensor *tensor);
+void NN_matrixNorm(Tensor *scalar, Tensor *x);
 
-
-float NN_matrixNorm_F32_RVV(Tensor *tensor);
+void NN_matrixNorm_F32(Tensor *scalar, Tensor *x);
 
 
 #endif // __NN_MATRIXNORM_H
