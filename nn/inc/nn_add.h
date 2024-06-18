@@ -25,15 +25,6 @@
  */
 void NN_add(Tensor *out, Tensor *a, Tensor *b);
 
-<<<<<<< HEAD
-void NN_add_F16(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_add_F32(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_add_INT(Tensor *out, Tensor *a, Tensor *b);
-
-=======
->>>>>>> 264c7cf53a6ac215f54b2357d7068f11e3624c3d
 /**
  * Returns the element-wise addition of the input tensor with a scalar.
  * 
