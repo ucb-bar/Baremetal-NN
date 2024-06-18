@@ -5,19 +5,16 @@
 #include <float.h>
 
 #include "nn_tensor.h"
+#include "ops/min.h"
 
 
 /**
  * Returns the minimum value of all elements in the input tensor.
  * 
+ * @param out: the output scalar tensor
  * @param tensor: the input tensor
  */
-float NN_min(Tensor *tensor);
-
-float NN_min_F32(Tensor *tensor);
-
-
-float NN_min_F32_RVV(Tensor *tensor);
+void NN_min(Tensor *scalar, Tensor *tensor);
 
 
 #endif // __NN_MIN_H

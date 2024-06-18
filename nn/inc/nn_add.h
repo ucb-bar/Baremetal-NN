@@ -6,6 +6,10 @@
 
 #include "nn_tensor.h"
 #include "nn_print.h"
+#include "ops/acc.h"
+#include "ops/acc1.h"
+#include "ops/add.h"
+#include "ops/add1.h"
 
 
 /**
@@ -21,12 +25,15 @@
  */
 void NN_add(Tensor *out, Tensor *a, Tensor *b);
 
+<<<<<<< HEAD
 void NN_add_F16(Tensor *out, Tensor *a, Tensor *b);
 
 void NN_add_F32(Tensor *out, Tensor *a, Tensor *b);
 
 void NN_add_INT(Tensor *out, Tensor *a, Tensor *b);
 
+=======
+>>>>>>> 264c7cf53a6ac215f54b2357d7068f11e3624c3d
 /**
  * Returns the element-wise addition of the input tensor with a scalar.
  * 
@@ -34,12 +41,35 @@ void NN_add_INT(Tensor *out, Tensor *a, Tensor *b);
  * @param in: the input tensor
  * @param scalar: scalar value
  */
-void NN_addF(Tensor *out, Tensor *in, float scalar);
+void NN_add1(Tensor *out, Tensor *in, float scalar);
 
-void NN_addF_F32(Tensor *out, Tensor *in, float scalar);
+/**
+ * Element-wise addition
+ * 
+ * B += A
+ * 
+ * Broadcast is only supported between tensor with same dimensions.
+ *
+ * @param b: the target tensor
+ * @param a: the input tensor
+ */
+void NN_addInplace(Tensor *b, Tensor *a);
 
+/**
+ * Returns the element-wise addition of the input tensor with a scalar.
+ * 
+ * @param b: the target tensor
+ * @param scalar: scalar value
+ */
+void NN_addInplace1(Tensor *b, float scalar);
 
-void NN_add_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
+void NN_add_1D(Tensor *out, Tensor *a, Tensor *b);
+
+void NN_add_2D(Tensor *out, Tensor *a, Tensor *b);
+
+void NN_add_3D(Tensor *out, Tensor *a, Tensor *b);
+
+void NN_add_4D(Tensor *out, Tensor *a, Tensor *b);
 
 
 #endif // __NN_ADD_H

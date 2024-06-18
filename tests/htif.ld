@@ -2,7 +2,7 @@ OUTPUT_ARCH ("riscv")
 ENTRY (_start)
 
 PROVIDE (__origin = 0x80000000);
-PROVIDE (__length = 16M);
+PROVIDE (__length = 1024M);
 
 MEMORY
 {
@@ -15,7 +15,7 @@ SECTIONS
     . = __origin;
 
     /* Keep under a power of 2 to reserve space for TCB */
-    PROVIDE (__stack_size_min = 24K);
+    PROVIDE (__stack_size_min = 512K);
 
     .text : {
         *(.text.init)
@@ -127,7 +127,7 @@ SECTIONS
     PROVIDE (_end = .);
 
     /* Reserve heap space */
-    PROVIDE(__heap_size = 128K);
+    PROVIDE(__heap_size = 512K);
     . += __heap_size;
     . = ALIGN (4K);
     PROVIDE (__heap_end = .);

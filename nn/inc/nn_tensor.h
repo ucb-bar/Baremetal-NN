@@ -19,14 +19,14 @@
 
 typedef enum {
   DTYPE_I8,
-  DTYPE_I16,
+  // DTYPE_I16,
   DTYPE_I32,
-  DTYPE_I64,
-  DTYPE_I128,
-  DTYPE_F8,
-  DTYPE_F16,
+  // DTYPE_I64,
+  // DTYPE_I128,
+  // DTYPE_F8,
+  // DTYPE_F16,
   DTYPE_F32,
-  DTYPE_F64,
+  // DTYPE_F64,
 } DataType;
 
 typedef struct {
@@ -42,16 +42,16 @@ static inline size_t NN_sizeof(DataType dtype) {
   switch (dtype) {
     case DTYPE_I8:
       return sizeof(int8_t);
-    case DTYPE_I16:
-      return sizeof(int16_t);
+    // case DTYPE_I16:
+    //   return sizeof(int16_t);
     case DTYPE_I32:
       return sizeof(int32_t);
-    case DTYPE_I64:
-      return sizeof(int64_t);
+    // case DTYPE_I64:
+    //   return sizeof(int64_t);
     case DTYPE_F32:
       return sizeof(float);
-    case DTYPE_F64:
-      return sizeof(double);
+    // case DTYPE_F64:
+    //   return sizeof(double);
     default:
       printf("[WARNING] Unsupported data type: %d\n", dtype);
       return 0;
@@ -62,16 +62,16 @@ static inline const char *NN_getDataTypeName(DataType dtype) {
   switch (dtype) {
     case DTYPE_I8:
       return "INT8";
-    case DTYPE_I16:
-      return "INT16";
+    // case DTYPE_I16:
+    //   return "INT16";
     case DTYPE_I32:
       return "INT32";
-    case DTYPE_I64:
-      return "INT64";
+    // case DTYPE_I64:
+    //   return "INT64";
     case DTYPE_F32:
       return "FLOAT32";
-    case DTYPE_F64:
-      return "FLOAT64";
+    // case DTYPE_F64:
+    //   return "FLOAT64";
     default:
       return "UNKNOWN";
   }
@@ -80,12 +80,12 @@ static inline const char *NN_getDataTypeName(DataType dtype) {
 /**
  * Returns if the tensor is a scalar
  * 
- * A scalar is a 1D tensor with a single element, i.e., shape = (1, )
+ * A scalar is a 0D tensor with a single element
  * 
  * @param tensor: the target tensor
  */
 static inline uint8_t NN_isScalar(Tensor *tensor) {
-  return tensor->ndim == 1 && tensor->shape[0] == 1;
+  return tensor->ndim == 0;
 }
 
 /**
@@ -141,37 +141,6 @@ static inline void NN_freeTensorData(Tensor *tensor) {
 static inline void NN_deleteTensor(Tensor *tensor) {
   free(tensor);
 }
-
-/**
- * Fills the tensor with the specified value.
- * 
- * @param tensor: the input tensor
- * @param value: scalar value
- */
-static inline void NN_fill_F32(Tensor *tensor, float value) {
-  assert(tensor->dtype == DTYPE_F32);
-  
-  for (size_t i = 0; i < tensor->size; i += 1) {
-    ((float *)tensor->data)[i] = value;
-  }
-}
-
-static inline void NN_fill_I32(Tensor *tensor, int32_t value) {
-  assert(tensor->dtype == DTYPE_I32);
-  
-  for (size_t i = 0; i < tensor->size; i += 1) {
-    ((int32_t *)tensor->data)[i] = value;
-  }
-}
-
-static inline void NN_fill_I8(Tensor *tensor, int8_t value) {
-  assert(tensor->dtype == DTYPE_I8);
-  
-  for (size_t i = 0; i < tensor->size; i += 1) {
-    ((int8_t *)tensor->data)[i] = value;
-  }
-}
-
 
 /**
  * Initialize a given tensor

@@ -5,18 +5,16 @@
 #include <float.h>
 
 #include "nn_tensor.h"
+#include "ops/max.h"
 
 
 /**
  * Returns the maximum value of all elements in the input tensor.
  * 
+ * @param out: the output scalar tensor
  * @param tensor: the input tensor
  */
-float NN_max(Tensor *tensor);
-
-float NN_max_F32(Tensor *tensor);
-
-float NN_max_F32_RVV(Tensor *tensor);
+void NN_max(Tensor *scalar, Tensor *tensor);
 
 
 #endif // __NN_MAX_H

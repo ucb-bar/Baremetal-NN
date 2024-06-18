@@ -20,11 +20,17 @@ void NN_initTensor(Tensor *tensor, size_t ndim, const size_t *shape, DataType dt
     tensor->size *= tensor->shape[i];
   }
   
-  if (data == NULL) {
-    tensor->data = malloc(NN_sizeof(dtype) * tensor->size);
-  } else {
+  if (data != NULL) {
     tensor->data = data;
+    return;
   }
+
+  if (tensor->ndim == 0) {
+    tensor->data = malloc(NN_sizeof(dtype));
+    return;
+  }
+  
+  tensor->data = malloc(NN_sizeof(dtype) * tensor->size);
 }
 
 Tensor *NN_tensor(size_t ndim, const size_t *shape, DataType dtype, void *data) {
@@ -33,85 +39,24 @@ Tensor *NN_tensor(size_t ndim, const size_t *shape, DataType dtype, void *data) 
   return t;
 }
 
-Tensor *NN_zeros(size_t ndim, const size_t *shape, DataType dtype) {
-  Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
-
-  switch (dtype) {
-    case DTYPE_I8:
-      NN_fill_I8(t, 0);
-      break;
-    case DTYPE_I32:
-      NN_fill_I32(t, 0);
-      break;
-    case DTYPE_F16:
-      NN_fill_F16(t, 0);
-      break;
-    case DTYPE_F32:
-      NN_fill_F32(t, 0);
-      break;
-    default:
-      printf("[WARNING] Unsupported data type: %d\n", dtype);
+void NN_asType(Tensor *t, DataType dtype) {
+  if (t->dtype == dtype) {
+    return;
   }
-
-  return t;
-}
-
-Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype) {
-  Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
-
-  switch (dtype) {
-    case DTYPE_I8:
-      NN_fill_I8(t, 1);
-      break;
-    case DTYPE_I32:
-      NN_fill_I32(t, 1);
-      break;
-    case DTYPE_F16:
-      NN_fill_F16(t, 1);
-      break;
-    case DTYPE_F32:
-      NN_fill_F32(t, 1);
-      break;
-    default:
-      printf("[WARNING] Unsupported data type: %d\n", dtype);
+  if (t->dtype == DTYPE_I32 && dtype == DTYPE_F32) {
+    for (size_t i = 0; i < t->size; i += 1) {
+      ((float *)t->data)[i] = (float)((int32_t *)t->data)[i];
+    }
+    t->dtype = DTYPE_F32;
+    return;
   }
-
-  return t;
-}
-
-Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype) {
-  Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
-
-  switch (dtype) {
-    case DTYPE_I8:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((int8_t *)t->data)[i] = rand() % 256;
-      }
-      break;
-    case DTYPE_I32:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((int32_t *)t->data)[i] = rand();
-      }
-      break;
-    case DTYPE_F16:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((float16_t *)t->data)[i] = NN_floatToHalf((float)rand() / RAND_MAX);
-      }
-      break;
-    case DTYPE_F32:
-      for (size_t i = 0; i < t->size; i += 1) {
-        ((float *)t->data)[i] = (float)rand() / RAND_MAX;
-      }
-      break;
-    default:
-      printf("[WARNING] Unsupported data type: %d\n", dtype);
+  if (t->dtype == DTYPE_I32 && dtype == DTYPE_I8) {
+    for (size_t i = 0; i < t->size; i += 1) {
+      ((int8_t *)t->data)[i] = (int8_t)((int32_t *)t->data)[i];
+    }
+    t->dtype = DTYPE_I8;
+    return;
   }
-
-  return t;
-}
-
-void NN_asType(Tensor *out, Tensor *in) {
-  assert(out->size == in->size);
 
   if (out->dtype == in->dtype) {
     NN_copy(out, in);

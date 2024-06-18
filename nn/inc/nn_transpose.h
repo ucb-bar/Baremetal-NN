@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-
+#include "ops/transpose.h"
 
 /**
  * Transpose a 2D tensor
@@ -15,12 +15,6 @@
  * @param a: the input tensor of shape (m, n)
  */
 void NN_transpose(Tensor *out, Tensor *a);
-
-void NN_transpose_I8(Tensor *out, Tensor *a);
-
-void NN_transpose_I32(Tensor *out, Tensor *a);
-
-void NN_transpose_F32(Tensor *out, Tensor *a);
 
 
 #endif // __NN_TRANSPOSE_H

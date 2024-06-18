@@ -86,7 +86,7 @@ int main() {
   init(model);
 
   printf("setting input data...\n");
-  // NN_fill_F32(&model->x, 0.0);
+  // NN_fill(&model->x, 0.0);
   memcpy((uint8_t *)model->x.data, (uint8_t *)model_input_data, (size_t)model_input_end - (size_t)model_input_start);
 
   // cycles = READ_CSR("mcycle");

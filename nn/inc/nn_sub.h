@@ -6,6 +6,7 @@
 
 #include "nn_tensor.h"
 #include "nn_print.h"
+#include "ops/sub.h"
 
 
 /**
@@ -21,12 +22,13 @@
  */
 void NN_sub(Tensor *out, Tensor *a, Tensor *b);
 
-void NN_sub_F32(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub_1D(Tensor *out, Tensor *a, Tensor *b);
 
-void NN_sub_INT(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub_2D(Tensor *out, Tensor *a, Tensor *b);
 
+void NN_sub_3D(Tensor *out, Tensor *a, Tensor *b);
 
-void NN_sub_F32_RVV(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub_4D(Tensor *out, Tensor *a, Tensor *b);
 
 
 #endif // __NN_SUB_H

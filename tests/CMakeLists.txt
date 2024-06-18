@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(test LANGUAGES C)
 
 
-add_executable(test src/main.c)
+add_executable(test src/generated.c)
 target_include_directories(test PUBLIC inc)
 
 target_compile_features(test INTERFACE c_std_11)
