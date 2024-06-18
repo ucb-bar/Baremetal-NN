@@ -20,28 +20,10 @@
  * @param padding: the amount of padding applied to the input
  * @param groups: number of blocked connections from input channels to output channels
  */
-void NN_Conv2d_F32(
+void NN_Conv2d(
   Tensor *out, Tensor *in, 
   Tensor *weight, Tensor *bias, 
-  const size_t *stride, const size_t *padding, size_t groups
-  );
-
-void NN_Conv2d_F32_RVV(
-  Tensor *out, Tensor *in, 
-  Tensor *weight, Tensor *bias, 
-  const size_t *stride, const size_t *padding, size_t groups
-  );
-
-void NN_Conv2dNHWC_F32(
-  Tensor *out, Tensor *in, 
-  Tensor *weight, Tensor *bias, 
-  const size_t *stride, const size_t *padding, size_t groups
-  );
-
-void NN_Conv2dNHWC_F32_Gemmini(
-  Tensor *out, Tensor *in, 
-  Tensor *weight, Tensor *bias, 
-  const size_t *stride, const size_t *padding, size_t groups
+  const size_t *stride, const size_t *padding, const size_t *dilation, size_t groups
   );
 
 

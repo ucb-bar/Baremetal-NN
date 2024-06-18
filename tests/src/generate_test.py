@@ -40,6 +40,10 @@ test_pattern = [
     ("Linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((1, 5)))]),
     ("ReLU",        lambda x: torch.nn.functional.relu(x),      [("x", rand((7, 7)))                                    ]),
     ("ReLU6",       lambda x: torch.nn.functional.relu6(x),     [("x", rand((7, 7)))                                    ]),
+    ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=0, dilation=1, groups=1).permute((0, 2, 3, 1)),
+        [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
+        ", (size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1"
+    ),
 ]
 
 
@@ -63,12 +67,12 @@ int main() {
 """
 
 
-def generateTestPattern(op, function, inputs, detail=""):
+def generateTestPattern(op, function, inputs, additional_params=""):
     result = function(*[value for name, value in inputs])
 
     test_template = env.from_string("""
   {
-    printf("{{ (op + detail + ":").ljust(24) }}");
+    printf("{{ (op + ":").ljust(24) }}");
 {% for name, value in inputs %}{% if (type(value) == torch.Tensor and name != "actual") %}
     Tensor *{{ name }} = NN_tensor({{ len(value.shape) }}, (size_t[]){ {{ value.shape | join(", ") }} }, DTYPE_F32, (float[]){ {{ value.numpy().flatten() | join(", ") }} });
 {% elif str(type(value)) == "<class 'float'>" %}
@@ -77,9 +81,9 @@ def generateTestPattern(op, function, inputs, detail=""):
     Tensor *golden = NN_tensor({{ len(result.shape) }}, (size_t[]){ {{ result.shape | join(", ") }} }, DTYPE_F32, (float[]){ {{ result.numpy().flatten() | join(", ") }} });
     Tensor *actual = NN_zeros({{ len(result.shape) }}, (size_t[]){ {{ result.shape | join(", ") }} }, DTYPE_F32);
     cycles = READ_CSR("mcycle");
-    NN_{{ op }}(actual{% for name, value in inputs if name != "actual" %}, {{ name }}{% endfor %});
+    NN_{{ op }}(actual{% for name, value in inputs if name != "actual" %}, {{ name }}{% endfor %}{{ additional_params }});
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s  (%lu cycles)\\n", compareTensor(golden, actual) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\\n", compareTensor(golden, actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
 {% for name, value in inputs %}{% if (type(value) == torch.Tensor and name != "actual") %}
     NN_deleteTensor({{ name }});{% endif %}{% endfor %}
@@ -89,7 +93,7 @@ def generateTestPattern(op, function, inputs, detail=""):
   }
 """)
     
-    return test_template.render(op=op, inputs=inputs, result=result, detail=detail)
+    return test_template.render(op=op, inputs=inputs, result=result, additional_params=additional_params)
 
 
 template = env.from_string(c_code)

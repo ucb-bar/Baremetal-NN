@@ -12,6 +12,7 @@
 #include "nn_clip.h"
 #include "nn_conv2d.h"
 #include "nn_copy.h"
+#include "nn_div.h"
 #include "nn_fill.h"
 #include "nn_interpolate.h"
 #include "nn_linear.h"

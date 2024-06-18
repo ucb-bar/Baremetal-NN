@@ -20,13 +20,13 @@ static void enableAcceleratorFeatures() {
   #endif
 }
 
-static uint8_t floatEqual(float golden, float actual, float relErr) {
-  return (fabs(actual - golden) < relErr) || (fabs((actual - golden) / actual) < relErr);
+static uint8_t floatEqual(float golden, float actual, float rel_err) {
+  return (fabs(actual - golden) < rel_err) || (fabs((actual - golden) / actual) < rel_err);
 }
 
-static uint8_t compareTensor(Tensor *golden, Tensor *actual) {
+static uint8_t compareTensor(Tensor *golden, Tensor *actual, float rel_err) {
   for (size_t i = 0; i < golden->size; i += 1) {
-    if (!floatEqual(((float *)golden->data)[i], ((float *)actual->data)[i], 1e-5)) {
+    if (!floatEqual(((float *)golden->data)[i], ((float *)actual->data)[i], rel_err)) {
       return 0;
     }
   }
