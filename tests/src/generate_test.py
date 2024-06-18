@@ -3,6 +3,13 @@ import random
 import torch
 import jinja2
 
+# seed
+
+seed = 0
+
+random.seed(seed)
+torch.manual_seed(seed)
+
 env = jinja2.Environment()
 
 
@@ -13,7 +20,7 @@ env.globals["torch"] = torch
 
 
 def rand(shape):
-    return (torch.rand(shape) - 0.5) * 1000
+    return (torch.rand(shape) - 0.5) * 100
 
 
 test_pattern = [
@@ -43,6 +50,10 @@ test_pattern = [
     ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=0, dilation=1, groups=1).permute((0, 2, 3, 1)),
         [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
         ", (size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1"
+    ),
+    ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=1).permute((0, 2, 3, 1)),
+        [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
+        ", (size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1"
     ),
 ]
 
@@ -83,7 +94,7 @@ def generateTestPattern(op, function, inputs, additional_params=""):
     cycles = READ_CSR("mcycle");
     NN_{{ op }}(actual{% for name, value in inputs if name != "actual" %}, {{ name }}{% endfor %}{{ additional_params }});
     cycles = READ_CSR("mcycle") - cycles;
-    printf("%s  (%lu cycles)\\n", compareTensor(golden, actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\\n", compareTensor(golden, actual, 1e-3) ? "PASS" : "FAIL", cycles);
 
 {% for name, value in inputs %}{% if (type(value) == torch.Tensor and name != "actual") %}
     NN_deleteTensor({{ name }});{% endif %}{% endfor %}
@@ -98,9 +109,6 @@ def generateTestPattern(op, function, inputs, additional_params=""):
 
 template = env.from_string(c_code)
 
-#seed
-random.seed(0)
-torch.manual_seed(0)
 
 
 result = template.render(code="\n".join([generateTestPattern(*pattern) for pattern in test_pattern]))

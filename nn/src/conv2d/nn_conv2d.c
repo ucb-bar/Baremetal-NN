@@ -81,5 +81,3 @@ void NN_Conv2d(
     }
   }
 }
-
-
