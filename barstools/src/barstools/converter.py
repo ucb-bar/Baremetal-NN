@@ -1,4 +1,6 @@
 import operator
+import os
+import inspect
 
 import numpy as np
 import torch
@@ -43,7 +45,9 @@ class TorchConverter(torch.fx.Interpreter):
         self.node_info = {n.name: (n.args, n.kwargs) for n in self.graph.nodes}
 
         self.env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader("templates")
+            loader=jinja2.FileSystemLoader(os.path.join(
+                os.path.dirname(inspect.getfile(inspect.currentframe())),
+                "templates"))
         )
 
         self.model_template = self.env.get_template("model.h.in")
@@ -328,20 +332,20 @@ class TorchConverter(torch.fx.Interpreter):
 
         return super().call_module(target, args, kwargs)
 
-    def convert(self, example_input):
+    def convert(self, example_input, output_dir="."):
         self.example_input = example_input
         output = self.run(example_input)
 
         print("finished tracing the model")
         
-        with open("model.h", "w") as f:
+        with open(os.path.join(output_dir, "model.h"), "w") as f:
             f.write(self.model_template.render(
                 model_struct=self.model_struct, 
                 model_init=self.model_init,
                 model_forward=self.model_forward
             ))
         
-        with open("model.bin", "wb") as f:
+        with open(os.path.join(output_dir, "model.bin"), "wb") as f:
             f.write(self.weight_content)
         
         return output
@@ -565,7 +569,9 @@ if __name__ == "__main__":
         def __init__(self):
             super(Net, self).__init__()
             self.actor = nn.Sequential(
-                nn.Linear(48, 5, bias=True),
+                nn.Linear(48, 128, bias=True),
+                nn.ELU(),
+                nn.Linear(128, 5, bias=True),
                 nn.ELU(),
                 nn.Linear(5, 12, bias=True),
             )

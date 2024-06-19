@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="barstool",
+    name="barstools",
     version="2024.06.18",
     author="-T.K.-",
     author_email="t_k_233@outlook.email",
