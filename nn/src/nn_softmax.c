@@ -11,17 +11,15 @@ void NN_Softmax(Tensor *out, Tensor *tensor, size_t dim) {
         for (size_t i = 0; i < tensor->shape[0]; i += 1) {
           float *x = (float *)tensor->data + i * tensor->shape[1];
           float *y = (float *)out->data + i * out->shape[1];
-          NN__softmax_F32(tensor->shape[1], y, x);
+          NN__softmax_F32(tensor->shape[1], y, x, 1);
         }
         return;
       }
       if (dim == 1) {
         for (size_t i = 0; i < tensor->shape[1]; i += 1) {
-          for (size_t j = 0; j < tensor->shape[0]; j += 1) {
-            float *x = (float *)tensor->data + j * tensor->shape[1] + i;
-            float *y = (float *)out->data + j * out->shape[1] + i;
-            NN__softmax_F32(1, y, x);
-          }
+          float *x = (float *)tensor->data + i;
+          float *y = (float *)out->data + i;
+          NN__softmax_F32(tensor->shape[0], y, x, tensor->shape[1]);
         }
         return;
       }
