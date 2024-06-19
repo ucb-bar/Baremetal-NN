@@ -8,7 +8,7 @@
   #include <riscv_vector.h>
 #endif
 
-void NN__softmax_F32(size_t n, float* x) {
+static inline void NN__softmax_F32(size_t n, float *y, float *x) {
   // find max value (for numerical stability)
   float max_val = x[0];
   for (int i = 1; i < n; i += 1) {
@@ -19,12 +19,12 @@ void NN__softmax_F32(size_t n, float* x) {
   // exp and sum
   float sum = 0.0f;
   for (int i = 0; i < n; i += 1) {
-      x[i] = expf(x[i] - max_val);
-      sum += x[i];
+      y[i] = expf(x[i] - max_val);
+      sum += y[i];
   }
   // normalize
   for (int i = 0; i < n; i += 1) {
-      x[i] /= sum;
+      y[i] /= sum;
   }
 }
 

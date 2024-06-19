@@ -29,6 +29,7 @@ add_library(nn
   src/nn_neg.c
   src/nn_relu.c
   src/nn_relu6.c
+  src/nn_softmax.c
   src/nn_sub.c
   src/nn_sum.c
   src/nn_transpose.c

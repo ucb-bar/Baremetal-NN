@@ -15,18 +15,34 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
           NN__add_F32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
           return;
         }
+        for (size_t i = 0; i < out->shape[0]; i += 1) {
+          for (size_t j = 0; j < out->shape[1]; j += 1) {
+            // handle broadcasting
+            size_t a_i = i < a->shape[0] ? i : 0;
+            size_t a_j = j < a->shape[1] ? j : 0;
+            size_t b_i = i < b->shape[0] ? i : 0;
+            size_t b_j = j < b->shape[1] ? j : 0;
+
+            ((float *)out->data)[i * out->shape[1] + j]
+              = ((float *)a->data)[a_i * a->shape[1] + a_j]
+              + ((float *)b->data)[b_i * b->shape[1] + b_j];
+          }
+        }
+        return;
       }
       // broadcast
       if (b->ndim == 1 && a->ndim == 2) {
-        if (b->shape[0] == a->shape[0]) {
-          for (size_t i = 0; i < a->shape[0]; i++) {
-            NN__add1_F32(a->shape[1], (float *)out->data + i*a->shape[1], (float *)a->data + i*a->shape[1], ((float *)b->data)[i]);
-          }
-          return;
-        }
         if (b->shape[0] == a->shape[1]) {
-          for (size_t i = 0; i < a->shape[1]; i++) {
-            NN__add1_F32(a->shape[0], (float *)out->data + i, (float *)a->data + i, ((float *)b->data)[i]);
+          for (size_t i = 0; i < out->shape[0]; i += 1) {
+            for (size_t j = 0; j < out->shape[1]; j += 1) {
+              // handle broadcasting
+              size_t a_i = i < a->shape[0] ? i : 0;
+              size_t a_j = j < a->shape[1] ? j : 0;
+
+              ((float *)out->data)[i * out->shape[1] + j]
+                = ((float *)a->data)[a_i * a->shape[1] + a_j]
+                + ((float *)b->data)[j];
+            }
           }
           return;
         }
