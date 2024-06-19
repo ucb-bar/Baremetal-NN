@@ -2,22 +2,18 @@
 #include "nn_tensor.h"
 
 
-void NN_initTensor(Tensor *tensor, size_t ndim, const size_t *shape, DataType dtype, void *data) {
-  tensor->ndim = ndim;
+void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, const void *data) {
   tensor->dtype = dtype;
+  tensor->ndim = ndim;
 
   // set shape
-  for (size_t i = 0; i < ndim; i += 1) {
-    tensor->shape[i] = shape[i];
-  }
-  for (size_t i = ndim; i < MAX_DIMS; i += 1) {
-    tensor->shape[i] = 0;
-  }
+  memcpy(tensor->shape, shape, ndim * sizeof(size_t));
+  memset(tensor->shape + ndim, 0, (MAX_DIMS - ndim) * sizeof(size_t));
 
   // calculate size (number of elements)
   tensor->size = 1;
   for (size_t i = 0; i < ndim; i += 1) {
-    tensor->size *= tensor->shape[i];
+    tensor->size *= shape[i];
   }
   
   if (data != NULL) {
@@ -25,6 +21,7 @@ void NN_initTensor(Tensor *tensor, size_t ndim, const size_t *shape, DataType dt
     return;
   }
 
+  // if this is a scalar tensor
   if (tensor->ndim == 0) {
     tensor->data = malloc(NN_sizeof(dtype));
     return;

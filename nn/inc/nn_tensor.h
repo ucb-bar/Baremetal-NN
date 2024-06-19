@@ -156,7 +156,7 @@ static inline void NN_deleteTensor(Tensor *tensor) {
  * @param dtype: data type
  * @param data: pointer to data, if NULL, the data will be allocated
  */
-void NN_initTensor(Tensor *tensor, size_t ndim, const size_t *shape, DataType dtype, void *data);
+void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, const void *data);
 
 /**
  * Create a new tensor
