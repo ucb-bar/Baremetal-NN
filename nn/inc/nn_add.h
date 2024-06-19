@@ -17,7 +17,7 @@
  * 
  * C = A + B
  * 
- * Broadcast is only supported between tensor with same dimensions.
+ * For broadcast, b should be smaller dimension or shape than a.
  *
  * @param out: the output tensor
  * @param a: the input tensor
@@ -39,7 +39,7 @@ void NN_add1(Tensor *out, Tensor *in, float scalar);
  * 
  * B += A
  * 
- * Broadcast is only supported between tensor with same dimensions.
+ * For broadcast, b should be smaller dimension or shape than a.
  *
  * @param b: the target tensor
  * @param a: the input tensor
