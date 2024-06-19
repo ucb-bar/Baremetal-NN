@@ -47,22 +47,25 @@ test_pattern = [
     ("sum",         lambda a: torch.sum(a),             [("a", rand((7, 7))),                                           ]),
     
     # ("Linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((1, 5)))]),
-    ("Linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((1, 5)))]),
-    ("ReLU",        lambda x: torch.nn.functional.relu(x),      [("x", rand((7, 7)))                                    ]),
-    ("ReLU6",       lambda x: torch.nn.functional.relu6(x),     [("x", rand((7, 7)))                                    ]),
+    ("Linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b),
+        [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((5, )))                                                  ]),
+    ("ReLU",        lambda x: torch.nn.functional.relu(x),
+        [("x", rand((7, 7)))                                                                                            ]),
+    ("Softmax",     lambda a: torch.nn.functional.softmax(a, dim=1),
+        [("x", rand((7, 7))),                                                                                           ]),
+    ("ReLU6",       lambda x: torch.nn.functional.relu6(x),    
+        [("x", rand((7, 7)))                                                                                            ]),
     ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=0, dilation=1, groups=1).permute((0, 2, 3, 1)),
         [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
-        ", (size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1"
-    ),
+        ", (size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1"                                                      ),
     ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=1).permute((0, 2, 3, 1)),
         [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
-        ", (size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1"
-    ),
+        ", (size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1"                                                      ),
     ("LayerNorm",   lambda x, w, b: torch.nn.functional.layer_norm(x, x.shape, w, b, eps=1e-05), 
         [("x", rand((6, 5))), ("w", rand((6, 5))), ("b", rand((6, 5)))],
-        ", 1e-05"),
+        ", 1e-05"                                                                                                        ),
 
-    ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 4))),                                           ]),
+    ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 4))),                                         ]),
 ]
 
 
