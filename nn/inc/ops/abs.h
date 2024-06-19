@@ -28,16 +28,12 @@ static inline void NN__abs_F32(size_t n, float *y, float *x) {
 
     while (n > 0) {
       size_t count = n < vl ? n : vl;
-
       // Load input values into an AVX register
       __m256 vec_x = _mm256_loadu_ps(x);
-      
       // Compute the absolute values
       __m256 vec_y = _mm256_and_ps(vec_x, mask);
-      
       // Store the result
       _mm256_storeu_ps(y, vec_y);
-      
       x += count;
       y += count;
       n -= count;

@@ -6,6 +6,37 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
   assert(b->ndim <= a->ndim);
 
   switch (b->dtype) {
+    case DTYPE_F16:
+      if (b->ndim == a->ndim) {
+        if (b->shape[0] == a->shape[0]
+            && b->shape[1] == a->shape[1]
+            && b->shape[2] == a->shape[2]
+            && b->shape[3] == a->shape[3]) {
+          NN__add_F16(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+          return;
+        }
+        for (size_t i = 0; i < out->shape[0]; i += 1) {
+          for (size_t j = 0; j < out->shape[1]; j += 1) {
+            // handle broadcasting
+            size_t a_i = i < a->shape[0] ? i : 0;
+            size_t a_j = j < a->shape[1] ? j : 0;
+            size_t b_i = i < b->shape[0] ? i : 0;
+            size_t b_j = j < b->shape[1] ? j : 0;
+
+            ((float *)out->data)[i * out->shape[1] + j]
+              = ((float *)a->data)[a_i * a->shape[1] + a_j]
+              + ((float *)b->data)[b_i * b->shape[1] + b_j];
+          }
+        }
+        return;
+      }
+      printf("[ERROR] Unsupported operation between tensor with shape ");
+      NN_printShape(a);
+      printf(" + ");
+      NN_printShape(b);
+      printf("\n");
+      return;
+      
     case DTYPE_F32:
       if (b->ndim == a->ndim) {
         if (b->shape[0] == a->shape[0]
