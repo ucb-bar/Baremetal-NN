@@ -58,6 +58,9 @@ test_pattern = [
         [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
         ", (size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1"
     ),
+    ("LayerNorm",   lambda x, w, b: torch.nn.functional.layer_norm(x, x.shape, w, b, eps=1e-05), 
+        [("x", rand((6, 5))), ("w", rand((6, 5))), ("b", rand((6, 5)))],
+        ", 1e-05"),
 
     ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 4))),                                           ]),
 ]

@@ -16,6 +16,7 @@ add_library(nn
   src/nn_elu.c
   src/nn_fill.c
   src/nn_interpolate.c
+  src/nn_layernorm.c
   src/nn_linear.c
   src/nn_matmul.c
   src/nn_matrixnorm.c
