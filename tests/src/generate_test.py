@@ -20,7 +20,7 @@ env.globals["torch"] = torch
 
 
 def rand(shape):
-    return (torch.rand(shape, dtype=torch.float32) - 0.5) * 100
+    return (torch.rand(shape, dtype=torch.float32) - 0.5) * 10
 
 def rand16(shape):
     return (torch.rand(shape, dtype=torch.float16) - 0.5) * 10
@@ -67,11 +67,16 @@ test_pattern = [
         [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
         ", (size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1"                                                      ),
     ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=1).permute((0, 2, 3, 1)),
-        [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, )))],
+        [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 71))), ("b", rand((71, )))],
         ", (size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1"                                                      ),
+    ("NCHWToNHWC",  lambda x: x.permute((0, 2, 3, 1)),  [("x", rand((1, 2, 3, 3)))                                     ]),
+    ("NHWCToNCHW",  lambda x: x.permute((0, 3, 1, 2)),  [("x", rand((1, 3, 3, 2)))                                     ]),
     ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=16).permute((0, 2, 3, 1)),
-        [("x", rand((1, 8, 8, 16))), ("w", rand((3, 3, 1, 16))), ("b", rand((16, )))],
+        [("x", rand((1, 12, 12, 16))), ("w", rand((3, 3, 1, 16))), ("b", rand((16, )))],
         ", (size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 16"                                                     ),
+    ("Conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=1).permute((0, 2, 3, 1)),
+        [("x", rand((1, 12, 12, 16))), ("w", rand((3, 3, 16, 56))), ("b", rand((56, )))],
+        ", (size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1"                                                     ),
     # ("LayerNorm",   lambda x, w, b: torch.nn.functional.layer_norm(x, x.shape, w, b, eps=1e-05), 
     #     [("x", rand((6, 5))), ("w", rand((6, 5))), ("b", rand((6, 5)))  ],
     #     ", 1e-05"                                                                                                        ),
