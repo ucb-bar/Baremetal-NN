@@ -48,22 +48,21 @@ void NN_Conv2d(
   memset(out->data, 0, batch_size * out_height * out_width * out_channels * sizeof(float));
 
   #ifdef GEMMINI
-    #warning "hi gemmini"
-    tiled_conv_auto(
-        batch_size, in_height, in_width, in_channels,
-        out_channels, out_height, out_width,
-        stride_height, dilation_height, 1, padding_height, kernel_height, 
-        0, 0, 0, 0, 0,
+    // tiled_conv_auto(
+    //     batch_size, in_height, in_width, in_channels,
+    //     out_channels, out_height, out_width,
+    //     stride_height, dilation_height, 1, padding_height, kernel_height, 
+    //     0, 0, 0, 0, 0,
 
-        in->data,
-        weight->data,
-        bias->data,
-        out->data,
+    //     in->data,
+    //     weight->data,
+    //     bias->data,
+    //     out->data,
 
-        NO_ACTIVATION, ACC_SCALE_IDENTITY,
-        0, 0, 0,
+    //     NO_ACTIVATION, ACC_SCALE_IDENTITY,
+    //     0, 0, 0,
 
-        WS);
+    //     WS);
   #else
     for (size_t n = 0; n < batch_size; n += 1) {
       for (size_t g = 0; g < groups; g += 1) {
@@ -77,18 +76,19 @@ void NN_Conv2d(
               for (size_t ic = 0; ic < in_channels / groups; ic += 1) {
                 for (size_t kh = 0; kh < kernel_height; kh += 1) {
                   for (size_t kw = 0; kw < kernel_width; kw += 1) {
-                    int ih = oh * stride_height + kh - padding_height;
-                    int iw = ow * stride_width + kw - padding_width;
+                    int ih = oh * stride_height + kh * dilation_height - padding_height;
+                    int iw = ow * stride_width + kw * dilation_width - padding_width;
                     if (ih < (int)in_height && iw < (int)in_width && ih >= 0 && iw >= 0) {
                       size_t in_idx = n * in_height * in_width * in_channels
-                                    + ih * in_width * in_channels
-                                    + iw * in_channels
-                                    + g * (in_channels / groups) + ic;
-                      size_t weight_idx = kh * kernel_width * in_channels * out_channels
-                                    + kw * in_channels * out_channels
-                                    + ic * out_channels
-                                    + g * (out_channels / groups) + oc;
-                      sum += ((float *)in->data)[in_idx] * ((float *)weight->data)[weight_idx];
+                                  + ih * in_width * in_channels
+                                  + iw * in_channels
+                                  + g * (in_channels / groups)
+                                  + ic;
+                      size_t weight_idx = kh * kernel_width * in_channels * out_channels / groups
+                                  + kw * in_channels * out_channels / groups
+                                  + ic * out_channels / groups
+                                  + oc;
+                      sum += ((float *)in->data)[in_idx] * ((float *)weight->data)[weight_idx + g * (in_channels / groups) * (kernel_height * kernel_width * out_channels / groups)];
                     }
                   }
                 }

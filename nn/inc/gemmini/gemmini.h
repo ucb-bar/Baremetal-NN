@@ -66,7 +66,7 @@
 #define SOFTMAX 4
 
 #ifdef ELEM_T_IS_FLOAT
-static elem_t elem_t_bits_to_elem_t(elem_t_bits x) {
+elem_t elem_t_bits_to_elem_t(elem_t_bits x) {
     union {
         elem_t_bits b;
         elem_t f;
@@ -76,7 +76,7 @@ static elem_t elem_t_bits_to_elem_t(elem_t_bits x) {
     return un.f;
 }
 
-static elem_t_bits elem_t_to_elem_t_bits(elem_t x) {
+elem_t_bits elem_t_to_elem_t_bits(elem_t x) {
     union {
         elem_t_bits b;
         elem_t f;
@@ -86,7 +86,7 @@ static elem_t_bits elem_t_to_elem_t_bits(elem_t x) {
     return un.b;
 }
 
-static acc_t acc_t_bits_to_acc_t(acc_t_bits x) {
+acc_t acc_t_bits_to_acc_t(acc_t_bits x) {
     union {
         acc_t_bits b;
         acc_t f;
@@ -96,7 +96,7 @@ static acc_t acc_t_bits_to_acc_t(acc_t_bits x) {
     return un.f;
 }
 
-static acc_t_bits acc_t_to_acc_t_bits(acc_t x) {
+acc_t_bits acc_t_to_acc_t_bits(acc_t x) {
     union {
         acc_t_bits b;
         acc_t f;
@@ -106,7 +106,7 @@ static acc_t_bits acc_t_to_acc_t_bits(acc_t x) {
     return un.b;
 }
 
-static bool elem_t_isnan(elem_t x) {
+bool elem_t_isnan(elem_t x) {
     elem_t_bits bits = elem_t_to_elem_t_bits(x);
     uint64_t exp = (bits >> (ELEM_T_SIG_BITS-1)) & (((uint64_t)1 << ELEM_T_EXP_BITS) - 1);
     uint64_t sig = bits & (((uint64_t)1 << ELEM_T_SIG_BITS) - 1);
@@ -115,7 +115,7 @@ static bool elem_t_isnan(elem_t x) {
     return is_nan_or_inf && is_not_inf;
 }
 
-static bool acc_t_isnan(acc_t x) {
+bool acc_t_isnan(acc_t x) {
     acc_t_bits bits = acc_t_to_acc_t_bits(x);
     uint64_t exp = (bits >> (ACC_T_SIG_BITS-1)) & (((uint64_t)1 << ACC_T_EXP_BITS) - 1);
     uint64_t sig = bits & (((uint64_t)1 << ACC_T_SIG_BITS) - 1);
@@ -339,7 +339,7 @@ static void counter_reset() {
   gemmini_counter_access(placeholder, config_reg);
 }
 
-static int ceil_divide_int(int a, int b){
+int ceil_divide_int(int a, int b){
     int c = (a % b == 0) ? ((int)(a/b)) :(((int)(a/b)) + 1); 
     if(a < b) c = 1;
     return c;
@@ -1033,63 +1033,63 @@ static void matmul_cpu(bool transA, bool transB, size_t DIM_I, size_t DIM_J, siz
           *c = scale_and_sat(sum, act, scale, bert_scale);
       }
 
-      if (act == LAYERNORM) {
-        acc_t sum = 0;
-        for (size_t j = 0; j < DIM_J; j++)
-          sum += c_buffer[j];
-        acc_t mean = sum / (acc_t)DIM_J;
+      // if (act == LAYERNORM) {
+      //   acc_t sum = 0;
+      //   for (size_t j = 0; j < DIM_J; j++)
+      //     sum += c_buffer[j];
+      //   acc_t mean = sum / (acc_t)DIM_J;
 
-        acc_t total_err_sq = 0;
-        for (size_t j = 0; j < DIM_J; j++)
-          total_err_sq += (c_buffer[j] - mean)*(c_buffer[j] - mean);
-        acc_t variance = total_err_sq / (acc_t)DIM_J;
+      //   acc_t total_err_sq = 0;
+      //   for (size_t j = 0; j < DIM_J; j++)
+      //     total_err_sq += (c_buffer[j] - mean)*(c_buffer[j] - mean);
+      //   acc_t variance = total_err_sq / (acc_t)DIM_J;
 
-        acc_t stddev = int_sqrt(variance);
-        if (variance == 0) stddev = 1;
+      //   acc_t stddev = int_sqrt(variance);
+      //   if (variance == 0) stddev = 1;
 
-        for (size_t j = 0; j < DIM_J; j++) {
-          c_buffer[j] -= mean;
-          // c_buffer[j] /= stddev;
-          c_buffer[j] = ROUND_NEAR_EVEN((double)c_buffer[j] / stddev); // TODO I don't think I-BERT uses round-near-even, so we shouldn't either. We just use this rounding mode here in order to match the hardware.
+      //   for (size_t j = 0; j < DIM_J; j++) {
+      //     c_buffer[j] -= mean;
+      //     // c_buffer[j] /= stddev;
+      //     c_buffer[j] = ROUND_NEAR_EVEN((double)c_buffer[j] / stddev); // TODO I don't think I-BERT uses round-near-even, so we shouldn't either. We just use this rounding mode here in order to match the hardware.
 
-          elem_t* c = C + (i * stride_C) + j;
-          *c = scale_and_sat(c_buffer[j], act, scale, bert_scale);
-        }
-      } else if (act == SOFTMAX) {
-        const scale_t a = 0.3585;
-        const scale_t b = 1.353;
-        const scale_t c = 0.344;
+      //     elem_t* c = C + (i * stride_C) + j;
+      //     *c = scale_and_sat(c_buffer[j], act, scale, bert_scale);
+      //   }
+      // } else if (act == SOFTMAX) {
+      //   const scale_t a = 0.3585;
+      //   const scale_t b = 1.353;
+      //   const scale_t c = 0.344;
 
-        // is SCALE supposed to be input scale?
-        const acc_t qln2 = (acc_t) (0.693147 / bert_scale);
-        const acc_t qln2_inv = 65536 / qln2;
-        const acc_t qb = b / bert_scale;
-        const acc_t qc = c / (a*bert_scale*bert_scale);
+      //   // is SCALE supposed to be input scale?
+      //   const acc_t qln2 = (acc_t) (0.693147 / bert_scale);
+      //   const acc_t qln2_inv = 65536 / qln2;
+      //   const acc_t qb = b / bert_scale;
+      //   const acc_t qc = c / (a*bert_scale*bert_scale);
 
-        // pass 1: get max_q
-        acc_t max_q = -2147483648;
-        for (size_t j = 0; j < DIM_J; j++) {
-          if (c_buffer[j] > max_q) max_q = c_buffer[j];
-        }
+      //   // pass 1: get max_q
+      //   acc_t max_q = -2147483648;
+      //   for (size_t j = 0; j < DIM_J; j++) {
+      //     if (c_buffer[j] > max_q) max_q = c_buffer[j];
+      //   }
 
-        // pass 2: calculate iexp(q_tilde) and sum(q_tilde)
-        acc_t sum_exp = 0;
-        for (size_t j = 0; j < DIM_J; j++) {
-          acc_t q = c_buffer[j] - max_q;
-          acc_t z = (acc_t) (-q * qln2_inv) >> 16;
-          acc_t qp = q + z * qln2;
-          acc_t q_exp = (qp + qb)*(qp + qb) + qc;
-          c_buffer[j] = q_exp >> z;
-          sum_exp += c_buffer[j];
-        }
+      //   // pass 2: calculate iexp(q_tilde) and sum(q_tilde)
+      //   acc_t sum_exp = 0;
+      //   for (size_t j = 0; j < DIM_J; j++) {
+      //     acc_t q = c_buffer[j] - max_q;
+      //     acc_t z = (acc_t) (-q * qln2_inv) >> 16;
+      //     acc_t qp = q + z * qln2;
+      //     acc_t q_exp = (qp + qb)*(qp + qb) + qc;
+      //     c_buffer[j] = q_exp >> z;
+      //     sum_exp += c_buffer[j];
+      //   }
 
-        // pass 3: divide by sum
-        scale_t factor = (127.f) / (float) sum_exp; // what corresponds to 1 in output?
-        for (size_t j = 0; j < DIM_J; j++) {
-          elem_t* c = C + (i * stride_C) + j;
-          *c = scale_and_sat(c_buffer[j], act, factor, bert_scale);
-        }
-      }
+      //   // pass 3: divide by sum
+      //   scale_t factor = (127.f) / (float) sum_exp; // what corresponds to 1 in output?
+      //   for (size_t j = 0; j < DIM_J; j++) {
+      //     elem_t* c = C + (i * stride_C) + j;
+      //     *c = scale_and_sat(c_buffer[j], act, factor, bert_scale);
+      //   }
+      // }
     }
   }
 }
@@ -3588,3 +3588,4 @@ static void tiled_norm_auto(const size_t I, const size_t J,
 #undef abs
 
 #endif // SRC_MAIN_C_GEMMINI_H
+
