@@ -1,7 +1,7 @@
 
 #include "nn_interpolate.h"
 
-void NN_interpolate_F32(Tensor *out, Tensor *in, const float *scale_factor/*const char* mode*/) {
+void NN_interpolate(Tensor *out, Tensor *in, const float *scale_factor/*const char* mode*/) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);
@@ -10,11 +10,11 @@ void NN_interpolate_F32(Tensor *out, Tensor *in, const float *scale_factor/*cons
   assert(scale_factor[1] > 0);
 
   size_t batch_size = in->shape[0];
-  size_t channels = in->shape[1];
-  size_t input_height = in->shape[2];
-  size_t input_width = in->shape[3];
-  size_t output_height = out->shape[2];
-  size_t output_width = out->shape[3];
+  size_t input_height = in->shape[1];
+  size_t input_width = in->shape[2];
+  size_t channels = in->shape[3];
+  size_t output_height = out->shape[1];
+  size_t output_width = out->shape[2];
 
   // Ensure output dimensions match the expected dimensions after scaling
   assert(output_height == (size_t)(input_height * scale_factor[0]));
@@ -24,20 +24,18 @@ void NN_interpolate_F32(Tensor *out, Tensor *in, const float *scale_factor/*cons
   memset(out->data, 0, batch_size * channels * output_height * output_width * sizeof(float));
 
   for (size_t n = 0; n < batch_size; n += 1) {
-    for (size_t c = 0; c < channels; c += 1) {
-      for (size_t oh = 0; oh < output_height; oh += 1) {
-        for (size_t ow = 0; ow < output_width; ow += 1) {
+    for (size_t oh = 0; oh < output_height; oh += 1) {
+      for (size_t ow = 0; ow < output_width; ow += 1) {
+        for (size_t c = 0; c < channels; c += 1) {
           size_t ih = (size_t)(oh / scale_factor[0]);
           size_t iw = (size_t)(ow / scale_factor[1]);
 
-          size_t in_idx = n * channels * input_height * input_width
-                        + c * input_height * input_width
-                        + ih * input_width
-                        + iw;
-          size_t out_idx = n * channels * output_height * output_width
-                          + c * output_height * output_width
-                          + oh * output_width
-                          + ow;
+          size_t in_idx = n * input_height * input_width * channels
+                        + ih * input_width * channels
+                        + iw * channels + c;
+          size_t out_idx = n * output_height * output_width * channels
+                        + oh * output_width * channels
+                        + ow * channels + c;
 
           ((float *)out->data)[out_idx] = ((float *)in->data)[in_idx];
         }

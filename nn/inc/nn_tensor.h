@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #include "nn_float16.h"
 
@@ -156,7 +157,7 @@ static inline void NN_deleteTensor(Tensor *tensor) {
  * @param dtype: data type
  * @param data: pointer to data, if NULL, the data will be allocated
  */
-void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, const void *data);
+void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, void *data);
 
 /**
  * Create a new tensor

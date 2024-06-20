@@ -12,7 +12,7 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
             && b->shape[1] == a->shape[1]
             && b->shape[2] == a->shape[2]
             && b->shape[3] == a->shape[3]) {
-          NN__add_F16(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+          NN__add_F16(out->size, (float16_t *)out->data, (float16_t *)a->data, (float16_t *)b->data);
           return;
         }
         for (size_t i = 0; i < out->shape[0]; i += 1) {

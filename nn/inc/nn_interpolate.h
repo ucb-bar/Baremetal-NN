@@ -16,7 +16,7 @@
  * @param out: the output tensor
  * @param input: the input tensor
  */
-void NN_interpolate_F32(Tensor *out, Tensor *in, const float *scale_factor/*const char* mode*/);
+void NN_interpolate(Tensor *out, Tensor *in, const float *scale_factor/*, const char* mode*/);
 
 
 #endif // __NN_INTERPOLATE_H

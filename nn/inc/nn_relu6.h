@@ -21,4 +21,4 @@ void NN_ReLU6(Tensor *y, Tensor *x);
 void NN_ReLU6Inplace(Tensor *x);
 
 
-#endif // __NN_RELU_H
+#endif // __NN_RELU6_H

@@ -116,6 +116,12 @@ class TorchConverter(torch.fx.Interpreter):
     
     def placeholder(self, target, args, kwargs):
         print("placeholder:", target)
+        
+        ## sooooo hacky
+        shape = self.example_input.shape
+        if len(shape) == 4:
+            shape = (shape[0], shape[2], shape[3], shape[1])
+
 
         # this is also hacky
         
@@ -130,14 +136,19 @@ class TorchConverter(torch.fx.Interpreter):
         
         self.model_init += INDENT + "NN_initTensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, DTYPE_F32, NULL);\n".format(
             name=name,
-            dim=len(self.example_input.shape),
-            shape=", ".join(str(x) for x in self.example_input.shape)
+            dim=len(shape),
+            shape=", ".join(str(x) for x in shape)
         )
 
         return super().placeholder(target, args, kwargs)
     
     def call_function(self, target, args, kwargs):
-        # print("call function:", target)
+        print("call function:", target)
+        output = super().call_function(target, args, kwargs)
+        
+        output_shape = output.shape
+        if len(output_shape) == 4:
+            output_shape = (output_shape[0], output_shape[2], output_shape[3], output_shape[1])
 
         count = self.function_counter.get(target, 0)
         self.function_counter[target] = count + 1
@@ -149,7 +160,7 @@ class TorchConverter(torch.fx.Interpreter):
                 layer_name=layer_name,
                 input_names=self.node_info[layer_name][0]
             )
-            self.addOutputTensor(layer_name, args[0].shape)
+            self.addOutputTensor(layer_name, output_shape)
         
         elif target == torch.nn.functional.interpolate:
             layer_name = "interpolate_{count}".format(count=count) if count > 0 else "interpolate"
@@ -159,14 +170,7 @@ class TorchConverter(torch.fx.Interpreter):
                 input_names=self.node_info[layer_name][0],
                 scale_factor=kwargs.get("scale_factor")
             )
-            input_shape = args[0].shape
-            self.addOutputTensor(
-                layer_name, 
-                (
-                    input_shape[0], input_shape[1], 
-                    input_shape[2]*kwargs.get("scale_factor"), input_shape[3]*kwargs.get("scale_factor")
-                )
-            )
+            self.addOutputTensor(layer_name, output_shape)
         
         elif target == torch.nn.functional.relu:
             layer_name = "relu_{count}".format(count=count) if count > 0 else "relu"
@@ -188,7 +192,7 @@ class TorchConverter(torch.fx.Interpreter):
             
         self.model_forward += "\n"
 
-        return super().call_function(target, args, kwargs)
+        return output
 
     def call_method(self, target, args, kwargs):
         # print("call method:", target)
@@ -196,6 +200,11 @@ class TorchConverter(torch.fx.Interpreter):
 
     def call_module(self, target, args, kwargs):
         print("call module:", target)
+        output = super().call_module(target, args, kwargs)
+
+        output_shape = output.shape
+        if len(output_shape) == 4:
+            output_shape = (output_shape[0], output_shape[2], output_shape[3], output_shape[1])
 
         module = self.getModule(target)
         layer_name = target.replace(".", "_")
@@ -219,7 +228,7 @@ class TorchConverter(torch.fx.Interpreter):
                     module.state_dict().get("bias")
                     )
             
-            batch_size = int(args[0].shape[0])
+            batch_size = int(output_shape[0])
             self.addOutputTensor(
                 layer_name,
                 (batch_size, module.out_features)
@@ -254,11 +263,8 @@ class TorchConverter(torch.fx.Interpreter):
                     module.state_dict().get("running_var")
                     )
                 
-            batch_size = int(args[0].shape[0])
-            self.addOutputTensor(
-                layer_name, 
-                (batch_size, module.num_features, args[0].shape[2], args[0].shape[3])
-                )
+            batch_size = int(output_shape[0])
+            self.addOutputTensor(layer_name, output_shape)
             
             self.model_forward += INDENT + """NN_BatchNorm2d(
     &model->{layer_name}, &model->{input_name[0]},
@@ -286,14 +292,7 @@ class TorchConverter(torch.fx.Interpreter):
                     module.state_dict().get("bias")
                     )
             
-            batch_size = int(args[0].shape[0])
-            out_height = int(args[0].shape[2])
-            out_width = int(args[0].shape[3])
-
-            self.addOutputTensor(
-                layer_name, 
-                (batch_size, out_height, out_width, module.out_channels)
-                )
+            self.addOutputTensor(layer_name, output_shape)
         
             self.model_forward += INDENT + """NN_Conv2d(
     &model->{layer_name}, &model->{input_names[0]},
@@ -314,14 +313,14 @@ class TorchConverter(torch.fx.Interpreter):
                 layer_name=layer_name,
                 input_names=input_names
             )
-            self.addOutputTensor(layer_name, args[0].shape)
+            self.addOutputTensor(layer_name, output_shape)
         
         elif type(module) == torch.nn.ReLU6:
             self.model_forward += INDENT + "NN_ReLU6(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=input_names
             )
-            self.addOutputTensor(layer_name, args[0].shape)
+            self.addOutputTensor(layer_name, output_shape)
 
         elif type(module) == torch.nn.ELU:
             self.model_forward += INDENT + "NN_ELU(&model->{layer_name}, &model->{input_names[0]}, {eps});\n".format(
@@ -329,13 +328,13 @@ class TorchConverter(torch.fx.Interpreter):
                 input_names=input_names,
                 eps=module.alpha
             )
-            self.addOutputTensor(layer_name, args[0].shape)
+            self.addOutputTensor(layer_name, output_shape)
 
         else:
             print("[WARNING] Unsupported module call:", target)
 
 
-        return super().call_module(target, args, kwargs)
+        return output
 
     def convert(self, example_input, output_dir="."):
         self.example_input = example_input

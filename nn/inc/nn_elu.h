@@ -1,5 +1,5 @@
-#ifndef __NN_RELU_H
-#define __NN_RELU_H
+#ifndef __NN_ELU_H
+#define __NN_ELU_H
 
 #include <assert.h>
 #include <math.h>
@@ -24,4 +24,4 @@ void NN_ELU(Tensor *y, Tensor *x, float alpha);
 void NN_ELUInplace(Tensor *x, float alpha);
 
 
-#endif // __NN_RELU_H
+#endif // __NN_ELU_H

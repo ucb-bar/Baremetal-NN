@@ -108,6 +108,10 @@ void NN_Conv2d(
   memset(out->data, 0, batch_size * out_height * out_width * out_channels * sizeof(float));
 
   #ifdef GEMMINI
+    if (!bias) {
+      bias = NN_zeros(1, (size_t []){ out_channels }, DTYPE_F32);
+    }
+
     if (groups == 1) {
       tiled_conv_auto(
           batch_size, in_height, in_width, in_channels,

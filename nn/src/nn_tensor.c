@@ -2,7 +2,7 @@
 #include "nn_tensor.h"
 
 
-void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, const void *data) {
+void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, void *data) {
   tensor->dtype = dtype;
   tensor->ndim = ndim;
 
