@@ -275,9 +275,10 @@ class TorchConverter(torch.fx.Interpreter):
 
         elif type(module) == torch.nn.Conv2d:
             if module.weight is not None:
+                # weight need to be converted from (out_ch, in_ch, kh, kw) to (kh, kw, in_ch, out_ch)
                 self.addDataTensor(
                     "{layer_name}_weight".format(layer_name=layer_name), 
-                    module.state_dict().get("weight")
+                    module.state_dict().get("weight").permute(2, 3, 1, 0)
                     )
             if module.bias is not None:
                 self.addDataTensor(
@@ -286,20 +287,24 @@ class TorchConverter(torch.fx.Interpreter):
                     )
             
             batch_size = int(args[0].shape[0])
+            out_height = int(args[0].shape[2])
+            out_width = int(args[0].shape[3])
+
             self.addOutputTensor(
                 layer_name, 
-                (batch_size, module.out_channels, args[0].shape[2]//module.stride[0], args[0].shape[3]//module.stride[1])
+                (batch_size, out_height, out_width, module.out_channels)
                 )
         
             self.model_forward += INDENT + """NN_Conv2d(
     &model->{layer_name}, &model->{input_names[0]},
-    {weight}, {bias}, (size_t[]){{{stride}}}, (size_t[]){{{padding}}}, {groups});\n""".format(
+    {weight}, {bias}, (size_t[]){{{stride}}}, (size_t[]){{{padding}}}, (size_t[]){{{dilation}}}, {groups});\n""".format(
                 layer_name=layer_name,
                 input_names=input_names,
                 weight="&model->{layer_name}_weight".format(layer_name=layer_name) if module.weight is not None else "NULL",
                 bias="&model->{layer_name}_bias".format(layer_name=layer_name) if module.bias is not None else "NULL",
                 stride=", ".join(str(x) for x in module.stride),
                 padding=", ".join(str(x) for x in module.padding),
+                dilation=", ".join(str(x) for x in module.dilation),
                 groups=module.groups
             )
             self.prev_layer_name = "{layer_name}".format(layer_name=layer_name)
