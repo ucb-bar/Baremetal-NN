@@ -118,18 +118,15 @@ void NN_Conv2d(
           out_channels, out_height, out_width,
           stride_height, dilation_height, 1, padding_height, kernel_height, 
           0, 0, 0, 0, 0,
-
           in->data,
           weight->data,
           bias->data,
           out->data,
-
           NO_ACTIVATION, ACC_SCALE_IDENTITY,
           0, 0, 0,
-
           WS);
     }
-    else {
+    else if (groups == in_channels) {
       assert(weight->shape[2] == 1);
 
       Tensor *in_nchw = NN_tensor(4, (size_t[]){batch_size, in_channels, in_height, in_width}, DTYPE_F32, NULL);
@@ -138,30 +135,8 @@ void NN_Conv2d(
       Tensor *weight_1hwc = NN_tensor(4, (size_t[]){1, kernel_height, kernel_width, out_channels}, DTYPE_F32, weight->data);
       Tensor *weight_1chw = NN_tensor(4, (size_t[]){1, out_channels, kernel_height, kernel_width}, DTYPE_F32, NULL);
 
-      // printf("in:\t");
-      // NN_printShape(in);
-      // printf("\n");
-      // NN_printf(in);
-      // printf("in_nchw:\t");
-      // NN_printShape(in_nchw);
-      // printf("\n");
-      // NN_printf(in_nchw);
-
-      
-      // printf("weight_1hwc:\t");
-      // NN_printShape(weight_1hwc);
-      // printf("\n");
-      // NN_printf(weight_1hwc);
-      // printf("weight_1chw:\t");
-      // NN_printShape(weight_1chw);
-      // printf("\n");
-      // NN_printf(weight_1chw);
-
       NN_NHWCToNCHW(in_nchw, in);
       NN_NHWCToNCHW(weight_1chw, weight_1hwc);
-
-
-      
 
       for (size_t g = 0; g < groups; g += 1) {
         tiled_conv_auto(
@@ -169,65 +144,102 @@ void NN_Conv2d(
           1, out_height, out_width,
           stride_height, dilation_height, 1, padding_height, kernel_height, 
           0, 0, 0, 0, 0,
-
           ((float *)in_nchw->data) + g * in_height * in_width,
           ((float *)weight_1chw->data) + g * kernel_height * kernel_width,
           ((float *)bias->data) + g,
           ((float *)out_nchw->data) + g * out_height * out_width,
-
           NO_ACTIVATION, ACC_SCALE_IDENTITY,
           0, 0, 0,
-
           WS);
-
-          // printf("channel group %d\n", g);
-          // NN_printf(out_nchw);
-          // printf("\n\n");
       }
 
       NN_NCHWToNHWC(out, out_nchw);
+
+    }
+    else {
+      printf("[ERROR] Unsupported conv2d operation for groups other than 1 or in_channels\n");
     }
 
 
   #else
-    for (size_t n = 0; n < batch_size; n += 1) {
-      for (size_t g = 0; g < groups; g += 1) {
-        for (size_t oc = 0; oc < out_channels / groups; oc += 1) {
+
+    if (groups == 1) {
+      // Standard convolution
+      for (size_t b = 0; b < batch_size; b += 1) {
+        for (size_t oc = 0; oc < out_channels; oc += 1) {
           for (size_t oh = 0; oh < out_height; oh += 1) {
             for (size_t ow = 0; ow < out_width; ow += 1) {
-              float sum = 0.f;
-              if (bias != NULL) {
-                sum = ((float *)bias->data)[g * (out_channels / groups) + oc];
-              }
-              for (size_t ic = 0; ic < in_channels / groups; ic += 1) {
-                for (size_t kh = 0; kh < kernel_height; kh += 1) {
-                  for (size_t kw = 0; kw < kernel_width; kw += 1) {
-                    int ih = oh * stride_height + kh * dilation_height - padding_height;
-                    int iw = ow * stride_width + kw * dilation_width - padding_width;
-                    if (ih < (int)in_height && iw < (int)in_width && ih >= 0 && iw >= 0) {
-                      size_t in_idx = n * in_height * in_width * in_channels
-                                  + ih * in_width * in_channels
-                                  + iw * in_channels
-                                  + g * (in_channels / groups)
-                                  + ic;
-                      size_t weight_idx = kh * kernel_width * in_channels * out_channels / groups
-                                  + kw * in_channels * out_channels / groups
-                                  + ic * out_channels / groups
-                                  + oc;
-                      sum += ((float *)in->data)[in_idx] * ((float *)weight->data)[weight_idx + g * (in_channels / groups) * (kernel_height * kernel_width * out_channels / groups)];
+              float value = 0.0f;
+              for (size_t kh = 0; kh < kernel_height; kh += 1) {
+                for (size_t kw = 0; kw < kernel_width; kw += 1) {
+                  for (size_t ic = 0; ic < in_channels; ic += 1) {
+                    size_t ih = oh * stride_height + kh * dilation_height - padding_height;
+                    size_t iw = ow * stride_width + kw * dilation_width - padding_width;
+                    if (ih < in_height && iw < in_width) {
+                      size_t in_idx = b * in_height * in_width * in_channels
+                          + ih * in_width * in_channels
+                          + iw * in_channels
+                          + ic;
+                      size_t weight_idx = kh * kernel_width * in_channels * out_channels
+                          + kw * in_channels * out_channels
+                          + ic * out_channels
+                          + oc;
+                      value += ((float*)in->data)[in_idx] * ((float*)weight->data)[weight_idx];
                     }
                   }
                 }
               }
-              size_t out_idx = n * out_height * out_width * out_channels
-                            + oh * out_width * out_channels
-                            + ow * out_channels
-                            + g * (out_channels / groups) + oc;
-              ((float *)out->data)[out_idx] = sum;
+              if (bias != NULL) {
+                value += ((float*)bias->data)[oc];
+              }
+              size_t out_idx = b * out_height * out_width * out_channels
+                  + oh * out_width * out_channels
+                  + ow * out_channels
+                  + oc;
+              ((float*)out->data)[out_idx] = value;
             }
           }
         }
       }
+    }
+    else if (groups == in_channels) {
+      // Depthwise convolution
+      for (size_t b = 0; b < batch_size; b += 1) {
+        for (size_t oc = 0; oc < out_channels; oc += 1) {
+          for (size_t oh = 0; oh < out_height; oh += 1) {
+            for (size_t ow = 0; ow < out_width; ow += 1) {
+              float value = 0.0f;
+              for (size_t kh = 0; kh < kernel_height; kh += 1) {
+                for (size_t kw = 0; kw < kernel_width; kw += 1) {
+                  size_t ih = oh * stride_height + kh * dilation_height - padding_height;
+                  size_t iw = ow * stride_width + kw * dilation_width - padding_width;
+                  if (ih < in_height && iw < in_width) {
+                    size_t in_idx = b * in_height * in_width * in_channels
+                        + ih * in_width * in_channels
+                        + iw * in_channels
+                        + oc;
+                    size_t weight_idx = kh * kernel_width * in_channels
+                        + kw * in_channels
+                        + oc;
+                    value += ((float *)in->data)[in_idx] * ((float *)weight->data)[weight_idx];
+                  }
+                }
+              }
+              if (bias != NULL) {
+                value += ((float *)bias->data)[oc];
+              }
+              size_t out_idx = b * out_height * out_width * out_channels
+                  + oh * out_width * out_channels
+                  + ow * out_channels
+                  + oc;
+              ((float *)out->data)[out_idx] = value;
+            }
+          }
+        }
+      }
+    }
+    else {
+      printf("[ERROR] Unsupported conv2d operation for groups other than 1 or in_channels\n");
     }
   #endif
 }
