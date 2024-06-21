@@ -10,7 +10,19 @@
 
 #include "nn_float16.h"
 
+inline static void NN__fill_U8(size_t n, uint8_t *x, uint8_t v) {
+  for (size_t i = 0; i < n; i += 1) {
+    x[i] = v;
+  }
+}
+
 inline static void NN__fill_I8(size_t n, int8_t *x, int8_t v) {
+  for (size_t i = 0; i < n; i += 1) {
+    x[i] = v;
+  }
+}
+
+inline static void NN__fill_U16(size_t n, uint16_t *x, uint16_t v) {
   for (size_t i = 0; i < n; i += 1) {
     x[i] = v;
   }

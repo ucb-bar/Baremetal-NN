@@ -60,6 +60,18 @@ void NN_sub_2D(Tensor *out, Tensor *a, Tensor *b) {
       NN__sub_I8(out->size, (int8_t *)out->data, (int8_t *)a->data, (int8_t *)b->data);
       return;
     }
+    if (out->dtype == DTYPE_I16 && a->dtype == DTYPE_I16 && b->dtype == DTYPE_I16) {
+      NN__sub_I16(out->size, (int16_t *)out->data, (int16_t *)a->data, (int16_t *)b->data);
+      return;
+    }
+    if (out->dtype == DTYPE_I32 && a->dtype == DTYPE_I32 && b->dtype == DTYPE_I32) {
+      NN__sub_I32(out->size, (int32_t *)out->data, (int32_t *)a->data, (int32_t *)b->data);
+      return;
+    }
+    if (out->dtype == DTYPE_U8 && a->dtype == DTYPE_U8 && b->dtype == DTYPE_U8) {
+      NN__sub_U8(out->size, (uint8_t *)out->data, (uint8_t *)a->data, (uint8_t *)b->data);
+      return;
+    }
   }
 
   if (out->dtype == DTYPE_F32 && a->dtype == DTYPE_F32 && b->dtype == DTYPE_F32) {

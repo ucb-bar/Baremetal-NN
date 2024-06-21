@@ -13,6 +13,66 @@
   #include <riscv_vector.h>
 #endif
 
+static inline void NN__abs_I8(size_t n, int8_t *y, int8_t *x) {
+  #if defined(RVV)
+    while (n > 0) {
+      size_t vl = __riscv_vsetvl_e8m1(n);
+      vint8m1_t vec_x = __riscv_vle8_v_i8m1(x, vl);
+      vint8m1_t vec_neg_x = __riscv_vneg_v_i8m1(vec_x, vl);
+      vbool8_t mask = __riscv_vmslt_vx_i8m1_b8(vec_x, 0, vl);
+      vint8m1_t vec_abs_x = __riscv_vmerge_vvm_i8m1(vec_x, vec_neg_x, mask, vl);
+      __riscv_vse8_v_i8m1(y, vec_abs_x, vl);
+      x += vl;
+      y += vl;
+      n -= vl;
+    }
+  #else
+    for (size_t i = 0; i < n; i += 1) {
+      y[i] = x[i] < 0 ? -x[i] : x[i];
+    }
+  #endif
+}
+
+static inline void NN__abs_I16(size_t n, int16_t *y, int16_t *x) {
+  #if defined(RVV)
+    while (n > 0) {
+      size_t vl = __riscv_vsetvl_e16m1(n);
+      vint16m1_t vec_x = __riscv_vle16_v_i16m1(x, vl);
+      vint16m1_t vec_neg_x = __riscv_vneg_v_i16m1(vec_x, vl);
+      vbool16_t mask = __riscv_vmslt_vx_i16m1_b16(vec_x, 0, vl);
+      vint16m1_t vec_abs_x = __riscv_vmerge_vvm_i16m1(vec_x, vec_neg_x, mask, vl);
+      __riscv_vse16_v_i16m1(y, vec_abs_x, vl);
+      x += vl;
+      y += vl;
+      n -= vl;
+    }
+  #else
+    for (size_t i = 0; i < n; i += 1) {
+      y[i] = x[i] < 0 ? -x[i] : x[i];
+    }
+  #endif
+}
+
+static inline void NN__abs_I32(size_t n, int32_t *y, int32_t *x) {
+  #if defined(RVV)
+    while (n > 0) {
+      size_t vl = __riscv_vsetvl_e32m1(n);
+      vint32m1_t vec_x = __riscv_vle32_v_i32m1(x, vl);
+      vint32m1_t vec_neg_x = __riscv_vneg_v_i32m1(vec_x, vl);
+      vbool32_t mask = __riscv_vmslt_vx_i32m1_b32(vec_x, 0, vl);
+      vint32m1_t vec_abs_x = __riscv_vmerge_vvm_i32m1(vec_x, vec_neg_x, mask, vl);
+      __riscv_vse32_v_i32m1(y, vec_abs_x, vl);
+      x += vl;
+      y += vl;
+      n -= vl;
+    }
+  #else
+    for (size_t i = 0; i < n; i += 1) {
+      y[i] = x[i] < 0 ? -x[i] : x[i];
+    }
+  #endif
+}
+
 static inline void NN__abs_F16(size_t n, float16_t *y, float16_t *x) {
   for (size_t i = 0; i < n; i += 1) {
     y[i] = NN_floatToHalf(fabsf(NN_halfToFloat(x[i])));

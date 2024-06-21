@@ -19,8 +19,11 @@
 
 
 typedef enum {
+  DTYPE_U8,
   DTYPE_I8,
-  // DTYPE_I16,
+  DTYPE_U16,
+  DTYPE_I16,
+  DTYPE_U32,
   DTYPE_I32,
   // DTYPE_I64,
   // DTYPE_I128,
@@ -41,10 +44,16 @@ typedef struct {
 
 static inline size_t NN_sizeof(DataType dtype) {
   switch (dtype) {
+    case DTYPE_U8:
+      return sizeof(uint8_t);
     case DTYPE_I8:
       return sizeof(int8_t);
-    // case DTYPE_I16:
-    //   return sizeof(int16_t);
+    case DTYPE_U16:
+      return sizeof(uint16_t);
+    case DTYPE_I16:
+      return sizeof(int16_t);
+    case DTYPE_U32:
+      return sizeof(uint32_t);
     case DTYPE_I32:
       return sizeof(int32_t);
     // case DTYPE_I64:
@@ -63,10 +72,16 @@ static inline size_t NN_sizeof(DataType dtype) {
 
 static inline const char *NN_getDataTypeName(DataType dtype) {
   switch (dtype) {
+    case DTYPE_U8:
+      return "UINT8";
     case DTYPE_I8:
       return "INT8";
-    // case DTYPE_I16:
-    //   return "INT16";
+    case DTYPE_U16:
+      return "UINT16";
+    case DTYPE_I16:
+      return "INT16";
+    case DTYPE_U32:
+      return "UINT32";
     case DTYPE_I32:
       return "INT32";
     // case DTYPE_I64:

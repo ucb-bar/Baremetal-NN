@@ -4,8 +4,6 @@
 void NN_interpolate(Tensor *out, Tensor *in, const float *scale_factor/*const char* mode*/) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
-  assert(in->dtype == DTYPE_F32);
-  assert(out->dtype == DTYPE_F32);
   assert(scale_factor[0] > 0);
   assert(scale_factor[1] > 0);
 
@@ -21,7 +19,7 @@ void NN_interpolate(Tensor *out, Tensor *in, const float *scale_factor/*const ch
   assert(output_width == (size_t)(input_width * scale_factor[1]));
 
   // Initialize output tensor to zeros
-  memset(out->data, 0, batch_size * channels * output_height * output_width * sizeof(float));
+  memset(out->data, 0, batch_size * channels * output_height * output_width * NN_sizeof(out->dtype));
 
   for (size_t n = 0; n < batch_size; n += 1) {
     for (size_t oh = 0; oh < output_height; oh += 1) {
@@ -37,7 +35,21 @@ void NN_interpolate(Tensor *out, Tensor *in, const float *scale_factor/*const ch
                         + oh * output_width * channels
                         + ow * channels + c;
 
-          ((float *)out->data)[out_idx] = ((float *)in->data)[in_idx];
+          switch (out->dtype) {
+            case DTYPE_U8:
+              ((uint8_t *)out->data)[out_idx] = ((uint8_t *)in->data)[in_idx];
+              break;
+
+            case DTYPE_F32:
+              ((float *)out->data)[out_idx] = ((float *)in->data)[in_idx];
+              break;
+
+            default:
+              printf("[ERROR] Unsupported operation of tensor with dtype %s = |%s|\n", 
+                NN_getDataTypeName(out->dtype), NN_getDataTypeName(in->dtype)
+              );
+              break;
+          }
         }
       }
     }

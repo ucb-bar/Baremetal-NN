@@ -4,6 +4,9 @@
 
 void NN_fill(Tensor *tensor, float value) {
   switch (tensor->dtype) {
+    case DTYPE_U8:
+      NN__fill_U8(tensor->size, (uint8_t *)tensor->data, (uint8_t)value);
+      return;
     case DTYPE_I8:
       NN__fill_I8(tensor->size, (int8_t *)tensor->data, (int8_t)value);
       return;
@@ -41,9 +44,19 @@ Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype) {
   Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
 
   switch (dtype) {
+    case DTYPE_U8:
+      for (size_t i = 0; i < t->size; i += 1) {
+        ((uint8_t *)t->data)[i] = rand() % 0x100;
+      }
+      break;
     case DTYPE_I8:
       for (size_t i = 0; i < t->size; i += 1) {
-        ((int8_t *)t->data)[i] = rand() % 256;
+        ((int8_t *)t->data)[i] = rand() % 0x100;
+      }
+      break;
+    case DTYPE_U16:
+      for (size_t i = 0; i < t->size; i += 1) {
+        ((uint16_t *)t->data)[i] = rand() % 0x10000;
       }
       break;
     case DTYPE_I32:

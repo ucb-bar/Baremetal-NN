@@ -43,8 +43,33 @@ void NN_asType(Tensor *out, Tensor *in) {
   }
 
   switch (in->dtype) {
+    case DTYPE_U8:
+      switch (out->dtype) {
+        case DTYPE_U16:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((uint16_t *)out->data)[i] = (uint16_t)((uint8_t *)in->data)[i];
+          }
+          return;
+        case DTYPE_U32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((uint32_t *)out->data)[i] = (uint32_t)((uint8_t *)in->data)[i];
+          }
+          return;
+        case DTYPE_I32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((int32_t *)out->data)[i] = (int32_t)((uint8_t *)in->data)[i];
+          }
+          return;
+      }
+      break;
+    
     case DTYPE_I8:
       switch (out->dtype) {
+        case DTYPE_I16:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((int16_t *)out->data)[i] = (int16_t)((int8_t *)in->data)[i];
+          }
+          return;
         case DTYPE_I32:
           for (size_t i = 0; i < in->size; i += 1) {
             ((int32_t *)out->data)[i] = (int32_t)((int8_t *)in->data)[i];
@@ -53,6 +78,16 @@ void NN_asType(Tensor *out, Tensor *in) {
         case DTYPE_F32:
           for (size_t i = 0; i < in->size; i += 1) {
             ((float *)out->data)[i] = (float)((int8_t *)in->data)[i];
+          }
+          return;
+      }
+      break;
+  
+    case DTYPE_I16:
+      switch (out->dtype) {
+        case DTYPE_I32:
+          for (size_t i = 0; i < in->size; i += 1) {
+            ((int32_t *)out->data)[i] = (int32_t)((int16_t *)in->data)[i];
           }
           return;
       }

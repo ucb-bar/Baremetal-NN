@@ -59,6 +59,9 @@ void NN_printf(Tensor *tensor) {
     case 1:
       for (size_t i=0; i<tensor->shape[0]; i+=1) {
         switch (tensor->dtype) {
+          case DTYPE_U8:
+            printf("%d", *((uint8_t *)tensor->data + i));
+            break;
           case DTYPE_I8:
             printf("%d", *((int8_t *)tensor->data + i));
             break;
@@ -86,6 +89,9 @@ void NN_printf(Tensor *tensor) {
         printf("[");
         for (size_t j=0; j<tensor->shape[1]; j+=1) {
           switch (tensor->dtype) {
+            case DTYPE_U8:
+              printf("%d", *((uint8_t *)tensor->data + i*tensor->shape[1] + j));
+              break;
             case DTYPE_I8:
               printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1] + j));
               break;
@@ -123,6 +129,9 @@ void NN_printf(Tensor *tensor) {
           printf("[");
           for (size_t k=0; k<tensor->shape[2]; k+=1) {
             switch (tensor->dtype) {
+              case DTYPE_U8:
+                printf("%d", *((uint8_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k));
+                break;
               case DTYPE_I8:
                 printf("%d", *((int8_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k));
                 break;
@@ -164,6 +173,9 @@ void NN_printf(Tensor *tensor) {
             printf("[");
             for (size_t w = 0; w < tensor->shape[3]; w += 1) {
               switch (tensor->dtype) {
+                case DTYPE_U8:
+                  printf("%d", *((uint8_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w));
+                  break;
                 case DTYPE_I8:
                   printf("%d", *((int8_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w));
                   break;
