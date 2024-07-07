@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "rv.h"
 #include "nn.h"
 #include "termimg.h"
 
@@ -176,7 +177,13 @@ int main() {
   Tensor *left_image = NN_tensor(4, (const size_t[]){1, IMG_HEIGHT, IMG_WIDTH, 1}, DTYPE_U8, left_data);
   Tensor *right_image = NN_tensor(4, (const size_t[]){1, IMG_HEIGHT, IMG_WIDTH, 1}, DTYPE_U8, right_data);
 
+  size_t cycles = READ_CSR("cycle");
+
   Tensor *disparity_image = compute_dispartiy(left_image, right_image, 0, 32, 4);
+
+  cycles = READ_CSR("cycle") - cycles;
+  printf("Cycles: %lu\n", cycles);
+
   // Save the disparity image
   
   // write only the data
@@ -191,7 +198,7 @@ int main() {
 
   NN_interpolate(img_small, disparity_image, (float []){0.25, 0.5});
 
-  showASCIIImage(img_small);
+  // showASCIIImage(img_small);
 
   return 0;
 }
