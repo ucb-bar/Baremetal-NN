@@ -1,0 +1,1 @@
+make && spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 --misaligned ./llama2
