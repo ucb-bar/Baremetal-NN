@@ -7,7 +7,7 @@ void NN_min(Tensor *scalar, Tensor *tensor) {
 
   switch (tensor->dtype) {
     case DTYPE_F32:
-      NN__min_f32(tensor->size, (float *)scalar->data, (float *)tensor->data);
+      NN__min_f32(tensor->size, (float *)scalar->data, (float *)tensor->data, 1);
       break;
     
     default:

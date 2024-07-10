@@ -11,6 +11,12 @@ set(cpu_impl
   impl/cpu/div.c
   impl/cpu/dot.c
   impl/cpu/fill.c
+  impl/cpu/max.c
+  impl/cpu/maximum.c
+  impl/cpu/maximum1.c
+  impl/cpu/min.c
+  impl/cpu/minimum.c
+  impl/cpu/minimum1.c
 )
 
 set(rvv_impl
@@ -20,6 +26,12 @@ set(rvv_impl
   impl/rvv/add.c
   impl/rvv/add1.c
   impl/rvv/div.c
+  impl/rvv/max.c
+  impl/rvv/maximum.c
+  impl/rvv/maximum1.c
+  impl/rvv/min.c
+  impl/rvv/minimum.c
+  impl/rvv/minimum1.c
 )
 
 
