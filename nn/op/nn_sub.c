@@ -60,18 +60,18 @@ void NN_sub_2d(Tensor *out, Tensor *a, Tensor *b) {
       NN__sub_i8(out->size, (int8_t *)out->data, 1, (int8_t *)a->data, 1, (int8_t *)b->data, 1);
       return;
     }
-    // if (out->dtype == DTYPE_I16 && a->dtype == DTYPE_I16 && b->dtype == DTYPE_I16) {
-    //   NN__sub_i16(out->size, (int16_t *)out->data, 1, (int16_t *)a->data, 1, (int16_t *)b->data, 1);
-    //   return;
-    // }
-    // if (out->dtype == DTYPE_I32 && a->dtype == DTYPE_I32 && b->dtype == DTYPE_I32) {
-    //   NN__sub_i32(out->size, (int32_t *)out->data, 1, (int32_t *)a->data, 1, (int32_t *)b->data, 1);
-    //   return;
-    // }
-    // if (out->dtype == DTYPE_U8 && a->dtype == DTYPE_U8 && b->dtype == DTYPE_U8) {
-    //   NN__sub_u8(out->size, (uint8_t *)out->data, 1, (uint8_t *)a->data, 1, (uint8_t *)b->data, 1);
-    //   return;
-    // }
+    if (out->dtype == DTYPE_I16 && a->dtype == DTYPE_I16 && b->dtype == DTYPE_I16) {
+      NN__sub_i16(out->size, (int16_t *)out->data, 1, (int16_t *)a->data, 1, (int16_t *)b->data, 1);
+      return;
+    }
+    if (out->dtype == DTYPE_I32 && a->dtype == DTYPE_I32 && b->dtype == DTYPE_I32) {
+      NN__sub_i32(out->size, (int32_t *)out->data, 1, (int32_t *)a->data, 1, (int32_t *)b->data, 1);
+      return;
+    }
+    if (out->dtype == DTYPE_U8 && a->dtype == DTYPE_U8 && b->dtype == DTYPE_U8) {
+      NN__sub_u8(out->size, (uint8_t *)out->data, 1, (uint8_t *)a->data, 1, (uint8_t *)b->data, 1);
+      return;
+    }
   }
 
   if (out->dtype == DTYPE_F32 && a->dtype == DTYPE_F32 && b->dtype == DTYPE_F32) {
