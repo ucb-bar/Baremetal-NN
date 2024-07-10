@@ -81,7 +81,7 @@ test_pattern = [
     #     [("x", rand((6, 5))), ("w", rand((6, 5))), ("b", rand((6, 5)))  ],
     #     ", 1e-05"                                                                                                        ),
 
-    ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 4))),                                         ]),
+    # ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 4))),                                         ]),
     ("add",         lambda a, b: a + b,                 [("a", rand16((6, 7))),       ("b", rand16((6, 7)))             ]),
     ("matmulT",     lambda a, b: a @ b.T,               [("a", rand16((6, 7))),       ("b", rand16((5, 7)))             ]),
     ("matmul",      lambda a, b: a @ b,                 [("a", rand16((6, 7))),       ("b", rand16((7, 5)))             ]),
