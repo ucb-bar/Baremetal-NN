@@ -1,5 +1,5 @@
 
-#include "nn_batchnorm2d.h"
+#include "nn_batch_norm2d.h"
 
 void NN_batch_norm2d(
   Tensor *out, Tensor *in, 

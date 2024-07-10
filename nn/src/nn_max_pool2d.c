@@ -1,6 +1,6 @@
 
 
-#include "nn_maxpool2d.h"
+#include "nn_max_pool2d.h"
 
 void NN_max_pool2d(Tensor *out, Tensor *in, const size_t *kernel_size) {
   assert(in->ndim == 4);

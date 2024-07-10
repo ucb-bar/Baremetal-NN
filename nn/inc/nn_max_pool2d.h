@@ -1,5 +1,5 @@
-#ifndef __NN_MAXPOOL2D_H
-#define __NN_MAXPOOL2D_H
+#ifndef __NN_MAX_POOL2D_H
+#define __NN_MAX_POOL2D_H
 
 #include <assert.h>
 
@@ -17,4 +17,4 @@
 void NN_max_pool2d(Tensor *out, Tensor *in, const size_t *kernel_size);
 
 
-#endif // __NN_MAXPOOL2D_H
+#endif // __NN_MAX_POOL2D_H

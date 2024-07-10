@@ -1,5 +1,5 @@
-#ifndef __NN_LAYERNORM_H
-#define __NN_LAYERNORM_H
+#ifndef __NN_LAYER_NORM_H
+#define __NN_LAYER_NORM_H
 
 #include <assert.h>
 #include <math.h>
@@ -13,4 +13,4 @@ void NN_layer_norm(
   const float eps);
 
 
-#endif // __NN_LAYERNORM_H
+#endif // __NN_LAYER_NORM_H

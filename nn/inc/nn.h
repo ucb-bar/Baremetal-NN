@@ -8,7 +8,7 @@
 #include "nn_print.h"
 #include "nn_abs.h"
 #include "nn_add.h"
-#include "nn_batchnorm2d.h"
+#include "nn_batch_norm2d.h"
 #include "nn_clip.h"
 #include "nn_conv2d.h"
 #include "nn_copy.h"

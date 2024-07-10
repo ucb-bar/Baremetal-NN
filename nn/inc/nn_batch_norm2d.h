@@ -1,5 +1,5 @@
-#ifndef __NN_BATCHNORM2D_H
-#define __NN_BATCHNORM2D_H
+#ifndef __NN_BATCH_NORM2D_H
+#define __NN_BATCH_NORM2D_H
 
 #include <assert.h>
 #include <math.h>
@@ -25,4 +25,4 @@ void NN_batch_norm2d(
     );
 
 
-#endif // __NN_BATCHNORM2D_H
+#endif // __NN_BATCH_NORM2D_H

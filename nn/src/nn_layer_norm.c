@@ -1,5 +1,5 @@
 
-#include "nn_layernorm.h"
+#include "nn_layer_norm.h"
 
 void NN_layer_norm(
   Tensor *out, Tensor *in,

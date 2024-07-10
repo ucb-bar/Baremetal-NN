@@ -8,7 +8,7 @@ add_library(nn
   src/nn_print.c
   src/nn_abs.c
   src/nn_add.c
-  src/nn_batchnorm2d.c
+  src/nn_batch_norm2d.c
   src/nn_conv2d.c
   src/nn_clip.c
   src/nn_copy.c
@@ -16,13 +16,13 @@ add_library(nn
   src/nn_elu.c
   src/nn_fill.c
   src/nn_interpolate.c
-  src/nn_layernorm.c
+  src/nn_layer_norm.c
   src/nn_linear.c
   src/nn_matmul.c
   src/nn_norm.c
   src/nn_max.c
   src/nn_maximum.c
-  src/nn_maxpool2d.c
+  src/nn_max_pool2d.c
   src/nn_min.c
   src/nn_minimum.c
   src/nn_mul.c
