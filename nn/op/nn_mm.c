@@ -1,14 +1,6 @@
 
 #include "nn_mm.h"
 
-#ifdef GEMMINI
-  #include <math.h>
-  #include <limits.h>
-  #include <stdbool.h>
-
-  #include "gemmini/gemmini.h"
-#endif
-
 
 void NN_mm(Tensor *out, Tensor *a, Tensor *b) {
   assert(a->ndim == 2);
@@ -18,55 +10,7 @@ void NN_mm(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[1] == b->shape[1]);
 
   #ifdef GEMMINI
-    // // This function runs a tiled matrix multiplication, with automatically
-    // // calculated tiling factors
-    // static void tiled_matmul_auto(size_t dim_I, size_t dim_J, size_t dim_K,
-    //         const elem_t* A, const elem_t* B,
-    //         const void * D, void * C,
-    //         size_t stride_A, size_t stride_B, size_t stride_D, size_t stride_C,
-    //         scale_t A_scale_factor, scale_t B_scale_factor, scale_acc_t D_scale_factor,
-    //         int act, acc_scale_t scale, acc_scale_t bert_scale,
-    //         bool repeating_bias,
-    //         bool transpose_A, bool transpose_B,
-    //         bool full_C, bool low_D,
-    //         uint8_t weightA,
-    //         enum tiled_matmul_type_t tiled_matmul_type) {
-
-    size_t dim_I = a->shape[0];
-    size_t dim_J = b->shape[1];
-    size_t dim_K = a->shape[1];
-
-    size_t stride_A = dim_K;
-    size_t stride_B = dim_J;
-    size_t stride_D = dim_J;
-    size_t stride_C = dim_J;
-
-    scale_t A_scale_factor = 1.0;
-    scale_t B_scale_factor = 1.0;
-    scale_acc_t D_scale_factor = 1.0;
-    
-    int act = 0;
-    acc_scale_t scale = 1.0;
-    acc_scale_t bert_scale = 1.0;
-
-    bool repeating_bias = false;
-    bool transpose_A = false;
-    bool transpose_B = false;
-    bool full_C = false;
-    bool low_D = false;
-
-    tiled_matmul_auto(dim_I, dim_J, dim_K,
-          a->data, b->data,
-          NULL, out->data,
-          stride_A, stride_B, stride_D, stride_C,
-          MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY, MVIN_SCALE_IDENTITY,
-          NO_ACTIVATION, ACC_SCALE_IDENTITY, 0,
-          repeating_bias,
-          transpose_A, transpose_B,
-          full_C, low_D,
-          0,
-          WS);
-    
+    NN__mm_f32(out->shape[0], out->shape[1], (float *)out->data, (float *)a->data, (float *)b->data);
     return;
   #endif
 

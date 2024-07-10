@@ -21,33 +21,20 @@
   typedef uint16_t  float16_t;
 #endif
 
+/**
+ * Converts a half-precision floating-point number to a single-precision floating-point number.
+ * 
+ * @param h The half-precision floating-point number to convert.
+ * @return The single-precision floating-point number.
+ */
 static inline float NN_half_to_float(float16_t h) {
   #ifdef _Float16
     return (float)h;
   #else
     // from https://github.com/AcademySoftwareFoundation/Imath/blob/main/src/Imath/half.h
+    // Note: This only supports the "round to even" rounding mode, which
+    // was the only mode supported by the original OpenEXR library
 
-    ///
-    /// Convert half to float
-    ///
-    /// Note: This only supports the "round to even" rounding mode, which
-    /// was the only mode supported by the original OpenEXR library
-    ///
-
-
-    // #if defined(__F16C__)
-    //   // NB: The intel implementation does seem to treat NaN slightly
-    //   // different than the original toFloat table does (i.e. where the
-    //   // 1 bits are, meaning the signalling or not bits). This seems
-    //   // benign, given that the original library didn't really deal with
-    //   // signalling vs non-signalling NaNs
-    //   #ifdef _MSC_VER
-    //     /* msvc does not seem to have cvtsh_ss :( */
-    //     return _mm_cvtss_f32(_mm_cvtph_ps (_mm_set1_epi16 (h)));
-    //   #else
-    //     return _cvtsh_ss(h);
-    //   #endif
-    // #else
     float_uint32_union_t v;
     // this code would be clearer, although it does appear to be faster
     // (1.06 vs 1.08 ns/call) to avoid the constants and just do 4
@@ -71,7 +58,6 @@ static inline float NN_half_to_float(float16_t h) {
     else if (hexpmant != 0) {
       // exponent is 0 because we're denormal, don't have to extract
       // the mantissa, can just use as is
-      //
       //
       // other compilers may provide count-leading-zeros primitives,
       // but we need the community to inform us of the variants
@@ -97,39 +83,24 @@ static inline float NN_half_to_float(float16_t h) {
       v.i -= (lc << 23);
     }
     return v.f;
-    // #endif
-
   #endif
-
 }
 
 
+/**
+ * Converts a single-precision floating-point number to a half-precision floating-point number.
+ * 
+ * @param f The single-precision floating-point number to convert.
+ * @return The half-precision floating-point number.
+ */
 static inline float16_t NN_float_to_half(float f) {
   #ifdef _Float16
     return (_Float16)f;
   #else
     // from https://github.com/AcademySoftwareFoundation/Imath/blob/main/src/Imath/half.h
-
-    ///
-    /// Convert half to float
-    ///
-    /// Note: This only supports the "round to even" rounding mode, which
-    /// was the only mode supported by the original OpenEXR library
-    ///
-
-
-    // #if defined(__F16C__)
-    //   #ifdef _MSC_VER
-    //     // msvc does not seem to have cvtsh_ss :(
-    //     return _mm_extract_epi16 (
-    //         _mm_cvtps_ph (
-    //             _mm_set_ss (f), (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC)),
-    //         0);
-    //   #else
-    //     // preserve the fixed rounding mode to nearest
-    //     return _cvtss_sh (f, (_MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
-    //   #endif
-    // #else
+    // Note: This only supports the "round to even" rounding mode, which
+    // was the only mode supported by the original OpenEXR library
+    
     float_uint32_union_t  v;
     float16_t ret;
     uint32_t e, m, ui, r, shift;
@@ -177,7 +148,6 @@ static inline float16_t NN_float_to_half(float f) {
       ret += 1;
     }
     return ret;
-  // #endif
   #endif
 }
 

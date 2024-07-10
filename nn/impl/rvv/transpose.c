@@ -4,7 +4,7 @@
 #ifdef RVV
 
 
-void NN__transpose_f32(size_t n, size_t m, float *y, float *x) {
+void NN__transpose_f32(size_t m, size_t n, float *y, float *x) {
   for (size_t i = 0; i < m; i += 1) {
     size_t k = n;
     while (k > 0) {

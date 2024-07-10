@@ -31,25 +31,45 @@ set(cpu_impl
   impl/cpu/transpose.c
 )
 
-set(rvv_impl
-  impl/rvv/abs.c
-  impl/rvv/acc.c
-  impl/rvv/acc1.c
-  impl/rvv/add.c
-  impl/rvv/add1.c
-  impl/rvv/div.c
-  impl/rvv/max.c
-  impl/rvv/maximum.c
-  impl/rvv/maximum1.c
-  impl/rvv/min.c
-  impl/rvv/minimum.c
-  impl/rvv/minimum1.c
-  impl/rvv/mul.c
-  impl/rvv/mul1.c
-  impl/rvv/neg.c
-  impl/rvv/sub.c
-  impl/rvv/transpose.c
-)
+
+if (AVX)
+  message(STATUS "Using AVX implementation")
+  add_compile_definitions(AVX)
+endif ()
+
+if (RVV)
+  message(STATUS "Using RVV implementation")
+  add_compile_definitions(RVV)
+  
+  set(rvv_impl
+      impl/rvv/abs.c
+      impl/rvv/acc.c
+      impl/rvv/acc1.c
+      impl/rvv/add.c
+      impl/rvv/add1.c
+      impl/rvv/div.c
+      impl/rvv/max.c
+      impl/rvv/maximum.c
+      impl/rvv/maximum1.c
+      impl/rvv/min.c
+      impl/rvv/minimum.c
+      impl/rvv/minimum1.c
+      impl/rvv/mul.c
+      impl/rvv/mul1.c
+      impl/rvv/neg.c
+      impl/rvv/sub.c
+      impl/rvv/transpose.c
+      )
+endif ()
+
+if (GEMMINI)
+  message(STATUS "Using Gemmini implementation")
+  add_compile_definitions(GEMMINI)
+
+  set(gemmini_impl
+      impl/gemmini/mm.c
+      )
+endif ()
 
 
 add_library(nn
@@ -87,25 +107,10 @@ add_library(nn
 
   ${cpu_impl}
   ${rvv_impl}
+  ${gemmini_impl}
 )
 
 target_include_directories(nn PUBLIC op impl)
-
-
-if (AVX)
-  message(STATUS "Using AVX implementation")
-  add_compile_definitions(AVX)
-endif ()
-
-if (RVV)
-  message(STATUS "Using RVV implementation")
-  add_compile_definitions(RVV)
-endif ()
-
-if (GEMMINI)
-  message(STATUS "Using Gemmini implementation")
-  add_compile_definitions(GEMMINI)
-endif ()
 
 if (X86)
   message("NN: Building for x86")

@@ -15,12 +15,5 @@
  */
 void NN_fill(Tensor *tensor, float value);
 
-Tensor *NN_zeros(size_t ndim, const size_t *shape, DataType dtype);
-
-Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype);
-
-Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype);
-
-
 
 #endif // __NN_FILL_H

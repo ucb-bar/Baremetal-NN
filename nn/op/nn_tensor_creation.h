@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "nn_tensor.h"
+#include "nn_fill.h"
 
 
 /**

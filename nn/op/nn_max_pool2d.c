@@ -28,8 +28,6 @@ void NN_max_pool2d(Tensor *out, Tensor *in, const size_t *kernel_size) {
   size_t output_height = (input_height - kernel_height) + 1;
   size_t output_width = (input_width - kernel_width) + 1;
 
-  size_t stride = kernel_size[0];
-
   for (size_t b = 0; b < batch_size; b += 1) {
     for (size_t c = 0; c < channels; c += 1) {
       for (size_t h = 0; h < output_height; h += 1) {
@@ -40,10 +38,7 @@ void NN_max_pool2d(Tensor *out, Tensor *in, const size_t *kernel_size) {
                                + h * in->shape[3]
                                + w;
 
-          // Create a tensor for the current pooling window
-          Tensor *window = NN_tensor(2, (size_t[]){kernel_height, kernel_width}, DTYPE_F32, ((float *)in->data) + window_offset);
-
-          NN_max((((float *)out->data) + window_offset), window);
+          NN__max_f32(kernel_height * kernel_width, ((float *)out->data) + window_offset, ((float *)out->data) + window_offset, 1);
         }
       }
     }
