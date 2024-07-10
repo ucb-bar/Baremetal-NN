@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "nn_matmul.h"
+#include "nn_mm.h"
 #include "nn_add.h"
 
 
