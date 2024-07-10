@@ -2,40 +2,65 @@
 option(AVX "Use AVX implementation" OFF)
 option(RVV "Use RISCV vector extension implementation" OFF)
 
-
-add_library(nn 
-  src/nn_tensor.c
-  src/nn_print.c
-  src/nn_abs.c
-  src/nn_add.c
-  src/nn_batch_norm2d.c
-  src/nn_conv2d.c
-  src/nn_clip.c
-  src/nn_copy.c
-  src/nn_div.c
-  src/nn_elu.c
-  src/nn_fill.c
-  src/nn_interpolate.c
-  src/nn_layer_norm.c
-  src/nn_linear.c
-  src/nn_matmul.c
-  src/nn_norm.c
-  src/nn_max.c
-  src/nn_maximum.c
-  src/nn_max_pool2d.c
-  src/nn_min.c
-  src/nn_minimum.c
-  src/nn_mul.c
-  src/nn_neg.c
-  src/nn_relu.c
-  src/nn_relu6.c
-  src/nn_softmax.c
-  src/nn_sub.c
-  src/nn_sum.c
-  src/nn_transpose.c
-  src/nn_unfold.c
+set(cpu_impl 
+  impl/cpu/abs.c
+  impl/cpu/acc.c
+  impl/cpu/acc1.c
+  impl/cpu/add.c
+  impl/cpu/add1.c
+  impl/cpu/div.c
+  impl/cpu/dot.c
+  impl/cpu/fill.c
 )
-target_include_directories(nn PUBLIC inc)
+
+set(rvv_impl
+  impl/rvv/abs.c
+  impl/rvv/acc.c
+  impl/rvv/acc1.c
+  impl/rvv/add.c
+  impl/rvv/add1.c
+  impl/rvv/div.c
+)
+
+
+add_library(nn
+  op/nn_tensor_creation.c
+  op/nn_print.c
+  op/nn_abs.c
+  op/nn_add.c
+  op/nn_batch_norm2d.c
+  op/nn_conv2d.c
+  op/nn_clip.c
+  op/nn_copy.c
+  op/nn_div.c
+  op/nn_elu.c
+  op/nn_fill.c
+  op/nn_interpolate.c
+  op/nn_layer_norm.c
+  op/nn_linear.c
+  op/nn_matmul.c
+  op/nn_mm.c
+  op/nn_norm.c
+  op/nn_max.c
+  op/nn_maximum.c
+  op/nn_max_pool2d.c
+  op/nn_min.c
+  op/nn_minimum.c
+  op/nn_mul.c
+  op/nn_neg.c
+  op/nn_relu.c
+  op/nn_relu6.c
+  op/nn_softmax.c
+  op/nn_sub.c
+  op/nn_sum.c
+  op/nn_transpose.c
+  op/nn_unfold.c
+
+  ${cpu_impl}
+  ${rvv_impl}
+)
+
+target_include_directories(nn PUBLIC op impl)
 
 
 if (AVX)

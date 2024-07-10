@@ -6,6 +6,8 @@ import jinja2
 
 # see if we have a GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Using device: {}".format(device))
+
 
 # seed
 seed = 0
@@ -30,27 +32,27 @@ def rand16(shape):
 
 
 test_pattern = [
-    # ("abs",         lambda a: torch.abs(a),             [("a", rand((7, 7))),                                           ]),
-    # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 7)))               ]),
-    # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((1, 7)))               ]),
-    # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 1)))               ]),
-    # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((7, )))               ]),
-    # ("add_inplace",  lambda a, b: a + b,                 [("actual", torch.zeros((7, 7))),   ("b", rand((7, 7)))         ]),
-    # ("add1",        lambda a, b: a + b,                 [("a", rand((7, 7))),         ("v", random.random())            ]),
-    # ("clip",        lambda a, v_min, v_max: torch.clip(a, v_min, v_max),  [("a", rand((7, 7))), ("v_min", random.random() - 1), ("v_max", random.random())]),
-    # ("div",         lambda a, b: a / b,                 [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
-    # ("fill",        lambda a, v: a.fill_(v),            [("actual", torch.zeros((7, 7))),   ("v", random.random())      ]),
-    # ("matmul_t",     lambda a, b: a @ b.T,               [("a", rand((6, 7))),         ("b", rand((5, 7)))               ]),
-    # ("matmul",      lambda a, b: a @ b,                 [("a", rand((6, 7))),         ("b", rand((7, 5)))               ]),
-    # ("max",         lambda a: torch.max(a),             [("a", rand((7, 7)))                                            ]),
-    # ("maximum",     lambda a, b: torch.maximum(a, b),   [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
-    # ("min",         lambda a: torch.min(a),             [("a", rand((7, 7)))                                            ]),
-    # ("minimum",     lambda a, b: torch.minimum(a, b),   [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
-    # ("mul",         lambda a, b: a * b,                 [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
-    # ("mul1",        lambda a, b: a * b,                 [("a", rand((7, 7))),         ("v", random.random())            ]),
-    # ("neg",         lambda a: -a,                       [("a", rand((7, 7))),                                           ]),
-    # ("sub",         lambda a, b: a - b,                 [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
-    # ("sum",         lambda a: torch.sum(a),             [("a", rand((7, 7))),                                           ]),
+    ("abs",         lambda a: torch.abs(a),             [("a", rand((7, 7))),                                           ]),
+    ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 7)))               ]),
+    ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((1, 7)))               ]),
+    ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 1)))               ]),
+    ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((7, )))               ]),
+    ("add_inplace",  lambda a, b: a + b,                 [("actual", torch.zeros((7, 7))),   ("b", rand((7, 7)))         ]),
+    ("add1",        lambda a, b: a + b,                 [("a", rand((7, 7))),         ("v", random.random())            ]),
+    ("clip",        lambda a, v_min, v_max: torch.clip(a, v_min, v_max),  [("a", rand((7, 7))), ("v_min", random.random() - 1), ("v_max", random.random())]),
+    ("div",         lambda a, b: a / b,                 [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
+    ("fill",        lambda a, v: a.fill_(v),            [("actual", torch.zeros((7, 7))),   ("v", random.random())      ]),
+    ("matmul_t",     lambda a, b: a @ b.T,               [("a", rand((6, 7))),         ("b", rand((5, 7)))               ]),
+    ("matmul",      lambda a, b: a @ b,                 [("a", rand((6, 7))),         ("b", rand((7, 5)))               ]),
+    ("max",         lambda a: torch.max(a),             [("a", rand((7, 7)))                                            ]),
+    ("maximum",     lambda a, b: torch.maximum(a, b),   [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
+    ("min",         lambda a: torch.min(a),             [("a", rand((7, 7)))                                            ]),
+    ("minimum",     lambda a, b: torch.minimum(a, b),   [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
+    ("mul",         lambda a, b: a * b,                 [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
+    ("mul1",        lambda a, b: a * b,                 [("a", rand((7, 7))),         ("v", random.random())            ]),
+    ("neg",         lambda a: -a,                       [("a", rand((7, 7))),                                           ]),
+    ("sub",         lambda a, b: a - b,                 [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
+    ("sum",         lambda a: torch.sum(a),             [("a", rand((7, 7))),                                           ]),
     
     # ("linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), 
     #     [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((1, 5)))                                                 ]),
@@ -84,7 +86,7 @@ test_pattern = [
     #     [("x", rand((6, 5))), ("w", rand((6, 5))), ("b", rand((6, 5)))  ],
     #     ", 1e-05"                                                                                                        ),
 
-    # ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 4))),                                         ]),
+    ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 44))),                                         ]),
     ("add",         lambda a, b: a + b,                 [("a", rand16((6, 7))),       ("b", rand16((6, 7)))             ]),
     ("matmul_t",     lambda a, b: a @ b.T,               [("a", rand16((6, 7))),       ("b", rand16((5, 7)))             ]),
     ("matmul",      lambda a, b: a @ b,                 [("a", rand16((6, 7))),       ("b", rand16((7, 5)))             ]),
