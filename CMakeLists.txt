@@ -27,7 +27,7 @@ set(WRAP_SPECS_FILE     "htif_wrap.specs")
 set(SPECS_FILE          "htif_nano.specs")
 set(LIBGLOSS_DIR        "$ENV{RISCV}/riscv64-unknown-elf/lib/")
 
-set(MARCH               "rv64gcv_zfh")
+set(MARCH               "rv64gcv_zfh_zvfh")
 set(MABI                "lp64d")
 set(MCMODEL             "medany")
 

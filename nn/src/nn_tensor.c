@@ -112,7 +112,7 @@ void NN_as_type(Tensor *out, Tensor *in) {
       switch (out->dtype) {
         case DTYPE_F32:
           for (size_t i = 0; i < in->size; i += 1) {
-            ((float *)out->data)[i] = NN_halfToFloat(((float16_t *)in->data)[i]);
+            ((float *)out->data)[i] = NN_half_to_float(((float16_t *)in->data)[i]);
           }
           return;
       }
@@ -127,7 +127,7 @@ void NN_as_type(Tensor *out, Tensor *in) {
           return;
         case DTYPE_F16:
           for (size_t i = 0; i < in->size; i += 1) {
-            ((float16_t *)out->data)[i] = NN_floatToHalf(((float *)in->data)[i]);
+            ((float16_t *)out->data)[i] = NN_float_to_half(((float *)in->data)[i]);
           }
           return;
       }

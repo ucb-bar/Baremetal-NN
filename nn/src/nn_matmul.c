@@ -101,9 +101,9 @@ void NN_matmul(Tensor *out, Tensor *a, Tensor *b) {
       for (size_t j = 0; j < out->shape[1]; j += 1) {
         float sum = 0;
         for (size_t k = 0; k < a->shape[1]; k += 1) {
-          sum += NN_halfToFloat(((float16_t *)a->data)[i * a->shape[1] + k]) * NN_halfToFloat(((float16_t *)b->data)[k * b->shape[1] + j]);
+          sum += NN_half_to_float(((float16_t *)a->data)[i * a->shape[1] + k]) * NN_half_to_float(((float16_t *)b->data)[k * b->shape[1] + j]);
         }
-        ((float16_t *)out->data)[i * out->shape[1] + j] = NN_floatToHalf(sum);
+        ((float16_t *)out->data)[i * out->shape[1] + j] = NN_float_to_half(sum);
       }
     }
     return;

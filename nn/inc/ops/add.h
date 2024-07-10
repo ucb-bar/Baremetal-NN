@@ -32,7 +32,7 @@ static inline void NN__add_i8(size_t n, int8_t *z, int8_t *x, int8_t *y) {
 
 static inline void NN__add_f16(size_t n, float16_t *z, float16_t *x, float16_t *y) {
   for (size_t i = 0; i < n; i += 1) {
-    z[i] = NN_floatToHalf(NN_halfToFloat(x[i]) + NN_halfToFloat(y[i]));
+    z[i] = NN_float_to_half(NN_half_to_float(x[i]) + NN_half_to_float(y[i]));
   }
 }
 

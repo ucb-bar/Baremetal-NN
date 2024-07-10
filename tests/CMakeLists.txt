@@ -34,6 +34,10 @@ endif()
 
 add_compile_options(-O3 -Wall -Wextra)
 
+
+# add -mfp16-format=ieee
+# add_compile_options(-mavx512fp16)
+
 target_compile_options(test PRIVATE -u _printf_float)
 
 add_subdirectory(../ ./build/)

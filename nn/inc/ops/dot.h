@@ -34,9 +34,9 @@ static inline void NN__dot_f16(size_t n, float16_t *s, float16_t *x, float16_t *
   #else
     float sum_f32 = 0;
     for (size_t i = 0; i < n; i += 1) {
-      sum_f32 += NN_halfToFloat(x[i]) * NN_halfToFloat(y[i]);
+      sum_f32 += NN_half_to_float(x[i]) * NN_half_to_float(y[i]);
     }
-    sum = NN_floatToHalf(sum_f32);
+    sum = NN_float_to_half(sum_f32);
   #endif
 
   *s = sum;

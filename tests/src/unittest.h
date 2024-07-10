@@ -15,7 +15,7 @@
   #include "riscv_vector.h"
 #endif
 
-static void enableAcceleratorFeatures() {
+static void enable_accelerator_features() {
   #ifdef RVV
     // enable vector operation
     unsigned long mstatus;
@@ -25,7 +25,7 @@ static void enableAcceleratorFeatures() {
   #endif
 }
 
-static size_t readCycles() {
+static size_t read_cycles() {
   #ifdef X86
     return __rdtsc();
   #elif defined(RISCV)
@@ -33,22 +33,22 @@ static size_t readCycles() {
   #endif
 }
 
-static uint8_t floatEqual(float golden, float actual, float rel_err) {
+static uint8_t float_equal(float golden, float actual, float rel_err) {
   return (fabs(actual - golden) < rel_err) || (fabs((actual - golden) / actual) < rel_err);
 }
 
-static uint8_t compareTensor(Tensor *golden, Tensor *actual, float rel_err) {
+static uint8_t compare_tensor(Tensor *golden, Tensor *actual, float rel_err) {
   switch (golden->dtype) {
     case DTYPE_F16:
       for (size_t i = 0; i < golden->size; i += 1) {
-        if (!floatEqual(NN_halfToFloat(((float16_t *)golden->data)[i]), NN_halfToFloat(((float16_t *)actual->data)[i]), rel_err)) {
+        if (!float_equal(NN_half_to_float(((float16_t *)golden->data)[i]), NN_half_to_float(((float16_t *)actual->data)[i]), rel_err)) {
           return 0;
         }
       }
       return 1;
     case DTYPE_F32:
       for (size_t i = 0; i < golden->size; i += 1) {
-        if (!floatEqual(((float *)golden->data)[i], ((float *)actual->data)[i], rel_err)) {
+        if (!float_equal(((float *)golden->data)[i], ((float *)actual->data)[i], rel_err)) {
           return 0;
         }
       }

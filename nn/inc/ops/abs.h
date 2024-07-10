@@ -74,9 +74,21 @@ static inline void NN__abs_i32(size_t n, int32_t *y, int32_t *x) {
 }
 
 static inline void NN__abs_f16(size_t n, float16_t *y, float16_t *x) {
-  for (size_t i = 0; i < n; i += 1) {
-    y[i] = NN_floatToHalf(fabsf(NN_halfToFloat(x[i])));
-  }
+  #if defined(RVV)
+    // while (n > 0) {
+    //   size_t vl = __riscv_vsetvl_e16m1(n);
+    //   vfloat16m1_t vec_x = __riscv_vle16_v_f16m1(x, vl);
+    //   vfloat16m1_t vec_y = __riscv_vfabs_v_f16m1(vec_x, vl);
+    //   __riscv_vse16_v_f16m1(y, vec_y, vl);
+    //   x += vl;
+    //   y += vl;
+    //   n -= vl;
+    // }
+  #else
+    for (size_t i = 0; i < n; i += 1) {
+      y[i] = NN_float_to_half(fabsf(NN_half_to_float(x[i])));
+    }
+  #endif
 }
 
 static inline void NN__abs_f32(size_t n, float *y, float *x) {
