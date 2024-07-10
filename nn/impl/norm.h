@@ -3,21 +3,19 @@
 
 #include <stddef.h>
 #include <math.h>
-#ifdef RVV
-  #include <riscv_vector.h>
-#endif
 
 #include "dot.h"
 
-static inline void NN__norm_f32(size_t n, float *s, float *x) {
-  NN__dot_f32(n, s, x, x);
-  *s = sqrtf(*s);
-}
 
-static inline void NN__norm_inv_f32(size_t n, float *s, float *x) {
-  NN__norm_f32(n, s, x);
-  *s = 1.f/(*s);
-}
+void NN__norm_f32(size_t n,
+    float *result,
+    float *x, size_t incx
+    );
+
+void NN__norm_inv_f32(size_t n,
+    float *result,
+    float *x, size_t incx
+    );
 
 
 #endif // __NN__NORM_H

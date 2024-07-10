@@ -17,6 +17,18 @@ set(cpu_impl
   impl/cpu/min.c
   impl/cpu/minimum.c
   impl/cpu/minimum1.c
+  impl/cpu/mul.c
+  impl/cpu/mul1.c
+  impl/cpu/neg.c
+  impl/cpu/norm.c
+  impl/cpu/rmsnorm.c
+  impl/cpu/sgn.c
+  impl/cpu/softmax.c
+  impl/cpu/sqr.c
+  impl/cpu/sqrt.c
+  impl/cpu/sub.c
+  impl/cpu/sum.c
+  impl/cpu/transpose.c
 )
 
 set(rvv_impl
@@ -32,6 +44,11 @@ set(rvv_impl
   impl/rvv/min.c
   impl/rvv/minimum.c
   impl/rvv/minimum1.c
+  impl/rvv/mul.c
+  impl/rvv/mul1.c
+  impl/rvv/neg.c
+  impl/rvv/sub.c
+  impl/rvv/transpose.c
 )
 
 

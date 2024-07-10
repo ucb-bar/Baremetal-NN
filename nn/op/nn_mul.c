@@ -11,7 +11,7 @@ void NN_mul(Tensor *out, Tensor *a, Tensor *b) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__mul_f32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+      NN__mul_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, (float *)b->data, 1);
       return;
 
     default:
@@ -31,7 +31,7 @@ void NN_mul1(Tensor *out, Tensor *in, float scalar) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__mul1_f32(out->size, (float *)out->data, (float *)in->data, scalar);
+      NN__mul1_f32(out->size, (float *)out->data, 1, (float *)in->data, 1, scalar);
       return;
 
     default:

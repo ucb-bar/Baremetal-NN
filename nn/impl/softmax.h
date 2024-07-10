@@ -4,22 +4,11 @@
 #include <stddef.h>
 #include <math.h>
 
-#ifdef RVV
-  #include <riscv_vector.h>
-#endif
 
-static inline void NN__softmax_f32(size_t n, float *y, float *x, size_t stride) {
-  // exp and sum
-  float sum = 0.0f;
-  for (size_t i = 0; i < n * stride; i += stride) {
-    y[i] = expf(x[i]);
-    sum += y[i];
-  }
-  // normalize
-  for (size_t i = 0; i < n * stride; i += stride) {
-    y[i] /= sum;
-  }
-}
+void NN__softmax_f32(size_t n,
+    float *y, size_t incy,
+    float *x, size_t incx
+    );
 
 
 #endif // __NN__SOFTMAX_H
