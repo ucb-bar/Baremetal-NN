@@ -2,20 +2,16 @@
 #include "nn_softmax.h"
 
 
-void NN_softmax(Tensor *out, Tensor *tensor, size_t dim) {
+void NN_softmax(Tensor *out, Tensor *tensor, int dim) {
   assert(out->dtype == tensor->dtype);
+
+  if (dim < 0) {
+    dim = out->ndim + dim;
+  }
 
   switch (tensor->dtype) {
     case DTYPE_F32:
       if (dim == 0) {
-        for (size_t i = 0; i < tensor->shape[0]; i += 1) {
-          float *x = (float *)tensor->data + i * tensor->shape[1];
-          float *y = (float *)out->data + i * out->shape[1];
-          NN__softmax_f32(tensor->shape[1], y, 1, x, 1);
-        }
-        return;
-      }
-      if (dim == 1) {
         for (size_t i = 0; i < tensor->shape[1]; i += 1) {
           float *x = (float *)tensor->data + i;
           float *y = (float *)out->data + i;
@@ -23,8 +19,14 @@ void NN_softmax(Tensor *out, Tensor *tensor, size_t dim) {
         }
         return;
       }
-
-      // NN__softmax_f32(tensor->size, (float *)out->data, (float *)tensor->data);
+      if (dim == 1) {
+        for (size_t i = 0; i < tensor->shape[0]; i += 1) {
+          float *x = (float *)tensor->data + i * tensor->shape[1];
+          float *y = (float *)out->data + i * out->shape[1];
+          NN__softmax_f32(tensor->shape[1], y, 1, x, 1);
+        }
+        return;
+      }
       break;
     
     default:

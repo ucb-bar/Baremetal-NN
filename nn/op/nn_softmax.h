@@ -12,8 +12,9 @@
  * 
  * @param out: the output scalar tensor
  * @param tensor: the input tensor
+ * @param dim: the dimension to reduce
  */
-void NN_softmax(Tensor *out, Tensor *tensor, size_t dim);
+void NN_softmax(Tensor *out, Tensor *tensor, int dim);
 
 
 #endif // __NN_SOFTMAX_H
