@@ -9,13 +9,13 @@
 
 #include "dot.h"
 
-static inline void NN__norm_F32(size_t n, float *s, float *x) {
-  NN__dot_F32(n, s, x, x);
+static inline void NN__norm_f32(size_t n, float *s, float *x) {
+  NN__dot_f32(n, s, x, x);
   *s = sqrtf(*s);
 }
 
-static inline void NN__norm_inv_F32(size_t n, float *s, float *x) {
-  NN__norm_F32(n, s, x);
+static inline void NN__norm_inv_f32(size_t n, float *s, float *x) {
+  NN__norm_f32(n, s, x);
   *s = 1.f/(*s);
 }
 

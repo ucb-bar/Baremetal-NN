@@ -9,7 +9,7 @@
   #include <riscv_vector.h>
 #endif
 
-static inline void NN__max_F32(size_t n, float *s, float *x) {
+static inline void NN__max_f32(size_t n, float *s, float *x) {
   float max = -FLT_MAX;
   
   #ifdef RVV

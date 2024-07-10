@@ -109,11 +109,11 @@ void NN_matmul(Tensor *out, Tensor *a, Tensor *b) {
     return;
   }
   printf("Unsupported operation: %s = %s @ %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 
-void NN_matmulT(Tensor *out, Tensor *a, Tensor *b) {
+void NN_matmul_t(Tensor *out, Tensor *a, Tensor *b) {
   if (a->dtype == DTYPE_F16 && b->dtype == DTYPE_F16 && out->dtype == DTYPE_F16) {
     // currently only support 2D matrix multiplication
     assert(a->ndim == 2);
@@ -127,7 +127,7 @@ void NN_matmulT(Tensor *out, Tensor *a, Tensor *b) {
 
     for (size_t i = 0; i < out->shape[0]; i += 1) {
       for (size_t j = 0; j < out->shape[1]; j += 1) {
-        NN__dot_F16(a->shape[1], 
+        NN__dot_f16(a->shape[1], 
           (float16_t *)out->data + i * out->shape[1] + j, 
           (float16_t *)a->data + i * a->shape[1], 
           (float16_t *)b->data + j * b->shape[1]
@@ -149,7 +149,7 @@ void NN_matmulT(Tensor *out, Tensor *a, Tensor *b) {
 
     for (size_t i = 0; i < out->shape[0]; i += 1) {
       for (size_t j = 0; j < out->shape[1]; j += 1) {
-        NN__dot_F32(a->shape[1], 
+        NN__dot_f32(a->shape[1], 
           (float *)out->data + i * out->shape[1] + j, 
           (float *)a->data + i * a->shape[1], 
           (float *)b->data + j * b->shape[1]
@@ -159,7 +159,7 @@ void NN_matmulT(Tensor *out, Tensor *a, Tensor *b) {
     return;
   }
   printf("Unsupported operation: %s = %s @ %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 

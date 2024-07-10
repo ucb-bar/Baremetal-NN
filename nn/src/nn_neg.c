@@ -10,7 +10,7 @@ void NN_neg(Tensor *out, Tensor *in) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__neg_F32(out->size, (float *)out->data, (float *)in->data);
+      NN__neg_f32(out->size, (float *)out->data, (float *)in->data);
       return;
 
     default:
@@ -18,10 +18,10 @@ void NN_neg(Tensor *out, Tensor *in) {
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = -%s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(in->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(in->dtype)
   );
 }
 
-void NN_negInplace(Tensor *tensor) {
+void NN_neg_inplace(Tensor *tensor) {
   NN_neg(tensor, tensor);
 }

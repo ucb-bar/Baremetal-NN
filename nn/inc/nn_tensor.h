@@ -70,7 +70,7 @@ static inline size_t NN_sizeof(DataType dtype) {
   }
 }
 
-static inline const char *NN_getDataTypeName(DataType dtype) {
+static inline const char *NN_get_datatype_name(DataType dtype) {
   switch (dtype) {
     case DTYPE_U8:
       return "UINT8";
@@ -104,7 +104,7 @@ static inline const char *NN_getDataTypeName(DataType dtype) {
  * 
  * @param tensor: the target tensor
  */
-static inline uint8_t NN_isScalar(Tensor *tensor) {
+static inline uint8_t NN_is_scalar(Tensor *tensor) {
   return tensor->ndim == 0;
 }
 
@@ -113,7 +113,7 @@ static inline uint8_t NN_isScalar(Tensor *tensor) {
  * 
  * @param tensor: the target tensor
  */
-static inline uint8_t NN_isVector(Tensor *tensor) {
+static inline uint8_t NN_is_vector(Tensor *tensor) {
   return tensor->ndim == 1;
 }
 
@@ -122,7 +122,7 @@ static inline uint8_t NN_isVector(Tensor *tensor) {
  * 
  * @param tensor: the target tensor
  */
-static inline uint8_t NN_isMatrix(Tensor *tensor) {
+static inline uint8_t NN_is_matrix(Tensor *tensor) {
   return tensor->ndim == 2;
 }
 
@@ -131,7 +131,7 @@ static inline uint8_t NN_isMatrix(Tensor *tensor) {
  * 
  * @param tensor: the target tensor
  */
-static inline uint8_t NN_is3D(Tensor *tensor) {
+static inline uint8_t NN_is_3d(Tensor *tensor) {
   return tensor->ndim == 3;
 }
 
@@ -140,7 +140,7 @@ static inline uint8_t NN_is3D(Tensor *tensor) {
  * 
  * @param tensor: the target tensor
  */
-static inline uint8_t NN_is4D(Tensor *tensor) {
+static inline uint8_t NN_is_4d(Tensor *tensor) {
   return tensor->ndim == 4;
 }
 
@@ -149,7 +149,7 @@ static inline uint8_t NN_is4D(Tensor *tensor) {
  * 
  * @param tensor: the target tensor
  */
-static inline void NN_freeTensorData(Tensor *tensor) {
+static inline void NN_free_tensor_data(Tensor *tensor) {
   free(tensor->data);
 }
 
@@ -158,7 +158,7 @@ static inline void NN_freeTensorData(Tensor *tensor) {
  * 
  * @param tensor: the target tensor
  */
-static inline void NN_deleteTensor(Tensor *tensor) {
+static inline void NN_delete_tensor(Tensor *tensor) {
   free(tensor);
 }
 
@@ -172,7 +172,7 @@ static inline void NN_deleteTensor(Tensor *tensor) {
  * @param dtype: data type
  * @param data: pointer to data, if NULL, the data will be allocated
  */
-void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, void *data);
+void NN_init_tensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, void *data);
 
 /**
  * Create a new tensor
@@ -228,7 +228,7 @@ Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype);
  * @param out: the output tensor
  * @param in: the input tensor
  */
-void NN_asType(Tensor *out, Tensor *in);
+void NN_as_type(Tensor *out, Tensor *in);
 
 
 #endif // __NN_TENSOR

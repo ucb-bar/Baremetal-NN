@@ -46,7 +46,7 @@ void NN_interpolate(Tensor *out, Tensor *in, const float *scale_factor/*const ch
 
             default:
               printf("[ERROR] Unsupported operation of tensor with dtype %s = |%s|\n", 
-                NN_getDataTypeName(out->dtype), NN_getDataTypeName(in->dtype)
+                NN_get_datatype_name(out->dtype), NN_get_datatype_name(in->dtype)
               );
               break;
           }

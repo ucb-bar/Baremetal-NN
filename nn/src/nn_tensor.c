@@ -2,7 +2,7 @@
 #include "nn_tensor.h"
 
 
-void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, void *data) {
+void NN_init_tensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataType dtype, void *data) {
   tensor->dtype = dtype;
   tensor->ndim = ndim;
 
@@ -32,11 +32,11 @@ void NN_initTensor(Tensor *tensor, const size_t ndim, const size_t *shape, DataT
 
 Tensor *NN_tensor(size_t ndim, const size_t *shape, DataType dtype, void *data) {
   Tensor *t = (Tensor *)malloc(sizeof(Tensor));
-  NN_initTensor(t, ndim, shape, dtype, data);
+  NN_init_tensor(t, ndim, shape, dtype, data);
   return t;
 }
 
-void NN_asType(Tensor *out, Tensor *in) {
+void NN_as_type(Tensor *out, Tensor *in) {
   if (out->dtype == in->dtype) {
     NN_copy(out, in);
     return;
@@ -133,5 +133,5 @@ void NN_asType(Tensor *out, Tensor *in) {
       }
       break;
   }
-  printf("[ERROR] Cannot convert data type from %s to %s\n", NN_getDataTypeName(in->dtype), NN_getDataTypeName(out->dtype));
+  printf("[ERROR] Cannot convert data type from %s to %s\n", NN_get_datatype_name(in->dtype), NN_get_datatype_name(out->dtype));
 }

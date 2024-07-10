@@ -16,31 +16,31 @@ inline static void NN__fill_U8(size_t n, uint8_t *x, uint8_t v) {
   }
 }
 
-inline static void NN__fill_I8(size_t n, int8_t *x, int8_t v) {
+inline static void NN__fill_i8(size_t n, int8_t *x, int8_t v) {
   for (size_t i = 0; i < n; i += 1) {
     x[i] = v;
   }
 }
 
-inline static void NN__fill_U16(size_t n, uint16_t *x, uint16_t v) {
+inline static void NN__fill_u16(size_t n, uint16_t *x, uint16_t v) {
   for (size_t i = 0; i < n; i += 1) {
     x[i] = v;
   }
 }
 
-inline static void NN__fill_I16(size_t n, int16_t *x, int16_t v) {
+inline static void NN__fill_i16(size_t n, int16_t *x, int16_t v) {
   for (size_t i = 0; i < n; i += 1) {
     x[i] = v;
   }
 }
 
-inline static void NN__fill_I32(size_t n, int32_t *x, int32_t v) {
+inline static void NN__fill_i32(size_t n, int32_t *x, int32_t v) {
   for (size_t i = 0; i < n; i += 1) {
     x[i] = v;
   }
 }
 
-inline static void NN__fill_F16(size_t n, float16_t *x, float16_t v) {
+inline static void NN__fill_f16(size_t n, float16_t *x, float16_t v) {
   for (size_t i = 0; i < n; i += 1) {
     x[i] = v;
   }
@@ -52,7 +52,7 @@ inline static void NN__fill_F16(size_t n, float16_t *x, float16_t v) {
 //   }
 // }
 
-inline static void NN__fill_F32(size_t n, float *x, float v) {
+inline static void NN__fill_f32(size_t n, float *x, float v) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e32m1(n);

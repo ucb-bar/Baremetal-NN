@@ -18,7 +18,7 @@
 #include "nn_interpolate.h"
 #include "nn_linear.h"
 #include "nn_matmul.h"
-#include "nn_matrixnorm.h"
+#include "nn_norm.h"
 #include "nn_max.h"
 #include "nn_maximum.h"
 #include "nn_min.h"

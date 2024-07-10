@@ -18,12 +18,12 @@ void NN_transpose(Tensor *out, Tensor *a) {
   assert(out->shape[1] == a->shape[0]);
 
   if (a->dtype == DTYPE_F32) {
-    NN__transpose_F32(a->shape[0], a->shape[1], (float *)out->data, (float *)a->data);
+    NN__transpose_f32(a->shape[0], a->shape[1], (float *)out->data, (float *)a->data);
     return;
   }
 
   printf("[ERROR] Unsupported operation of tensor with dtype %s = %s.T\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype)
   );
 }
 

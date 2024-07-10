@@ -6,7 +6,7 @@
 #endif
 
 
-void NN_NCHWToNHWC(Tensor *out, Tensor *in) {
+void NN_nchw_to_nhwc(Tensor *out, Tensor *in) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);
@@ -34,7 +34,7 @@ void NN_NCHWToNHWC(Tensor *out, Tensor *in) {
   }
 }
 
-void NN_NHWCToNCHW(Tensor *out, Tensor *in) {
+void NN_nhwc_to_nchw(Tensor *out, Tensor *in) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);
@@ -62,7 +62,7 @@ void NN_NHWCToNCHW(Tensor *out, Tensor *in) {
   }
 }
 
-void NN_Conv2d(
+void NN_conv2d(
   Tensor *out, Tensor *in,
   Tensor *weight, Tensor *bias,
   const size_t *stride, const size_t *padding, const size_t *dilation, size_t groups) {
@@ -135,8 +135,8 @@ void NN_Conv2d(
       Tensor *weight_1hwc = NN_tensor(4, (size_t[]){1, kernel_height, kernel_width, out_channels}, DTYPE_F32, weight->data);
       Tensor *weight_1chw = NN_tensor(4, (size_t[]){1, out_channels, kernel_height, kernel_width}, DTYPE_F32, NULL);
 
-      NN_NHWCToNCHW(in_nchw, in);
-      NN_NHWCToNCHW(weight_1chw, weight_1hwc);
+      NN_nhwc_to_nchw(in_nchw, in);
+      NN_nhwc_to_nchw(weight_1chw, weight_1hwc);
 
       for (size_t g = 0; g < groups; g += 1) {
         tiled_conv_auto(
@@ -153,7 +153,7 @@ void NN_Conv2d(
           WS);
       }
 
-      NN_NCHWToNHWC(out, out_nchw);
+      NN_nchw_to_nhwc(out, out_nchw);
 
     }
     else {

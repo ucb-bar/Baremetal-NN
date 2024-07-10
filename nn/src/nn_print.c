@@ -2,7 +2,7 @@
 #include "nn_print.h"
 
 
-void NN_printFloat(float v, int16_t num_digits) {
+void NN_print_f32(float v, int16_t num_digits) {
   if (isinf(v)) {
     if (signbit(v)) {
       printf("-inf");
@@ -38,7 +38,7 @@ void NN_printFloat(float v, int16_t num_digits) {
   }
 }
 
-void NN_printShape(Tensor *tensor) {
+void NN_print_shape(Tensor *tensor) {
   printf("(");
   for (size_t i = 0; i < tensor->ndim; i += 1) {
     printf("%d", (int)tensor->shape[i]);
@@ -69,10 +69,10 @@ void NN_printf(Tensor *tensor) {
             printf("%ld", (size_t)(*((int32_t *)tensor->data + i)));
             break;
           case DTYPE_F16:
-            NN_printFloat(NN_halfToFloat(*((float16_t *)tensor->data + i)), 3);
+            NN_print_f32(NN_halfToFloat(*((float16_t *)tensor->data + i)), 3);
             break;
           case DTYPE_F32:
-            NN_printFloat(*((float *)tensor->data + i), 4);
+            NN_print_f32(*((float *)tensor->data + i), 4);
             break;
         }
         if (i < tensor->shape[0]-1) {
@@ -99,10 +99,10 @@ void NN_printf(Tensor *tensor) {
               printf("%ld", (size_t)(*((int32_t *)tensor->data + i*tensor->shape[1] + j)));
               break;
             case DTYPE_F16:
-              NN_printFloat(NN_halfToFloat(*((float16_t *)tensor->data + i*tensor->shape[1] + j)), 3);
+              NN_print_f32(NN_halfToFloat(*((float16_t *)tensor->data + i*tensor->shape[1] + j)), 3);
               break;
             case DTYPE_F32:
-              NN_printFloat(*((float *)tensor->data + i*tensor->shape[1] + j), 4);
+              NN_print_f32(*((float *)tensor->data + i*tensor->shape[1] + j), 4);
               break;
           }
           if (j < tensor->shape[1]-1) {
@@ -139,10 +139,10 @@ void NN_printf(Tensor *tensor) {
                 printf("%ld", (size_t)(*((int32_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k)));
                 break;
               case DTYPE_F16:
-                NN_printFloat(NN_halfToFloat(*((float16_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k)), 3);
+                NN_print_f32(NN_halfToFloat(*((float16_t *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k)), 3);
                 break;
               case DTYPE_F32:
-                NN_printFloat(*((float *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k), 4);
+                NN_print_f32(*((float *)tensor->data + i*tensor->shape[1]*tensor->shape[2] + j*tensor->shape[2] + k), 4);
                 break;
             }
             if (k < tensor->shape[2]-1) {
@@ -183,10 +183,10 @@ void NN_printf(Tensor *tensor) {
                   printf("%ld", (size_t)(*((int32_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w)));
                   break;
                 case DTYPE_F16:
-                  NN_printFloat(NN_halfToFloat(*((float16_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w)), 3);
+                  NN_print_f32(NN_halfToFloat(*((float16_t *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w)), 3);
                   break;
                 case DTYPE_F32:
-                  NN_printFloat(*((float *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w), 4);
+                  NN_print_f32(*((float *)tensor->data + n*tensor->shape[1]*tensor->shape[2]*tensor->shape[3] + c*tensor->shape[2]*tensor->shape[3] + h*tensor->shape[3] + w), 4);
                   break;
               }
               if (w < tensor->shape[3]-1) {

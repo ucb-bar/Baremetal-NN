@@ -10,7 +10,7 @@
 
 #include "nn_float16.h"
 
-static inline void NN__add_I8(size_t n, int8_t *z, int8_t *x, int8_t *y) {
+static inline void NN__add_i8(size_t n, int8_t *z, int8_t *x, int8_t *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e8m1(n);
@@ -30,13 +30,13 @@ static inline void NN__add_I8(size_t n, int8_t *z, int8_t *x, int8_t *y) {
   #endif
 }
 
-static inline void NN__add_F16(size_t n, float16_t *z, float16_t *x, float16_t *y) {
+static inline void NN__add_f16(size_t n, float16_t *z, float16_t *x, float16_t *y) {
   for (size_t i = 0; i < n; i += 1) {
     z[i] = NN_floatToHalf(NN_halfToFloat(x[i]) + NN_halfToFloat(y[i]));
   }
 }
 
-static inline void NN__add_F32(size_t n, float *z, float *x, float *y) {
+static inline void NN__add_f32(size_t n, float *z, float *x, float *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e32m1(n);

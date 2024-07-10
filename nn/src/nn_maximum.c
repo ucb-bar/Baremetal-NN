@@ -12,13 +12,13 @@ void NN_maximum(Tensor *out, Tensor *a, Tensor *b) {
 
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__maximum_F32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+      NN__maximum_f32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
       return;
     default:
       break;
   }
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = max(%s, %s)\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }

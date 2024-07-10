@@ -17,7 +17,7 @@
  */
 void NN_abs(Tensor *out, Tensor *input);
 
-void NN_absInplace(Tensor *x);
+void NN_abs_inplace(Tensor *x);
 
 
 #endif // __NN_ABS_H

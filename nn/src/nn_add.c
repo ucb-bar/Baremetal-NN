@@ -12,7 +12,7 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
             && b->shape[1] == a->shape[1]
             && b->shape[2] == a->shape[2]
             && b->shape[3] == a->shape[3]) {
-          NN__add_F16(out->size, (float16_t *)out->data, (float16_t *)a->data, (float16_t *)b->data);
+          NN__add_f16(out->size, (float16_t *)out->data, (float16_t *)a->data, (float16_t *)b->data);
           return;
         }
         for (size_t i = 0; i < out->shape[0]; i += 1) {
@@ -31,9 +31,9 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
         return;
       }
       printf("[ERROR] Unsupported operation between tensor with shape ");
-      NN_printShape(a);
+      NN_print_shape(a);
       printf(" + ");
-      NN_printShape(b);
+      NN_print_shape(b);
       printf("\n");
       return;
       
@@ -43,7 +43,7 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
             && b->shape[1] == a->shape[1]
             && b->shape[2] == a->shape[2]
             && b->shape[3] == a->shape[3]) {
-          NN__add_F32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+          NN__add_f32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
           return;
         }
         for (size_t i = 0; i < out->shape[0]; i += 1) {
@@ -80,9 +80,9 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
       }
       
       printf("[ERROR] Unsupported operation between tensor with shape ");
-      NN_printShape(a);
+      NN_print_shape(a);
       printf(" + ");
-      NN_printShape(b);
+      NN_print_shape(b);
       printf("\n");
       return;
 
@@ -91,7 +91,7 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s = %s + %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 
@@ -102,47 +102,47 @@ void NN_add1(Tensor *out, Tensor *a, float b) {
 
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__add1_F32(out->size, (float *)out->data, (float *)a->data, b);
+      NN__add1_f32(out->size, (float *)out->data, (float *)a->data, b);
       return;
 
     default:
       break;
   }
   printf("[ERROR] Unsupported operation between tensor with dtype %s += %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype)
   );
 }
 
-void NN_addInplace(Tensor *b, Tensor *a) {
+void NN_add_inplace(Tensor *b, Tensor *a) {
   assert(b->ndim == a->ndim);
   assert(b->dtype == a->dtype);
 
   switch (b->dtype) {
     case DTYPE_F32:
-      NN__acc_F32(b->size, (float *)b->data, (float *)a->data);
+      NN__acc_f32(b->size, (float *)b->data, (float *)a->data);
       return;
     case DTYPE_I8:
-      NN__acc_I8(b->size, (int8_t *)b->data, (int8_t *)a->data);
+      NN__acc_i8(b->size, (int8_t *)b->data, (int8_t *)a->data);
       return;
     default:
       break;
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s += %s\n", 
-    NN_getDataTypeName(b->dtype), NN_getDataTypeName(a->dtype)
+    NN_get_datatype_name(b->dtype), NN_get_datatype_name(a->dtype)
   );
 }
 
-void NN_addInplace1(Tensor *b, float scalar) {
+void NN_add_inplace1(Tensor *b, float scalar) {
   switch (b->dtype) {
     case DTYPE_F32:
-      NN__acc1_F32(b->size, (float *)b->data, scalar);
+      NN__acc1_f32(b->size, (float *)b->data, scalar);
       return;
     default:
       break;
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s += float\n", 
-    NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(b->dtype)
   );
 }

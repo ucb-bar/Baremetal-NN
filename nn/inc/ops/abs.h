@@ -13,7 +13,7 @@
   #include <riscv_vector.h>
 #endif
 
-static inline void NN__abs_I8(size_t n, int8_t *y, int8_t *x) {
+static inline void NN__abs_i8(size_t n, int8_t *y, int8_t *x) {
   #if defined(RVV)
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e8m1(n);
@@ -33,7 +33,7 @@ static inline void NN__abs_I8(size_t n, int8_t *y, int8_t *x) {
   #endif
 }
 
-static inline void NN__abs_I16(size_t n, int16_t *y, int16_t *x) {
+static inline void NN__abs_i16(size_t n, int16_t *y, int16_t *x) {
   #if defined(RVV)
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e16m1(n);
@@ -53,7 +53,7 @@ static inline void NN__abs_I16(size_t n, int16_t *y, int16_t *x) {
   #endif
 }
 
-static inline void NN__abs_I32(size_t n, int32_t *y, int32_t *x) {
+static inline void NN__abs_i32(size_t n, int32_t *y, int32_t *x) {
   #if defined(RVV)
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e32m1(n);
@@ -73,13 +73,13 @@ static inline void NN__abs_I32(size_t n, int32_t *y, int32_t *x) {
   #endif
 }
 
-static inline void NN__abs_F16(size_t n, float16_t *y, float16_t *x) {
+static inline void NN__abs_f16(size_t n, float16_t *y, float16_t *x) {
   for (size_t i = 0; i < n; i += 1) {
     y[i] = NN_floatToHalf(fabsf(NN_halfToFloat(x[i])));
   }
 }
 
-static inline void NN__abs_F32(size_t n, float *y, float *x) {
+static inline void NN__abs_f32(size_t n, float *y, float *x) {
   #if defined(AVX)
     // Mask to clear the sign bit
     __m256 mask = _mm256_castsi256_ps(_mm256_set1_epi32(0x7FFFFFFF));

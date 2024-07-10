@@ -8,7 +8,7 @@
   #include <riscv_vector.h>
 #endif
 
-static inline void NN__sub_U8(size_t n, uint8_t *z, uint8_t *x, uint8_t *y) {
+static inline void NN__sub_u8(size_t n, uint8_t *z, uint8_t *x, uint8_t *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e8m1(n);
@@ -28,7 +28,7 @@ static inline void NN__sub_U8(size_t n, uint8_t *z, uint8_t *x, uint8_t *y) {
   #endif
 }
 
-static inline void NN__sub_I8(size_t n, int8_t *z, int8_t *x, int8_t *y) {
+static inline void NN__sub_i8(size_t n, int8_t *z, int8_t *x, int8_t *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e8m1(n);
@@ -48,7 +48,7 @@ static inline void NN__sub_I8(size_t n, int8_t *z, int8_t *x, int8_t *y) {
   #endif
 }
 
-static inline void NN__sub_I16(size_t n, int16_t *z, int16_t *x, int16_t *y) {
+static inline void NN__sub_i16(size_t n, int16_t *z, int16_t *x, int16_t *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e16m1(n);
@@ -68,7 +68,7 @@ static inline void NN__sub_I16(size_t n, int16_t *z, int16_t *x, int16_t *y) {
   #endif
 }
 
-static inline void NN__sub_I32(size_t n, int32_t *z, int32_t *x, int32_t *y) {
+static inline void NN__sub_i32(size_t n, int32_t *z, int32_t *x, int32_t *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e32m1(n);
@@ -88,7 +88,7 @@ static inline void NN__sub_I32(size_t n, int32_t *z, int32_t *x, int32_t *y) {
   #endif
 }
 
-static inline void NN__sub_F32(size_t n, float *z, float *x, float *y) {
+static inline void NN__sub_f32(size_t n, float *z, float *x, float *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e32m1(n);

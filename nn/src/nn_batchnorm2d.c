@@ -1,7 +1,7 @@
 
 #include "nn_batchnorm2d.h"
 
-void NN_BatchNorm2d(
+void NN_batch_norm2d(
   Tensor *out, Tensor *in, 
   Tensor *weight, Tensor *bias,
   float eps, Tensor *running_mean, Tensor *running_var) {

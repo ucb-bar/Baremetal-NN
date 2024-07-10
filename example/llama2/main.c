@@ -231,7 +231,7 @@ void softmax(float* x, int size) {
     //     x[i] /= sum;
     // }
     Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
-    NN_Softmax(out, out, 0);
+    NN_softmax(out, out, 0);
 }
 
 void matmul(float* xout, float* x, float* w, int n, int d) {
@@ -243,7 +243,7 @@ void matmul(float* xout, float* x, float* w, int n, int d) {
     Tensor *b = NN_tensor(2, (size_t[]){1, n}, DTYPE_F32, x);
 
 
-    NN_matmulT(out, a, b);
+    NN_matmul_t(out, a, b);
 
 
     // int i;

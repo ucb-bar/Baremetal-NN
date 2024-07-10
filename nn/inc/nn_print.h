@@ -6,9 +6,9 @@
 #include "nn_tensor.h"
 
 
-void NN_printFloat(float v, int16_t num_digits);
+void NN_print_f32(float v, int16_t num_digits);
 
-void NN_printShape(Tensor *t);
+void NN_print_shape(Tensor *t);
 
 void NN_printf(Tensor *t);
 

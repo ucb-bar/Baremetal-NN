@@ -19,7 +19,7 @@ add_library(nn
   src/nn_layernorm.c
   src/nn_linear.c
   src/nn_matmul.c
-  src/nn_matrixnorm.c
+  src/nn_norm.c
   src/nn_max.c
   src/nn_maximum.c
   src/nn_maxpool2d.c

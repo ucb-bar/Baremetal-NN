@@ -9,19 +9,19 @@ void NN_abs(Tensor *out, Tensor *in) {
   
   switch (out->dtype) {
     case DTYPE_I8:
-      NN__abs_I8(out->size, (int8_t *)out->data, (int8_t *)in->data);
+      NN__abs_i8(out->size, (int8_t *)out->data, (int8_t *)in->data);
       return;
     case DTYPE_I16:
-      NN__abs_I16(out->size, (int16_t *)out->data, (int16_t *)in->data);
+      NN__abs_i16(out->size, (int16_t *)out->data, (int16_t *)in->data);
       return;
     case DTYPE_I32:
-      NN__abs_I32(out->size, (int32_t *)out->data, (int32_t *)in->data);
+      NN__abs_i32(out->size, (int32_t *)out->data, (int32_t *)in->data);
       return;
     case DTYPE_F16:
-      NN__abs_F16(out->size, (float16_t *)out->data, (float16_t *)in->data);
+      NN__abs_f16(out->size, (float16_t *)out->data, (float16_t *)in->data);
       return;
     case DTYPE_F32:
-      NN__abs_F32(out->size, (float *)out->data, (float *)in->data);
+      NN__abs_f32(out->size, (float *)out->data, (float *)in->data);
       return;
 
     default:
@@ -29,10 +29,10 @@ void NN_abs(Tensor *out, Tensor *in) {
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = |%s|\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(in->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(in->dtype)
   );
 }
 
-void NN_absInplace(Tensor *x) {
+void NN_abs_inplace(Tensor *x) {
   NN_abs(x, x);
 }

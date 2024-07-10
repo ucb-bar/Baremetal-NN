@@ -1,7 +1,7 @@
 
 #include "nn_layernorm.h"
 
-void NN_LayerNorm(
+void NN_layer_norm(
   Tensor *out, Tensor *in,
   Tensor *weight, Tensor *bias,
   const float eps) {

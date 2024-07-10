@@ -55,19 +55,19 @@ typedef struct {
 } Model;
 
 void init(Model *model) {
-  NN_initTensor(&model->input, 2, (size_t[]){ 1, 10 }, DTYPE_F32, (float *)malloc(10 * sizeof(float)));
+  NN_init_tensor(&model->input, 2, (size_t[]){ 1, 10 }, DTYPE_F32, (float *)malloc(10 * sizeof(float)));
 
-  NN_initTensor(&model->fc1_weight, 2, (size_t[]){ 10, 15 }, DTYPE_F32, (float *)fc1_weight_data);
-  NN_initTensor(&model->fc1_bias, 2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)fc1_bias_data);
-  NN_initTensor(&model->fc1_out, 2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)malloc(15 * sizeof(float)));
+  NN_init_tensor(&model->fc1_weight, 2, (size_t[]){ 10, 15 }, DTYPE_F32, (float *)fc1_weight_data);
+  NN_init_tensor(&model->fc1_bias, 2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)fc1_bias_data);
+  NN_init_tensor(&model->fc1_out, 2, (size_t[]){ 1, 15 }, DTYPE_F32, (float *)malloc(15 * sizeof(float)));
   
-  NN_initTensor(&model->fc2_weight, 2, (size_t[]){ 15, 20 }, DTYPE_F32, (float *)fc2_weight_data);
-  NN_initTensor(&model->fc2_bias, 2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)fc2_bias_data);
-  NN_initTensor(&model->fc2_out, 2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)malloc(20 * sizeof(float)));
+  NN_init_tensor(&model->fc2_weight, 2, (size_t[]){ 15, 20 }, DTYPE_F32, (float *)fc2_weight_data);
+  NN_init_tensor(&model->fc2_bias, 2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)fc2_bias_data);
+  NN_init_tensor(&model->fc2_out, 2, (size_t[]){ 1, 20 }, DTYPE_F32, (float *)malloc(20 * sizeof(float)));
   
-  NN_initTensor(&model->fc3_weight, 2, (size_t[]){ 20, 5 }, DTYPE_F32, (float *)fc3_weight_data);
-  NN_initTensor(&model->fc3_bias, 2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)fc3_bias_data);
-  NN_initTensor(&model->output, 2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)malloc(5 * sizeof(float)));
+  NN_init_tensor(&model->fc3_weight, 2, (size_t[]){ 20, 5 }, DTYPE_F32, (float *)fc3_weight_data);
+  NN_init_tensor(&model->fc3_bias, 2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)fc3_bias_data);
+  NN_init_tensor(&model->output, 2, (size_t[]){ 1, 5 }, DTYPE_F32, (float *)malloc(5 * sizeof(float)));
 }
 
 void forward(Model *model) {

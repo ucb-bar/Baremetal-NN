@@ -17,7 +17,7 @@
  */
 void NN_neg(Tensor *out, Tensor *input);
 
-void NN_negInplace(Tensor *tensor);
+void NN_neg_inplace(Tensor *tensor);
 
 
 #endif // __NN_NEG_H

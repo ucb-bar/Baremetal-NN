@@ -30,10 +30,10 @@ Tensor D;
  * Initialize the required tensors for the model
  */
 void init(Tensor *A, Tensor *B, Tensor *C, Tensor *D) {
-  NN_initTensor(A, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)malloc(9 * sizeof(float)));
-  NN_initTensor(B, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)(weights_data + 3 * sizeof(float)));
-  NN_initTensor(C, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)malloc(9 * sizeof(float)));
-  NN_initTensor(D, 1, (size_t[]){3}, DTYPE_F32, (float *)(weights_data + 0 * sizeof(float)));
+  NN_init_tensor(A, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)malloc(9 * sizeof(float)));
+  NN_init_tensor(B, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)(weights_data + 3 * sizeof(float)));
+  NN_init_tensor(C, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)malloc(9 * sizeof(float)));
+  NN_init_tensor(D, 1, (size_t[]){3}, DTYPE_F32, (float *)(weights_data + 0 * sizeof(float)));
 }
 
 /**

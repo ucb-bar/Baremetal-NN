@@ -41,44 +41,44 @@ void forward(Model *model);
 void init(Model *model) {
   float *array_pointer = (float *)model_weight_data;
 
-  NN_initTensor(&model->input_1, 2, (size_t[]){1, 48}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->input_1, 2, (size_t[]){1, 48}, DTYPE_F32, NULL);
 
   // <class 'torch.nn.modules.linear.Linear'>: actor_0
-  NN_initTensor(&model->actor_0_weight, 2, (size_t[]){512, 48}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_0_weight, 2, (size_t[]){512, 48}, DTYPE_F32, array_pointer);
   array_pointer += 24576;
-  NN_initTensor(&model->actor_0_bias, 1, (size_t[]){512}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_0_bias, 1, (size_t[]){512}, DTYPE_F32, array_pointer);
   array_pointer += 512;
-  NN_initTensor(&model->actor_0, 2, (size_t[]){1, 512}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->actor_0, 2, (size_t[]){1, 512}, DTYPE_F32, NULL);
 
   // <class 'torch.nn.modules.activation.ELU'>: actor_1
-  NN_initTensor(&model->actor_1, 2, (size_t[]){1, 512}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->actor_1, 2, (size_t[]){1, 512}, DTYPE_F32, NULL);
 
   // <class 'torch.nn.modules.linear.Linear'>: actor_2
-  NN_initTensor(&model->actor_2_weight, 2, (size_t[]){256, 512}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_2_weight, 2, (size_t[]){256, 512}, DTYPE_F32, array_pointer);
   array_pointer += 131072;
-  NN_initTensor(&model->actor_2_bias, 1, (size_t[]){256}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_2_bias, 1, (size_t[]){256}, DTYPE_F32, array_pointer);
   array_pointer += 256;
-  NN_initTensor(&model->actor_2, 2, (size_t[]){1, 256}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->actor_2, 2, (size_t[]){1, 256}, DTYPE_F32, NULL);
 
   // <class 'torch.nn.modules.activation.ELU'>: actor_3
-  NN_initTensor(&model->actor_3, 2, (size_t[]){1, 256}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->actor_3, 2, (size_t[]){1, 256}, DTYPE_F32, NULL);
 
   // <class 'torch.nn.modules.linear.Linear'>: actor_4
-  NN_initTensor(&model->actor_4_weight, 2, (size_t[]){128, 256}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_4_weight, 2, (size_t[]){128, 256}, DTYPE_F32, array_pointer);
   array_pointer += 32768;
-  NN_initTensor(&model->actor_4_bias, 1, (size_t[]){128}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_4_bias, 1, (size_t[]){128}, DTYPE_F32, array_pointer);
   array_pointer += 128;
-  NN_initTensor(&model->actor_4, 2, (size_t[]){1, 128}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->actor_4, 2, (size_t[]){1, 128}, DTYPE_F32, NULL);
 
   // <class 'torch.nn.modules.activation.ELU'>: actor_5
-  NN_initTensor(&model->actor_5, 2, (size_t[]){1, 128}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->actor_5, 2, (size_t[]){1, 128}, DTYPE_F32, NULL);
 
   // <class 'torch.nn.modules.linear.Linear'>: actor_6
-  NN_initTensor(&model->actor_6_weight, 2, (size_t[]){12, 128}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_6_weight, 2, (size_t[]){12, 128}, DTYPE_F32, array_pointer);
   array_pointer += 1536;
-  NN_initTensor(&model->actor_6_bias, 1, (size_t[]){12}, DTYPE_F32, array_pointer);
+  NN_init_tensor(&model->actor_6_bias, 1, (size_t[]){12}, DTYPE_F32, array_pointer);
   array_pointer += 12;
-  NN_initTensor(&model->actor_6, 2, (size_t[]){1, 12}, DTYPE_F32, NULL);
+  NN_init_tensor(&model->actor_6, 2, (size_t[]){1, 12}, DTYPE_F32, NULL);
 
 }
 
@@ -87,13 +87,13 @@ void init(Model *model) {
  * Forward pass of the model
  */
 void forward(Model *model) {
-  NN_Linear(&model->actor_0, &model->input_1, &model->actor_0_weight, &model->actor_0_bias);
-  NN_ELU(&model->actor_1, &model->actor_0, 1.0);
-  NN_Linear(&model->actor_2, &model->actor_1, &model->actor_2_weight, &model->actor_2_bias);
-  NN_ELU(&model->actor_3, &model->actor_2, 1.0);
-  NN_Linear(&model->actor_4, &model->actor_3, &model->actor_4_weight, &model->actor_4_bias);
-  NN_ELU(&model->actor_5, &model->actor_4, 1.0);
-  NN_Linear(&model->actor_6, &model->actor_5, &model->actor_6_weight, &model->actor_6_bias);
+  NN_linear(&model->actor_0, &model->input_1, &model->actor_0_weight, &model->actor_0_bias);
+  NN_elu(&model->actor_1, &model->actor_0, 1.0);
+  NN_linear(&model->actor_2, &model->actor_1, &model->actor_2_weight, &model->actor_2_bias);
+  NN_elu(&model->actor_3, &model->actor_2, 1.0);
+  NN_linear(&model->actor_4, &model->actor_3, &model->actor_4_weight, &model->actor_4_bias);
+  NN_elu(&model->actor_5, &model->actor_4, 1.0);
+  NN_linear(&model->actor_6, &model->actor_5, &model->actor_6_weight, &model->actor_6_bias);
 
 }
 

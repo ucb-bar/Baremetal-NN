@@ -8,19 +8,19 @@ void NN_sub(Tensor *out, Tensor *a, Tensor *b) {
 
   switch (out->ndim) {
     case 1:
-      NN_sub_1D(out, a, b);
+      NN_sub_1d(out, a, b);
       return;
 
     case 2:
-      NN_sub_2D(out, a, b);
+      NN_sub_2d(out, a, b);
       return;
       
     case 3:
-      NN_sub_3D(out, a, b);
+      NN_sub_3d(out, a, b);
       return;
       
     case 4:
-      NN_sub_4D(out, a, b);
+      NN_sub_4d(out, a, b);
       return;
     
     default:
@@ -29,47 +29,47 @@ void NN_sub(Tensor *out, Tensor *a, Tensor *b) {
   }
 }
 
-void NN_sub_1D(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_1d(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
 
   if (out->dtype == DTYPE_F32 && a->dtype == DTYPE_F32 && b->dtype == DTYPE_F32) {
-    NN__sub_F32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+    NN__sub_f32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
     return;
   }
   
   if (out->dtype == DTYPE_I8 && a->dtype == DTYPE_I8 && b->dtype == DTYPE_I8) {
-    NN__sub_I8(out->size, (int8_t *)out->data, (int8_t *)a->data, (int8_t *)b->data);
+    NN__sub_i8(out->size, (int8_t *)out->data, (int8_t *)a->data, (int8_t *)b->data);
     return;
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 
-void NN_sub_2D(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_2d(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
   assert(out->shape[1] == a->shape[1] || out->shape[1] == b->shape[1]);
 
   if (a->shape[0] == b->shape[0] && a->shape[1] == b->shape[1]) {
     if (out->dtype == DTYPE_F32 && a->dtype == DTYPE_F32 && b->dtype == DTYPE_F32) {
-      NN__sub_F32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+      NN__sub_f32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
       return;
     }
     if (out->dtype == DTYPE_I8 && a->dtype == DTYPE_I8 && b->dtype == DTYPE_I8) {
-      NN__sub_I8(out->size, (int8_t *)out->data, (int8_t *)a->data, (int8_t *)b->data);
+      NN__sub_i8(out->size, (int8_t *)out->data, (int8_t *)a->data, (int8_t *)b->data);
       return;
     }
     if (out->dtype == DTYPE_I16 && a->dtype == DTYPE_I16 && b->dtype == DTYPE_I16) {
-      NN__sub_I16(out->size, (int16_t *)out->data, (int16_t *)a->data, (int16_t *)b->data);
+      NN__sub_i16(out->size, (int16_t *)out->data, (int16_t *)a->data, (int16_t *)b->data);
       return;
     }
     if (out->dtype == DTYPE_I32 && a->dtype == DTYPE_I32 && b->dtype == DTYPE_I32) {
-      NN__sub_I32(out->size, (int32_t *)out->data, (int32_t *)a->data, (int32_t *)b->data);
+      NN__sub_i32(out->size, (int32_t *)out->data, (int32_t *)a->data, (int32_t *)b->data);
       return;
     }
     if (out->dtype == DTYPE_U8 && a->dtype == DTYPE_U8 && b->dtype == DTYPE_U8) {
-      NN__sub_U8(out->size, (uint8_t *)out->data, (uint8_t *)a->data, (uint8_t *)b->data);
+      NN__sub_u8(out->size, (uint8_t *)out->data, (uint8_t *)a->data, (uint8_t *)b->data);
       return;
     }
   }
@@ -92,11 +92,11 @@ void NN_sub_2D(Tensor *out, Tensor *a, Tensor *b) {
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 
-void NN_sub_3D(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_3d(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
   assert(out->shape[1] == a->shape[1] || out->shape[1] == b->shape[1]);
   assert(out->shape[2] == a->shape[2] || out->shape[2] == b->shape[2]);
@@ -122,11 +122,11 @@ void NN_sub_3D(Tensor *out, Tensor *a, Tensor *b) {
   }
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 
-void NN_sub_4D(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_4d(Tensor *out, Tensor *a, Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
   assert(out->shape[1] == a->shape[1] || out->shape[1] == b->shape[1]);
   assert(out->shape[2] == a->shape[2] || out->shape[2] == b->shape[2]);
@@ -157,7 +157,7 @@ void NN_sub_4D(Tensor *out, Tensor *a, Tensor *b) {
   }
 
   printf("[ERROR] Unsupported operation between tensor with dtype %s = %s - %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 

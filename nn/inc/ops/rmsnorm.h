@@ -8,7 +8,7 @@
   #include <riscv_vector.h>
 #endif
 
-void NN__rmsnorm_F32(size_t size, float* o, float* x, float* weight) {
+void NN__rmsnorm_f32(size_t size, float* o, float* x, float* weight) {
     // calculate sum of squares
     float ss = 0.0f;
     for (int j = 0; j < size; j++) {

@@ -1,13 +1,13 @@
 
-#include "nn_matrixnorm.h"
+#include "nn_norm.h"
 
 #ifdef RVV
   #include <riscv_vector.h>
 #endif
 
-void NN_matrixNorm(Tensor *scalar, Tensor *x) {
+void NN_norm(Tensor *scalar, Tensor *x) {
   assert(x->ndim == 2);
-  assert(NN_isScalar(scalar));
+  assert(NN_is_scalar(scalar));
   assert(scalar->dtype == x->dtype);
 
   switch (x->dtype) {
@@ -20,7 +20,7 @@ void NN_matrixNorm(Tensor *scalar, Tensor *x) {
   }
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = ||%s||\n", 
-    NN_getDataTypeName(scalar->dtype), NN_getDataTypeName(x->dtype)
+    NN_get_datatype_name(scalar->dtype), NN_get_datatype_name(x->dtype)
   );
 }
 

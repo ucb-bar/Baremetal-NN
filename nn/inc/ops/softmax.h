@@ -8,7 +8,7 @@
   #include <riscv_vector.h>
 #endif
 
-static inline void NN__softmax_F32(size_t n, float *y, float *x, size_t stride) {
+static inline void NN__softmax_f32(size_t n, float *y, float *x, size_t stride) {
   // exp and sum
   float sum = 0.0f;
   for (size_t i = 0; i < n * stride; i += stride) {

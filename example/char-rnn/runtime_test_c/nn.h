@@ -31,7 +31,7 @@ void NN_assert(int condition, char *message) {
  * These functions assumes that printf is available.
  */
 
-void NN_printFloat(float v, int16_t num_digits) {
+void NN_print_f32(float v, int16_t num_digits) {
   int32_t scale = 1;
   int32_t integer_part, fractional_part;
   while (num_digits != 0) {
@@ -46,14 +46,14 @@ void NN_printFloat(float v, int16_t num_digits) {
   printf("%i.%i", integer_part, fractional_part);
 }
 
-void NN_printShape(Matrix *a) {
+void NN_print_shape(Matrix *a) {
   printf("(%d, %d)\n", a->rows, a->cols);
 }
 
 void NN_printMatrix(Matrix *a) {
   for (size_t i = 0; i < a->rows; i++) {
     for (size_t j = 0; j < a->cols; j++) {
-      NN_printFloat(a->data[i * a->cols + j], 2);
+      NN_print_f32(a->data[i * a->cols + j], 2);
       printf(" ");
     }
     printf("\n");
@@ -128,7 +128,7 @@ size_t NN_argmax(Matrix *a) {
  * ====== Operators ======
  */
 
-void NN_Linear(Matrix *out, Matrix *weight, Matrix *bias, Matrix *input) {
+void NN_linear(Matrix *out, Matrix *weight, Matrix *bias, Matrix *input) {
   NN_matmul(out, input, weight);
   NN_matadd(out, out, bias);
 }

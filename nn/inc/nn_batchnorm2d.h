@@ -18,7 +18,7 @@
  * @param running_mean: the running mean of the module of shape (channels), or NULL if no running mean is applied
  * @param running_var: the running variance of the module of shape (channels), or NULL if no running variance is applied
  */
-void NN_BatchNorm2d(
+void NN_batch_norm2d(
     Tensor *out, Tensor *in,
     Tensor *weight, Tensor *bias,
     float eps, Tensor *running_mean, Tensor *running_va

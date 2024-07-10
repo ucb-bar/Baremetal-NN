@@ -10,7 +10,7 @@
 #include "nn_float16.h"
 
 
-static inline void NN__dot_F16(size_t n, float16_t *s, float16_t *x, float16_t *y) {
+static inline void NN__dot_f16(size_t n, float16_t *s, float16_t *x, float16_t *y) {
   float16_t sum = 0.0;
   
   #ifdef RVV
@@ -42,7 +42,7 @@ static inline void NN__dot_F16(size_t n, float16_t *s, float16_t *x, float16_t *
   *s = sum;
 }
 
-static inline void NN__dot_F32(size_t n, float *s, float *x, float *y) {
+static inline void NN__dot_f32(size_t n, float *s, float *x, float *y) {
   float sum = 0.0;
   
   #ifdef RVV

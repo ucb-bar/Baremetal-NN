@@ -7,7 +7,7 @@
   #include <riscv_vector.h>
 #endif
 
-static inline void NN__transpose_F32(size_t n, size_t m, float *y, float *x) {
+static inline void NN__transpose_f32(size_t n, size_t m, float *y, float *x) {
   #ifdef RVV
     for (size_t i = 0; i < m; i += 1) {
       size_t k = n;

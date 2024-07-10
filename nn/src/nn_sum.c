@@ -7,7 +7,7 @@ void NN_sum(Tensor *out, Tensor *tensor) {
     case DTYPE_I16:
       switch (out->dtype) {
         case DTYPE_I32:
-          NN__sum_I16_to_I32(tensor->size, (int32_t *)out->data, (int16_t *)tensor->data);
+          NN__sum_i16_to_i32(tensor->size, (int32_t *)out->data, (int16_t *)tensor->data);
           return;
       }
       break;
@@ -15,13 +15,13 @@ void NN_sum(Tensor *out, Tensor *tensor) {
     case DTYPE_I32:
       switch (out->dtype) {
         case DTYPE_I32:
-          NN__sum_I32(tensor->size, (int32_t *)out->data, (int32_t *)tensor->data);
+          NN__sum_i32(tensor->size, (int32_t *)out->data, (int32_t *)tensor->data);
           return;
       }
       break;
     
     case DTYPE_F32:
-      NN__sum_F32(tensor->size, (float *)out->data, (float *)tensor->data);
+      NN__sum_f32(tensor->size, (float *)out->data, (float *)tensor->data);
       return;
     
     default:
@@ -29,6 +29,6 @@ void NN_sum(Tensor *out, Tensor *tensor) {
   }
 
   printf("[ERROR] Unsupported operation of tensor with dtype %s = sum(%s)\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(tensor->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(tensor->dtype)
   );
 }

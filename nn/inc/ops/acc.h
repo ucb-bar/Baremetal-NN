@@ -8,13 +8,13 @@
   #include <riscv_vector.h>
 #endif
 
-static inline void NN__acc_I8(size_t n, int8_t *y, int8_t *x) {
+static inline void NN__acc_i8(size_t n, int8_t *y, int8_t *x) {
   for (size_t i = 0; i < n; i += 1) {
     y[i] += x[i];
   }
 }
 
-static inline void NN__acc_F32(size_t n, float *y, float *x) {
+static inline void NN__acc_f32(size_t n, float *y, float *x) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e32m1(n);

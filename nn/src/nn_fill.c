@@ -8,16 +8,16 @@ void NN_fill(Tensor *tensor, float value) {
       NN__fill_U8(tensor->size, (uint8_t *)tensor->data, (uint8_t)value);
       return;
     case DTYPE_I8:
-      NN__fill_I8(tensor->size, (int8_t *)tensor->data, (int8_t)value);
+      NN__fill_i8(tensor->size, (int8_t *)tensor->data, (int8_t)value);
       return;
     case DTYPE_I32:
-      NN__fill_I32(tensor->size, (int32_t *)tensor->data, (int32_t)value);
+      NN__fill_i32(tensor->size, (int32_t *)tensor->data, (int32_t)value);
       return;
     case DTYPE_F16:
-      NN__fill_F16(tensor->size, (float16_t *)tensor->data, NN_floatToHalf(value));
+      NN__fill_f16(tensor->size, (float16_t *)tensor->data, NN_floatToHalf(value));
       return;
     case DTYPE_F32:
-      NN__fill_F32(tensor->size, (float *)tensor->data, value);
+      NN__fill_f32(tensor->size, (float *)tensor->data, value);
       return;
     default:
       printf("[ERROR] Unsupported operation fill to tensor with dtype: %d\n", tensor->dtype);

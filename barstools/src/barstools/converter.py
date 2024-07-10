@@ -92,7 +92,7 @@ class TorchConverter(torch.fx.Interpreter):
         )
         data = TorchConverter.toNumpy(tensor)
 
-        self.model_init += INDENT + "NN_initTensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, array_pointer);\n".format(
+        self.model_init += INDENT + "NN_init_tensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, array_pointer);\n".format(
             name=name,
             dim=len(tensor.shape),
             shape=", ".join(str(x) for x in tensor.shape),
@@ -107,7 +107,7 @@ class TorchConverter(torch.fx.Interpreter):
         self.model_struct += INDENT + "Tensor {name};\n".format(
             name=name
         )
-        self.model_init += INDENT + "NN_initTensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, NULL);\n".format(
+        self.model_init += INDENT + "NN_init_tensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, NULL);\n".format(
             name=name,
             dim=len(shape),
             shape=", ".join(str(x) for x in shape),
@@ -134,7 +134,7 @@ class TorchConverter(torch.fx.Interpreter):
         
         self.model_struct += INDENT + "Tensor {name};\n".format(name=name)
         
-        self.model_init += INDENT + "NN_initTensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, DTYPE_F32, NULL);\n".format(
+        self.model_init += INDENT + "NN_init_tensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, DTYPE_F32, NULL);\n".format(
             name=name,
             dim=len(shape),
             shape=", ".join(str(x) for x in shape)
@@ -175,7 +175,7 @@ class TorchConverter(torch.fx.Interpreter):
         elif target == torch.nn.functional.relu:
             layer_name = "relu_{count}".format(count=count) if count > 0 else "relu"
             self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
-            self.model_forward += INDENT + "NN_ReLU(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=self.node_info[layer_name][0]
             )
@@ -183,7 +183,7 @@ class TorchConverter(torch.fx.Interpreter):
         elif target == torch.nn.functional.relu6:
             layer_name = "relu6_{count}".format(count=count) if count > 0 else "relu6"
             self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
-            self.model_forward += INDENT + "NN_ReLU6(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu6(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=self.node_info[layer_name][0]
             )
@@ -234,7 +234,7 @@ class TorchConverter(torch.fx.Interpreter):
                 (batch_size, module.out_features)
                 )
             
-            self.model_forward += INDENT + "NN_Linear(&model->{layer_name}, &model->{input_names[0]}, {weight}, {bias});\n".format(
+            self.model_forward += INDENT + "NN_linear(&model->{layer_name}, &model->{input_names[0]}, {weight}, {bias});\n".format(
                 layer_name=layer_name,
                 input_names=input_names,
                 weight="&model->{layer_name}_weight".format(layer_name=layer_name),
@@ -266,7 +266,7 @@ class TorchConverter(torch.fx.Interpreter):
             batch_size = int(output_shape[0])
             self.addOutputTensor(layer_name, output_shape)
             
-            self.model_forward += INDENT + """NN_BatchNorm2d(
+            self.model_forward += INDENT + """NN_batch_norm2d(
     &model->{layer_name}, &model->{input_name[0]},
     {weight}, {bias}, 
     {eps}, {running_mean}, {running_var});\n""".format(
@@ -294,7 +294,7 @@ class TorchConverter(torch.fx.Interpreter):
             
             self.addOutputTensor(layer_name, output_shape)
         
-            self.model_forward += INDENT + """NN_Conv2d(
+            self.model_forward += INDENT + """NN_conv2d(
     &model->{layer_name}, &model->{input_names[0]},
     {weight}, {bias}, (size_t[]){{{stride}}}, (size_t[]){{{padding}}}, (size_t[]){{{dilation}}}, {groups});\n""".format(
                 layer_name=layer_name,
@@ -309,21 +309,21 @@ class TorchConverter(torch.fx.Interpreter):
             self.prev_layer_name = "{layer_name}".format(layer_name=layer_name)
         
         elif type(module) == torch.nn.ReLU:
-            self.model_forward += INDENT + "NN_ReLU(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=input_names
             )
             self.addOutputTensor(layer_name, output_shape)
         
         elif type(module) == torch.nn.ReLU6:
-            self.model_forward += INDENT + "NN_ReLU6(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu6(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=input_names
             )
             self.addOutputTensor(layer_name, output_shape)
 
         elif type(module) == torch.nn.ELU:
-            self.model_forward += INDENT + "NN_ELU(&model->{layer_name}, &model->{input_names[0]}, {eps});\n".format(
+            self.model_forward += INDENT + "NN_elu(&model->{layer_name}, &model->{input_names[0]}, {eps});\n".format(
                 layer_name=layer_name,
                 input_names=input_names,
                 eps=module.alpha

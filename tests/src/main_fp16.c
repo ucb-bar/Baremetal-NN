@@ -34,10 +34,10 @@ uint8_t compareResult(float golden, float actual) {
   if (diff > 1e-2) {
     printf("FAILED ");
     printf("golden: ");
-    NN_printFloat(golden, 6);
+    NN_print_f32(golden, 6);
     printf("\n");
     printf("actual: ");
-    NN_printFloat(actual, 6);
+    NN_print_f32(actual, 6);
     printf("\n");
     return 1;
   }

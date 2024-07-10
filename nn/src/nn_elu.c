@@ -2,7 +2,7 @@
 #include "nn_elu.h"
 
 
-void NN_ELU(Tensor *y, Tensor *x, float alpha) {
+void NN_elu(Tensor *y, Tensor *x, float alpha) {
   assert(y->ndim == x->ndim);
   assert(y->dtype == x->dtype);
   assert(y->size == x->size);
@@ -25,10 +25,10 @@ void NN_ELU(Tensor *y, Tensor *x, float alpha) {
   }
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = ELU(%s)\n", 
-    NN_getDataTypeName(y->dtype), NN_getDataTypeName(x->dtype)
+    NN_get_datatype_name(y->dtype), NN_get_datatype_name(x->dtype)
   );
 }
 
-void NN_ELUInplace(Tensor *x, float alpha) {
-  NN_ELU(x, x, alpha);
+void NN_elu_inplace(Tensor *x, float alpha) {
+  NN_elu(x, x, alpha);
 }

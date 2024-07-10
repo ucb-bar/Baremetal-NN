@@ -17,9 +17,9 @@ void NN_attention(
   s->v = s->value_cache + loff + pos * kv_dim;
 
   // qkv matmuls for this position
-  NN_matmulT(q, s->xb, w->wq + l*dim*dim, dim, dim);
-  NN_matmulT(k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
-  NN_matmulT(v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
+  NN_matmul_t(q, s->xb, w->wq + l*dim*dim, dim, dim);
+  NN_matmul_t(k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
+  NN_matmul_t(v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
 
         // RoPE relative positional encoding: complex-valued rotate q and k in each head
         for (int i = 0; i < dim; i+=2) {

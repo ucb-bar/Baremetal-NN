@@ -31,12 +31,12 @@ int main() {
     cycles = readCycles() - cycles;
     printf("%s  (%lu cycles)\n", compareTensor(golden, actual, 1e-3) ? "PASS" : "FAIL", cycles);
 
-    NN_deleteTensor(a);
-    NN_deleteTensor(b);
+    NN_delete_tensor(a);
+    NN_delete_tensor(b);
 
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   {
@@ -53,16 +53,16 @@ int main() {
     Tensor *actual = NN_zeros(2, (size_t[]){ 6, 5 }, DTYPE_F16);
 
     cycles = readCycles();
-    NN_matmulT(actual, a, b);                          
+    NN_matmul_t(actual, a, b);                          
     cycles = readCycles() - cycles;
     printf("%s  (%lu cycles)\n", compareTensor(golden, actual, 1e-3) ? "PASS" : "FAIL", cycles);
 
-    NN_deleteTensor(a);
-    NN_deleteTensor(b);
+    NN_delete_tensor(a);
+    NN_delete_tensor(b);
 
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   {
@@ -83,12 +83,12 @@ int main() {
     cycles = readCycles() - cycles;
     printf("%s  (%lu cycles)\n", compareTensor(golden, actual, 1e-3) ? "PASS" : "FAIL", cycles);
 
-    NN_deleteTensor(a);
-    NN_deleteTensor(b);
+    NN_delete_tensor(a);
+    NN_delete_tensor(b);
 
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
 }

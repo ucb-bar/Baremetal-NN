@@ -8,7 +8,7 @@
   #include <riscv_vector.h>
 #endif
 
-static inline void NN__minimum_F32(size_t n, float *z, float *x, float *y) {
+static inline void NN__minimum_f32(size_t n, float *z, float *x, float *y) {
   #ifdef RVV
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e32m1(n);

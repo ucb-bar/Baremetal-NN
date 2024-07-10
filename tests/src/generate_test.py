@@ -153,7 +153,7 @@ def generateTestPattern(op, function, inputs, additional_params=""):
             tensor_str = formatTensor(name, value)
             
             tensor_constructors.append(tensor_str)
-            tensor_destructors.append("    NN_deleteTensor({});\n".format(name))
+            tensor_destructors.append("    NN_delete_tensor({});\n".format(name))
 
         elif type(value) == float:
             tensor_str = env.from_string("float {{ name }} = {{ value }};").render(name=name, value=value)
@@ -191,9 +191,9 @@ def generateTestPattern(op, function, inputs, additional_params=""):
     printf("%s  (%lu cycles)\\n", compareTensor(golden, actual, 1e-3) ? "PASS" : "FAIL", cycles);
 
 {% for tensor_str in tensor_destructors %}{{ tensor_str }}{% endfor %}
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 """)
     

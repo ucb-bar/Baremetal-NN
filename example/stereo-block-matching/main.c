@@ -120,10 +120,10 @@ Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int ma
 
             diff->dtype = DTYPE_I8;
 
-            NN_asType(diff_wide, diff);
+            NN_as_type(diff_wide, diff);
             diff->dtype = DTYPE_U8;
 
-            NN_absInplace(diff_wide);
+            NN_abs_inplace(diff_wide);
 
             // NN_printf(diff);
 
@@ -152,16 +152,16 @@ Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int ma
     }
   }
 
-  NN_freeTensorData(left_block_signed);
-  NN_freeTensorData(right_block_signed);
-  NN_freeTensorData(diff);
-  NN_freeTensorData(out);
-  NN_deleteTensor(left_block_signed);
-  NN_deleteTensor(right_block_signed);
-  NN_deleteTensor(diff);
-  NN_deleteTensor(out);
-  NN_deleteTensor(left_block);
-  NN_deleteTensor(right_block);
+  NN_free_tensor_data(left_block_signed);
+  NN_free_tensor_data(right_block_signed);
+  NN_free_tensor_data(diff);
+  NN_free_tensor_data(out);
+  NN_delete_tensor(left_block_signed);
+  NN_delete_tensor(right_block_signed);
+  NN_delete_tensor(diff);
+  NN_delete_tensor(out);
+  NN_delete_tensor(left_block);
+  NN_delete_tensor(right_block);
 
   printf("SAD IOPs: %d\n", sad_iop);
 
@@ -189,7 +189,7 @@ int main() {
   // write only the data
 
   printf("printing result\n");
-  NN_printShape(disparity_image);
+  NN_print_shape(disparity_image);
   printf("\n");
 
   Tensor *img_small = NN_zeros(4, (const size_t[]){1, disparity_image->shape[1] / 4, disparity_image->shape[2] / 2, 1}, DTYPE_U8);

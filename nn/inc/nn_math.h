@@ -657,7 +657,7 @@
 // }
 
 
-// inline static void NN__sum_F32_ggf(const int n, float *s, const float *x) {
+// inline static void NN__sum_f32_ggf(const int n, float *s, const float *x) {
 //     float sum = 0.0;
 //     for (int i = 0; i < n; i += 1) {
 //         sum += (float)x[i];

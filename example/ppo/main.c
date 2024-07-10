@@ -46,32 +46,32 @@ typedef struct {
 void init(Model *model) {
   uint8_t *array_pointer = externdata;
 
-  NN_initTensor(&model->input, 2, (size_t[]){ 1, N_OBS }, DTYPE_F32, (float *)malloc(N_OBS * sizeof(float)));
+  NN_init_tensor(&model->input, 2, (size_t[]){ 1, N_OBS }, DTYPE_F32, (float *)malloc(N_OBS * sizeof(float)));
 
-  NN_initTensor(&model->fc1_weight, 2, (size_t[]){ N_OBS, FC1_SIZE }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc1_weight, 2, (size_t[]){ N_OBS, FC1_SIZE }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += N_OBS * FC1_SIZE * sizeof(float);
-  NN_initTensor(&model->fc1_bias, 2, (size_t[]){ 1, FC1_SIZE }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc1_bias, 2, (size_t[]){ 1, FC1_SIZE }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += FC1_SIZE * sizeof(float);
-  NN_initTensor(&model->fc1_out, 2, (size_t[]){ 1, FC1_SIZE }, DTYPE_F32, (float *)malloc(FC1_SIZE * sizeof(float)));
+  NN_init_tensor(&model->fc1_out, 2, (size_t[]){ 1, FC1_SIZE }, DTYPE_F32, (float *)malloc(FC1_SIZE * sizeof(float)));
   
-  NN_initTensor(&model->fc2_weight, 2, (size_t[]){ FC1_SIZE, FC2_SIZE }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc2_weight, 2, (size_t[]){ FC1_SIZE, FC2_SIZE }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += FC1_SIZE * FC2_SIZE * sizeof(float);
-  NN_initTensor(&model->fc2_bias, 2, (size_t[]){ 1, FC2_SIZE }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc2_bias, 2, (size_t[]){ 1, FC2_SIZE }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += FC2_SIZE * sizeof(float);
-  NN_initTensor(&model->fc2_out, 2, (size_t[]){ 1, FC2_SIZE }, DTYPE_F32, (float *)malloc(FC2_SIZE * sizeof(float)));
+  NN_init_tensor(&model->fc2_out, 2, (size_t[]){ 1, FC2_SIZE }, DTYPE_F32, (float *)malloc(FC2_SIZE * sizeof(float)));
   
-  NN_initTensor(&model->fc3_weight, 2, (size_t[]){ FC2_SIZE, FC3_SIZE }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc3_weight, 2, (size_t[]){ FC2_SIZE, FC3_SIZE }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += FC2_SIZE * FC3_SIZE * sizeof(float);
-  NN_initTensor(&model->fc3_bias, 2, (size_t[]){ 1, FC3_SIZE }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc3_bias, 2, (size_t[]){ 1, FC3_SIZE }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += FC3_SIZE * sizeof(float);
-  NN_initTensor(&model->fc3_out, 2, (size_t[]){ 1, FC3_SIZE }, DTYPE_F32, (float *)malloc(FC3_SIZE * sizeof(float)));
+  NN_init_tensor(&model->fc3_out, 2, (size_t[]){ 1, FC3_SIZE }, DTYPE_F32, (float *)malloc(FC3_SIZE * sizeof(float)));
 
-  NN_initTensor(&model->fc4_weight, 2, (size_t[]){ FC3_SIZE, N_ACS }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc4_weight, 2, (size_t[]){ FC3_SIZE, N_ACS }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += FC3_SIZE * N_ACS * sizeof(float);
   printf("ptr: %d\n", (int)array_pointer - (int)externdata_start);
-  NN_initTensor(&model->fc4_bias, 2, (size_t[]){ 1, N_ACS }, DTYPE_F32, (float *)(array_pointer));
+  NN_init_tensor(&model->fc4_bias, 2, (size_t[]){ 1, N_ACS }, DTYPE_F32, (float *)(array_pointer));
   array_pointer += N_ACS * sizeof(float);
-  NN_initTensor(&model->output, 2, (size_t[]){ 1, N_ACS }, DTYPE_F32, (float *)malloc(N_ACS * sizeof(float)));
+  NN_init_tensor(&model->output, 2, (size_t[]){ 1, N_ACS }, DTYPE_F32, (float *)malloc(N_ACS * sizeof(float)));
 
   printf("fc4_bias: \n");
   NN_printf(&model->fc4_bias);

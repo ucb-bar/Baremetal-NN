@@ -13,7 +13,7 @@
  * @param out: the output scalar tensor
  * @param tensor: the input tensor
  */
-void NN_Softmax(Tensor *out, Tensor *tensor, size_t dim);
+void NN_softmax(Tensor *out, Tensor *tensor, size_t dim);
 
 
 #endif // __NN_SOFTMAX_H

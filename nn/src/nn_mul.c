@@ -11,7 +11,7 @@ void NN_mul(Tensor *out, Tensor *a, Tensor *b) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__mul_F32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
+      NN__mul_f32(out->size, (float *)out->data, (float *)a->data, (float *)b->data);
       return;
 
     default:
@@ -19,7 +19,7 @@ void NN_mul(Tensor *out, Tensor *a, Tensor *b) {
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = %s * %s\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(a->dtype), NN_getDataTypeName(b->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(a->dtype), NN_get_datatype_name(b->dtype)
   );
 }
 
@@ -31,7 +31,7 @@ void NN_mul1(Tensor *out, Tensor *in, float scalar) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__mul1_F32(out->size, (float *)out->data, (float *)in->data, scalar);
+      NN__mul1_f32(out->size, (float *)out->data, (float *)in->data, scalar);
       return;
 
     default:
@@ -39,7 +39,7 @@ void NN_mul1(Tensor *out, Tensor *in, float scalar) {
   }
   
   printf("[ERROR] Unsupported operation of tensor with dtype %s = %s * scalar\n", 
-    NN_getDataTypeName(out->dtype), NN_getDataTypeName(in->dtype)
+    NN_get_datatype_name(out->dtype), NN_get_datatype_name(in->dtype)
   );
 }
 
