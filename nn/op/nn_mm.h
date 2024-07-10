@@ -1,5 +1,5 @@
-#ifndef __NN_MATMUL_H
-#define __NN_MATMUL_H
+#ifndef __NN_MM_H
+#define __NN_MM_H
 
 #include <assert.h>
 
@@ -34,4 +34,4 @@ void NN_mm(Tensor *out, Tensor *a, Tensor *b);
 void NN_mm_t(Tensor *out, Tensor *a, Tensor *b);
 
 
-#endif // __NN_MATMUL_H
+#endif // __NN_MM_H
