@@ -105,9 +105,9 @@ add_library(nn
   op/nn_transpose.c
   op/nn_unfold.c
 
-  ${cpu_impl}
   ${rvv_impl}
   ${gemmini_impl}
+  ${cpu_impl}
 )
 
 target_include_directories(nn PUBLIC op impl)

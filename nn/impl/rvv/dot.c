@@ -12,8 +12,8 @@
 
 //   while (n > 0) {
 //     size_t vl = __riscv_vsetvl_e16m1(n);
-//     vfloat16m1_t vec_x = __riscv_vlse16_v_f16m1(x, incx, vl);
-//     vfloat16m1_t vec_y = __riscv_vlse16_v_f16m1(y, incy, vl);
+//     vfloat16m1_t vec_x = __riscv_vlse16_v_f16m1(x, sizeof(float16_t) * incx, vl);
+//     vfloat16m1_t vec_y = __riscv_vlse16_v_f16m1(y, sizeof(float16_t) * incy, vl);
 //     vec_r = __riscv_vfmacc_vv_f16m1(vec_r, vec_x, vec_y, vl);
       
 //     x += vl;
@@ -32,8 +32,8 @@ void NN__dot_f32(size_t n, float *result, float *x, size_t incx, float *y, size_
 
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);
-    vfloat32m1_t vec_x = __riscv_vlse32_v_f32m1(x, incx, vl);
-    vfloat32m1_t vec_y = __riscv_vlse32_v_f32m1(y, incy, vl);
+    vfloat32m1_t vec_x = __riscv_vlse32_v_f32m1(x, sizeof(float) * incx, vl);
+    vfloat32m1_t vec_y = __riscv_vlse32_v_f32m1(y, sizeof(float) * incy, vl);
     vec_r = __riscv_vfmacc_vv_f32m1(vec_r, vec_x, vec_y, vl);
       
     x += vl;
