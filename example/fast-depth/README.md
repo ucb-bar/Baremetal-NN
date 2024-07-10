@@ -46,4 +46,12 @@ cmake --build .
 spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./fast-depth
 ```
 
+Running with Gemmini
+
+```bash
+spike --extension=gemmini ./fast-depth
+```
+
+
+
 

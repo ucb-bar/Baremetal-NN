@@ -14,12 +14,23 @@ Baremetal-NN is a tool for converting PyTorch models into raw C codes that can b
 cd test/
 mkdir build/
 cd build/
-cmake ..
+cmake .. -DRISCV=ON
 ```
 
+Running with RVV
+
 ```bash
+cmake .. -DRISCV=ON -DRVV=ON
 make
 spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./example 
+```
+
+Running with Gemmini
+
+```bash
+cmake .. -DRISCV=ON -DGEMMINI=ON
+make
+spike --extension=gemmini ./example
 ```
 
 
