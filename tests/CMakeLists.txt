@@ -32,7 +32,11 @@ elseif (RISCV)
     target_link_libraries(test PUBLIC target-riscv)
 endif()
 
-add_compile_options(-O3 -Wall -Wextra)
+add_compile_options(-O1 -Wall -Wextra)
+
+
+# add -mfp16-format=ieee
+# add_compile_options(-mavx512fp16)
 
 target_compile_options(test PRIVATE -u _printf_float)
 

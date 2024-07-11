@@ -1,6 +1,6 @@
 import numpy as np
 
-def NN_Linear(input, weight_T, bias):
+def NN_linear(input, weight_T, bias):
     return np.matmul(input, weight_T) + bias
 
 def nn_logsoftmax(input):

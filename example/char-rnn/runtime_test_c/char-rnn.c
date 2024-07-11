@@ -57,7 +57,7 @@ int main() {
     
     for (int j=1; j<strlen(str); j+=1) {
       encodeOneHot(&input, str[j]);
-      NN_Linear(&hidden, &i2h_weight_transposed, &i2h_bias, &input);
+      NN_linear(&hidden, &i2h_weight_transposed, &i2h_bias, &input);
 
       forward(&output, &hidden, &input);
     }
@@ -67,7 +67,7 @@ int main() {
     
     printf("\n> %s\n", str);
     printf("score: (");
-    NN_printFloat(output.data[index], 2);
+    NN_print_f32(output.data[index], 2);
     printf("), predicted: (%d, %s)\n", index, categories[index]);
   }
 

@@ -66,17 +66,17 @@ int main() {
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(B);
-    NN_deleteTensor(B);
-    NN_freeTensorData(f);
-    NN_deleteTensor(f);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(B);
+    NN_delete_tensor(B);
+    NN_free_tensor_data(f);
+    NN_delete_tensor(f);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // matvec
@@ -107,12 +107,12 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden_vect->data, actual_vect->data, N, 1) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(H);
-    NN_deleteTensor(H);
-    NN_freeTensorData(V);
-    NN_deleteTensor(V);
-    NN_freeTensorData(W);
-    NN_deleteTensor(W);
+    NN_free_tensor_data(H);
+    NN_delete_tensor(H);
+    NN_free_tensor_data(V);
+    NN_delete_tensor(V);
+    NN_free_tensor_data(W);
+    NN_delete_tensor(W);
   }
 
   // max and min
@@ -133,8 +133,8 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", float_eq(min_cpu, min_actual, 1e-6) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
   }
 
   // matmulf
@@ -150,12 +150,12 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(C->data, D->data, M, N) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(C);
-    NN_deleteTensor(C);
-    NN_freeTensorData(D);
-    NN_deleteTensor(D);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(C);
+    NN_delete_tensor(C);
+    NN_free_tensor_data(D);
+    NN_delete_tensor(D);
   }
 
   // matsub
@@ -172,15 +172,15 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(B);
-    NN_deleteTensor(B);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(B);
+    NN_delete_tensor(B);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // matadd
@@ -191,21 +191,21 @@ int main() {
     Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
     printf("matadd:\t\t");
-    NN_add_F32(golden, A, B);
+    NN_add_f32(golden, A, B);
     cycles = READ_CSR("mcycle");
-    NN_add_F32_RVV(actual, A, B);
+    NN_add_f32_RVV(actual, A, B);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(B);
-    NN_deleteTensor(B);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(B);
+    NN_delete_tensor(B);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // matneg
@@ -221,13 +221,13 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // matcopy
@@ -242,19 +242,19 @@ int main() {
     Tensor *actual = NN_tensor(2, (size_t[]){M, N}, DTYPE_F32, NULL);
 
     printf("cwiseabs:\t");
-    NN_abs_F32(golden, A);
+    NN_abs_f32(golden, A);
     cycles = READ_CSR("mcycle");
-    NN_abs_F32_RVV(actual, A);
+    NN_abs_f32_RVV(actual, A);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // cwisemin
@@ -271,15 +271,15 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(B);
-    NN_deleteTensor(B);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(B);
+    NN_delete_tensor(B);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // cwisemax
@@ -296,15 +296,15 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(B);
-    NN_deleteTensor(B);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(B);
+    NN_delete_tensor(B);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // cwisemul
@@ -321,15 +321,15 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(golden->data, actual->data, N, M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(B);
-    NN_deleteTensor(B);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(B);
+    NN_delete_tensor(B);
 
-    NN_freeTensorData(golden);
-    NN_deleteTensor(golden);
-    NN_freeTensorData(actual);
-    NN_deleteTensor(actual);
+    NN_free_tensor_data(golden);
+    NN_delete_tensor(golden);
+    NN_free_tensor_data(actual);
+    NN_delete_tensor(actual);
   }
 
   // matset
@@ -366,10 +366,10 @@ int main() {
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", (B->shape[0] == N && B->shape[1] == M) ? "PASS" : "FAIL", cycles);
 
-    NN_freeTensorData(A);
-    NN_deleteTensor(A);
-    NN_freeTensorData(B);
-    NN_deleteTensor(B);
+    NN_free_tensor_data(A);
+    NN_delete_tensor(A);
+    NN_free_tensor_data(B);
+    NN_delete_tensor(B);
   }
 
 
@@ -434,9 +434,9 @@ int main() {
 
     printf("conv2d:\t\t");
 
-    NN_Conv2d_F32(y_golden, x, w, b, (size_t[]){stride_height, stride_width}, (size_t[]){padding_height, padding_width}, 1);
+    NN_conv2d_F32(y_golden, x, w, b, (size_t[]){stride_height, stride_width}, (size_t[]){padding_height, padding_width}, 1);
     cycles = READ_CSR("mcycle");
-    NN_Conv2d_F32_RVV(y_actual, x, w, b, (size_t[]){stride_height, stride_width}, (size_t[]){padding_height, padding_width}, 1);
+    NN_conv2d_F32_RVV(y_actual, x, w, b, (size_t[]){stride_height, stride_width}, (size_t[]){padding_height, padding_width}, 1);
     cycles = READ_CSR("mcycle") - cycles;
     printf("%s (%lu)\n", compare_2d(y_golden->data, y_actual->data, in_width - kernel_width + 1, in_height - kernel_height + 1) ? "PASS" : "FAIL", cycles);
 
@@ -449,12 +449,12 @@ int main() {
     printf("output:\n");
     NN_printf(y_golden);
 
-    NN_freeTensorData(x);
-    NN_deleteTensor(x);
-    NN_freeTensorData(w);
-    NN_deleteTensor(w);
-    NN_freeTensorData(b);
-    NN_deleteTensor(b);
+    NN_free_tensor_data(x);
+    NN_delete_tensor(x);
+    NN_free_tensor_data(w);
+    NN_delete_tensor(w);
+    NN_free_tensor_data(b);
+    NN_delete_tensor(b);
 
   }
 
@@ -499,7 +499,7 @@ int main() {
 
   //   printf("sum:\t\t");
   //   float sum_cpu = NN_sum_F32(A);
-  //   NN_printFloat(sum_cpu, 4);
+  //   NN_print_f32(sum_cpu, 4);
   //   printf("\n");
     
   // }

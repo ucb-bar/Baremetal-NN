@@ -4,7 +4,7 @@ project(fast-depth LANGUAGES C)
 
 
 add_executable(fast-depth main.c)
-target_include_directories(fast-depth PUBLIC inc)
+target_include_directories(fast-depth PUBLIC inc ../utility)
 
 target_compile_features(fast-depth INTERFACE c_std_11)
 

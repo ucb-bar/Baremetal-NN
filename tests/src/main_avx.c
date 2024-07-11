@@ -14,7 +14,7 @@ int main() {
 
   NN_sub(a, a, ones);
 
-  NN_abs_F32_AVX(a, a);
+  NN_abs_f32_AVX(a, a);
 
   NN_printf(a);
   

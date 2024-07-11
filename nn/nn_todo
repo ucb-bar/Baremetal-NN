@@ -78,7 +78,7 @@ size_t NN_argmax(Matrix *a) {
  * ====== Operators ======
  */
 
-void NN_Linear(Matrix *out, Matrix *weight, Matrix *bias, Matrix *input) {
+void NN_linear(Matrix *out, Matrix *weight, Matrix *bias, Matrix *input) {
   NN_matmul(out, input, weight);
   NN_matadd(out, out, bias);
 }

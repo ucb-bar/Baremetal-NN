@@ -34,10 +34,10 @@ uint8_t compareResult(float golden, float actual) {
   if (diff > 1e-2) {
     printf("FAILED ");
     printf("golden: ");
-    NN_printFloat(golden, 6);
+    NN_print_f32(golden, 6);
     printf("\n");
     printf("actual: ");
-    NN_printFloat(actual, 6);
+    NN_print_f32(actual, 6);
     printf("\n");
     return 1;
   }
@@ -51,8 +51,8 @@ int main() {
 
     float x = (float)(0x47ca9334);
 
-    float16_t x_compressed = NN_floatToHalf(x);
-    float x_decompressed = NN_halfToFloat(x_compressed);
+    float16_t x_compressed = NN_float_to_half(x);
+    float x_decompressed = NN_half_to_float(x_compressed);
     
     print_bits(x);
     print_bits_half(x_compressed);

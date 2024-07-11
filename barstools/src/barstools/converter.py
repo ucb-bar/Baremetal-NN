@@ -13,15 +13,15 @@ INDENT = "  "
 
 class TorchConverter(torch.fx.Interpreter):
     @staticmethod
-    def toNumpy(tensor: torch.Tensor):
+    def to_numpy(tensor: torch.Tensor):
         return tensor.cpu().detach().contiguous().numpy()
     
     @staticmethod
-    def toBytes(ndarray: np.ndarray):
+    def to_bytes(ndarray: np.ndarray):
         return ndarray.astype(np.float32).flatten().tobytes()
     
     @staticmethod
-    def dtypeToStr(dtype: torch.dtype):
+    def dtype_to_str(dtype: torch.dtype):
         if dtype == torch.float16:
             return "DTYPE_F16"
         elif dtype == torch.float32:
@@ -67,12 +67,12 @@ class TorchConverter(torch.fx.Interpreter):
     def print(self):
         self.gm.graph.print_tabular()
         
-    def getModuleInSequential(self, module, indicies):
+    def get_module_in_sequential(self, module, indicies):
         if len(indicies) == 0:
             return module
-        return self.getModuleInSequential(module[indicies[0]], indicies[1:])
+        return self.get_module_in_sequential(module[indicies[0]], indicies[1:])
 
-    def getModule(self, module_name):
+    def get_module(self, module_name):
         if "." in module_name:
             # if we have nn.Sequential layers
             target_hierarchy = module_name.split(".")
@@ -82,36 +82,36 @@ class TorchConverter(torch.fx.Interpreter):
             indicies = [int(x) for x in target_hierarchy[1:]]
 
             module = getattr(self.model, sequential_name)
-            return self.getModuleInSequential(module, indicies)
+            return self.get_module_in_sequential(module, indicies)
         
         return getattr(self.model, module_name)
     
-    def addDataTensor(self, name, tensor):
+    def add_data_tensor(self, name, tensor):
         self.model_struct += INDENT + "Tensor {name};\n".format(
             name=name
         )
-        data = TorchConverter.toNumpy(tensor)
+        data = TorchConverter.to_numpy(tensor)
 
-        self.model_init += INDENT + "NN_initTensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, array_pointer);\n".format(
+        self.model_init += INDENT + "NN_init_tensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, array_pointer);\n".format(
             name=name,
             dim=len(tensor.shape),
             shape=", ".join(str(x) for x in tensor.shape),
-            dtype=TorchConverter.dtypeToStr(tensor.dtype)
+            dtype=TorchConverter.dtype_to_str(tensor.dtype)
         )
         self.model_init += INDENT + "array_pointer += {increment};\n".format(
             increment=np.prod(tensor.shape)
         )
-        self.weight_content += TorchConverter.toBytes(data)
+        self.weight_content += TorchConverter.to_bytes(data)
 
-    def addOutputTensor(self, name, shape, dtype=torch.float32):
+    def add_output_tensor(self, name, shape, dtype=torch.float32):
         self.model_struct += INDENT + "Tensor {name};\n".format(
             name=name
         )
-        self.model_init += INDENT + "NN_initTensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, NULL);\n".format(
+        self.model_init += INDENT + "NN_init_tensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, {dtype}, NULL);\n".format(
             name=name,
             dim=len(shape),
             shape=", ".join(str(x) for x in shape),
-            dtype=TorchConverter.dtypeToStr(dtype)
+            dtype=TorchConverter.dtype_to_str(dtype)
         )
     
     def placeholder(self, target, args, kwargs):
@@ -134,7 +134,7 @@ class TorchConverter(torch.fx.Interpreter):
         
         self.model_struct += INDENT + "Tensor {name};\n".format(name=name)
         
-        self.model_init += INDENT + "NN_initTensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, DTYPE_F32, NULL);\n".format(
+        self.model_init += INDENT + "NN_init_tensor(&model->{name}, {dim}, (size_t[]){{{shape}}}, DTYPE_F32, NULL);\n".format(
             name=name,
             dim=len(shape),
             shape=", ".join(str(x) for x in shape)
@@ -160,7 +160,7 @@ class TorchConverter(torch.fx.Interpreter):
                 layer_name=layer_name,
                 input_names=self.node_info[layer_name][0]
             )
-            self.addOutputTensor(layer_name, output_shape)
+            self.add_output_tensor(layer_name, output_shape)
         
         elif target == torch.nn.functional.interpolate:
             layer_name = "interpolate_{count}".format(count=count) if count > 0 else "interpolate"
@@ -170,12 +170,12 @@ class TorchConverter(torch.fx.Interpreter):
                 input_names=self.node_info[layer_name][0],
                 scale_factor=kwargs.get("scale_factor")
             )
-            self.addOutputTensor(layer_name, output_shape)
+            self.add_output_tensor(layer_name, output_shape)
         
         elif target == torch.nn.functional.relu:
             layer_name = "relu_{count}".format(count=count) if count > 0 else "relu"
             self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
-            self.model_forward += INDENT + "NN_ReLU(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=self.node_info[layer_name][0]
             )
@@ -183,7 +183,7 @@ class TorchConverter(torch.fx.Interpreter):
         elif target == torch.nn.functional.relu6:
             layer_name = "relu6_{count}".format(count=count) if count > 0 else "relu6"
             self.model_forward += INDENT + "// F.{layer_name}\n".format(layer_name=layer_name)
-            self.model_forward += INDENT + "NN_ReLU6(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu6(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=self.node_info[layer_name][0]
             )
@@ -206,7 +206,7 @@ class TorchConverter(torch.fx.Interpreter):
         if len(output_shape) == 4:
             output_shape = (output_shape[0], output_shape[2], output_shape[3], output_shape[1])
 
-        module = self.getModule(target)
+        module = self.get_module(target)
         layer_name = target.replace(".", "_")
         input_names = self.node_info[layer_name][0]
         
@@ -217,24 +217,24 @@ class TorchConverter(torch.fx.Interpreter):
             )
     
         if type(module) == torch.nn.Linear:
-            self.addDataTensor(
+            self.add_data_tensor(
                 "{layer_name}_weight".format(layer_name=layer_name), 
                 module.state_dict().get("weight")
                 )
             
             if module.bias is not None:
-                self.addDataTensor(
+                self.add_data_tensor(
                     "{layer_name}_bias".format(layer_name=layer_name),
                     module.state_dict().get("bias")
                     )
             
             batch_size = int(output_shape[0])
-            self.addOutputTensor(
+            self.add_output_tensor(
                 layer_name,
                 (batch_size, module.out_features)
                 )
             
-            self.model_forward += INDENT + "NN_Linear(&model->{layer_name}, &model->{input_names[0]}, {weight}, {bias});\n".format(
+            self.model_forward += INDENT + "NN_linear(&model->{layer_name}, &model->{input_names[0]}, {weight}, {bias});\n".format(
                 layer_name=layer_name,
                 input_names=input_names,
                 weight="&model->{layer_name}_weight".format(layer_name=layer_name),
@@ -243,30 +243,30 @@ class TorchConverter(torch.fx.Interpreter):
         
         elif type(module) == torch.nn.BatchNorm2d:
             if module.weight is not None:
-                self.addDataTensor(
+                self.add_data_tensor(
                     "{layer_name}_weight".format(layer_name=layer_name), 
                     module.state_dict().get("weight")
                     )
             if module.bias is not None:
-                self.addDataTensor(
+                self.add_data_tensor(
                     "{layer_name}_bias".format(layer_name=layer_name),
                     module.state_dict().get("bias")
                     )
             if module.running_mean is not None:
-                self.addDataTensor(
+                self.add_data_tensor(
                     "{layer_name}_running_mean".format(layer_name=layer_name),
                     module.state_dict().get("running_mean")
                     )
             if module.running_var is not None:
-                self.addDataTensor(
+                self.add_data_tensor(
                     "{layer_name}_running_var".format(layer_name=layer_name),
                     module.state_dict().get("running_var")
                     )
                 
             batch_size = int(output_shape[0])
-            self.addOutputTensor(layer_name, output_shape)
+            self.add_output_tensor(layer_name, output_shape)
             
-            self.model_forward += INDENT + """NN_BatchNorm2d(
+            self.model_forward += INDENT + """NN_batch_norm2d(
     &model->{layer_name}, &model->{input_name[0]},
     {weight}, {bias}, 
     {eps}, {running_mean}, {running_var});\n""".format(
@@ -282,19 +282,19 @@ class TorchConverter(torch.fx.Interpreter):
         elif type(module) == torch.nn.Conv2d:
             if module.weight is not None:
                 # weight need to be converted from (out_ch, in_ch, kh, kw) to (kh, kw, in_ch, out_ch)
-                self.addDataTensor(
+                self.add_data_tensor(
                     "{layer_name}_weight".format(layer_name=layer_name), 
                     module.state_dict().get("weight").permute(2, 3, 1, 0)
                     )
             if module.bias is not None:
-                self.addDataTensor(
+                self.add_data_tensor(
                     "{layer_name}_bias".format(layer_name=layer_name),
                     module.state_dict().get("bias")
                     )
             
-            self.addOutputTensor(layer_name, output_shape)
+            self.add_output_tensor(layer_name, output_shape)
         
-            self.model_forward += INDENT + """NN_Conv2d(
+            self.model_forward += INDENT + """NN_conv2d(
     &model->{layer_name}, &model->{input_names[0]},
     {weight}, {bias}, (size_t[]){{{stride}}}, (size_t[]){{{padding}}}, (size_t[]){{{dilation}}}, {groups});\n""".format(
                 layer_name=layer_name,
@@ -309,26 +309,26 @@ class TorchConverter(torch.fx.Interpreter):
             self.prev_layer_name = "{layer_name}".format(layer_name=layer_name)
         
         elif type(module) == torch.nn.ReLU:
-            self.model_forward += INDENT + "NN_ReLU(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=input_names
             )
-            self.addOutputTensor(layer_name, output_shape)
+            self.add_output_tensor(layer_name, output_shape)
         
         elif type(module) == torch.nn.ReLU6:
-            self.model_forward += INDENT + "NN_ReLU6(&model->{layer_name}, &model->{input_names[0]});\n".format(
+            self.model_forward += INDENT + "NN_relu6(&model->{layer_name}, &model->{input_names[0]});\n".format(
                 layer_name=layer_name,
                 input_names=input_names
             )
-            self.addOutputTensor(layer_name, output_shape)
+            self.add_output_tensor(layer_name, output_shape)
 
         elif type(module) == torch.nn.ELU:
-            self.model_forward += INDENT + "NN_ELU(&model->{layer_name}, &model->{input_names[0]}, {eps});\n".format(
+            self.model_forward += INDENT + "NN_elu(&model->{layer_name}, &model->{input_names[0]}, {eps});\n".format(
                 layer_name=layer_name,
                 input_names=input_names,
                 eps=module.alpha
             )
-            self.addOutputTensor(layer_name, output_shape)
+            self.add_output_tensor(layer_name, output_shape)
 
         else:
             print("[WARNING] Unsupported module call:", target)
