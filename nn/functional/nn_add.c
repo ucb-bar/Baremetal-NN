@@ -23,9 +23,10 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
             size_t b_i = i < b->shape[0] ? i : 0;
             size_t b_j = j < b->shape[1] ? j : 0;
 
-            ((float *)out->data)[i * out->shape[1] + j]
-              = ((float *)a->data)[a_i * a->shape[1] + a_j]
-              + ((float *)b->data)[b_i * b->shape[1] + b_j];
+            ((float16_t *)out->data)[i * out->shape[1] + j] = NN_float_to_half(
+                  NN_half_to_float(((float16_t *)a->data)[a_i * a->shape[1] + a_j])
+                + NN_half_to_float(((float16_t *)b->data)[b_i * b->shape[1] + b_j])
+              );
           }
         }
         return;

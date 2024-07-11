@@ -48,6 +48,7 @@ if (RVV)
     ./impl/rvv/add.c
     ./impl/rvv/add1.c
     ./impl/rvv/div.c
+    ./impl/rvv/dot.c
     ./impl/rvv/max.c
     ./impl/rvv/maximum.c
     ./impl/rvv/maximum1.c
