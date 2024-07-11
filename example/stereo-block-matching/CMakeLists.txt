@@ -4,7 +4,7 @@ project(stereoBM LANGUAGES C)
 
 
 add_executable(stereoBM main.c)
-target_include_directories(stereoBM PUBLIC inc)
+target_include_directories(stereoBM PUBLIC inc ../utility)
 
 target_compile_features(stereoBM INTERFACE c_std_11)
 
