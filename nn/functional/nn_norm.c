@@ -5,52 +5,29 @@
   #include <riscv_vector.h>
 #endif
 
-void NN_norm(Tensor *scalar, Tensor *x) {
+void NN_norm(Tensor *result, Tensor *x) {
   assert(x->ndim == 2);
-  assert(NN_is_scalar(scalar));
-  assert(scalar->dtype == x->dtype);
+  assert(NN_is_scalar(result));
+  assert(result->dtype == x->dtype);
+
+  float sum = 0;
 
   switch (x->dtype) {
     case DTYPE_F32:
-      NN_matrixNorm_F32(scalar, x);
+      for (size_t i = 0; i < x->shape[0]; i += 1) {
+        for (size_t j = 0; j < x->shape[1]; j += 1) {
+          sum += pow(((float *)x->data)[i * x->shape[1] + j], 2);
+        }
+      }
       return;
 
     default:
       break;
   }
+
+  ((float *)result->data)[0] = sqrt(sum);
   
   printf("[ERROR] Unsupported operation between tensor with dtype %s = ||%s||\n", 
-    NN_get_datatype_name(scalar->dtype), NN_get_datatype_name(x->dtype)
+    NN_get_datatype_name(result->dtype), NN_get_datatype_name(x->dtype)
   );
-}
-
-void NN_matrixNorm_F32(Tensor *scalar, Tensor *x) {
-  float sum = 0;
-  #ifdef RVV
-    float *ptr = x->data;
-
-    size_t vlmax = __riscv_vsetvlmax_e32m1();
-    vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
-    vfloat32m1_t vec_accumulate = __riscv_vfmv_v_f_f32m1(0, vlmax);
-
-    size_t n = x->shape[0] * x->shape[1];
-    while (n > 0) {
-      size_t vl = __riscv_vsetvl_e32m1(n);
-      vfloat32m1_t vec_a = __riscv_vle32_v_f32m1(ptr, vl);
-      vec_accumulate = __riscv_vfmacc_vv_f32m1(vec_accumulate, vec_a, vec_a, vl);
-      ptr += vl;
-      n -= vl;
-    }
-    vfloat32m1_t vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_accumulate, vec_zero, vlmax);
-    sum = __riscv_vfmv_f_s_f32m1_f32(vec_sum);
-  #else
-    for (size_t i = 0; i < x->shape[0]; i += 1) {
-      for (size_t j = 0; j < x->shape[1]; j += 1) {
-        sum += pow(((float *)x->data)[i * x->shape[1] + j], 2);
-      }
-    }
-  #endif
-
-  ((float *)scalar->data)[0] = sqrt(sum);
-  return;
 }
