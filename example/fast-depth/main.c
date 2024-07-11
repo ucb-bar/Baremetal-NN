@@ -13,6 +13,7 @@
 #include "nn.h"
 #include "model.h"
 
+#include "termimg.h"
 
 // load the weight data block from the model.bin file
 INCLUDE_FILE(".rodata", "../input.bin", model_input);
@@ -21,16 +22,21 @@ extern size_t model_input_start[];
 extern size_t model_input_end[];
 
 
-// static void enable_vector_operations() {
-//     unsigned long mstatus;
-//     asm volatile("csrr %0, mstatus" : "=r"(mstatus));
-//     mstatus |= 0x00000600 | 0x00006000 | 0x00018000;
-//     asm volatile("csrw mstatus, %0"::"r"(mstatus));
-// }
-
 int main() {
+  #ifdef RVV
+    printf("Using RVV\n");
 
-  // enable_vector_operations();
+    // enable vector instructions
+    unsigned long mstatus;
+    asm volatile("csrr %0, mstatus" : "=r"(mstatus));
+    mstatus |= 0x00000600 | 0x00006000 | 0x00018000;
+    asm volatile("csrw mstatus, %0"::"r"(mstatus));
+  #endif
+  
+  #ifdef GEMMINI
+    printf("Using Gemmini\n");
+  #endif
+
   
   Model *model = malloc(sizeof(Model));
 
@@ -56,7 +62,7 @@ int main() {
   
   
   printf("output:\n");
-  showASCIIImage(img);
+  show_ASCII_image(img);
   // showASCIIImage(&model->decode_conv6_2);
 
   return 0;
