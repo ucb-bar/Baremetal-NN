@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "nn_float16.h"
+
 
 void NN__minimum1_f32(size_t n,
     float *y, size_t incy,

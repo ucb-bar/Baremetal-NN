@@ -9,7 +9,7 @@ void NN_relu(Tensor *y, Tensor *x) {
 
   switch (y->dtype) {
     case DTYPE_F16:
-      NN__maximum1_f16(y->size, (float *)y->data, 1, (float *)x->data, 1, 0.0f);
+      NN__maximum1_f16(y->size, (float16_t *)y->data, 1, (float16_t *)x->data, 1, 0.0f);
       return;
     case DTYPE_F32:
       NN__maximum1_f32(y->size, (float *)y->data, 1, (float *)x->data, 1, 0.0f);
