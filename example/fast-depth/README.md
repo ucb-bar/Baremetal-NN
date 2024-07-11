@@ -41,7 +41,7 @@ Building for spike:
 
 ```bash
 cd ./example/fast-depth/build/
-cmake .. -D RISCV=ON
+cmake .. -D RISCV=ON -D RVV=ON
 cmake --build .
 spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./fast-depth
 ```
@@ -49,6 +49,9 @@ spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./fast-depth
 Running with Gemmini
 
 ```bash
+cd ./example/fast-depth/build/
+cmake .. -D RISCV=ON -D GEMMINI=ON
+cmake --build .
 spike --extension=gemmini ./fast-depth
 ```
 
