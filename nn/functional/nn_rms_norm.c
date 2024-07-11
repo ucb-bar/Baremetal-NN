@@ -14,7 +14,7 @@ void NN_rms_norm(Tensor *y, Tensor *x, Tensor *w, float eps) {
         (float *)y->data, 1,
         (float *)x->data, 1,
         (float *)w->data, 1,
-        &eps
+        eps
       );
       return;
 

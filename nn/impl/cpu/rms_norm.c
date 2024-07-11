@@ -1,6 +1,6 @@
 #include "rms_norm.h"
 
-__attribute__((weak)) void NN__rms_norm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw, float *eps) {
+__attribute__((weak)) void NN__rms_norm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw, float eps) {
 
   // TODO: for some reason, passing eps as float is not working, the function is getting random values
   // so we are passing it as a pointer and dereferencing it here temporarily
@@ -11,7 +11,7 @@ __attribute__((weak)) void NN__rms_norm_f32(size_t n, float* y, size_t incy, flo
     ss += x[i * incx] * x[i * incx];
   }
   ss /= n;
-  ss += *eps;
+  ss += eps;
   ss = 1.0f / sqrtf(ss);
   // normalize and scale
   for (size_t i = 0; i < n; i += 1) {

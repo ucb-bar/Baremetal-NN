@@ -4,17 +4,14 @@
 #ifdef RVV
 
 
-void NN__rms_norm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw, float *eps) {
-  // TODO: for some reason, passing eps as float is not working, the function is getting random values
-  // so we are passing it as a pointer and dereferencing it here temporarily
-
+void NN__rms_norm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw, float eps) {
   // calculate sum of squares
   float ss;
   NN__sqr_f32(n, y, incy, x, incx);
   NN__sum_f32(n, &ss, y, incy);
 
   ss /= n;
-  ss += *eps;
+  ss += eps;
   ss = 1.0f / sqrtf(ss);
 
   // normalize and scale
