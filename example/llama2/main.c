@@ -28,158 +28,170 @@ extern size_t checkpoint_start[];
 extern size_t checkpoint_end[];
 
 typedef struct {
-    int dim; // transformer dimension
-    int hidden_dim; // for ffn layers
-    int n_layers; // number of layers
-    int n_heads; // number of query heads
-    int n_kv_heads; // number of key/value heads (can be < query heads because of multiquery)
-    int vocab_size; // vocabulary size, usually 256 (byte-level)
-    int seq_len; // max sequence length
+  int dim; // transformer dimension
+  int hidden_dim; // for ffn layers
+  int n_layers; // number of layers
+  int n_heads; // number of query heads
+  int n_kv_heads; // number of key/value heads (can be < query heads because of multiquery)
+  int vocab_size; // vocabulary size, usually 256 (byte-level)
+  int seq_len; // max sequence length
 } Config;
 
 typedef struct {
-    // token embedding table
-    float* token_embedding_table;    // (vocab_size, dim)
-    // weights for rmsnorms
-    float* rms_att_weight; // (layer, dim) rmsnorm weights
-    float* rms_ffn_weight; // (layer, dim)
-    // weights for matmuls. note dim == n_heads * head_size
-    float* wq; // (layer, dim, n_heads * head_size)
-    float* wk; // (layer, dim, n_kv_heads * head_size)
-    float* wv; // (layer, dim, n_kv_heads * head_size)
-    float* wo; // (layer, n_heads * head_size, dim)
-    // weights for ffn
-    float* w1; // (layer, hidden_dim, dim)
-    float* w2; // (layer, dim, hidden_dim)
-    float* w3; // (layer, hidden_dim, dim)
-    // final rmsnorm
-    float* rms_final_weight; // (dim,)
-    // (optional) classifier weights for the logits, on the last layer
-    float* wcls;
+  // token embedding table
+  float* token_embedding_table;    // (vocab_size, dim)
+  // weights for rmsnorms
+  float* rms_att_weight; // (layer, dim) rmsnorm weights
+  float* rms_ffn_weight; // (layer, dim)
+  // weights for matmuls. note dim == n_heads * head_size
+  float* wq; // (layer, dim, n_heads * head_size)
+  float* wk; // (layer, dim, n_kv_heads * head_size)
+  float* wv; // (layer, dim, n_kv_heads * head_size)
+  float* wo; // (layer, n_heads * head_size, dim)
+  // weights for ffn
+  float* w1; // (layer, hidden_dim, dim)
+  float* w2; // (layer, dim, hidden_dim)
+  float* w3; // (layer, hidden_dim, dim)
+  // final rmsnorm
+  float* rms_final_weight; // (dim,)
+  // (optional) classifier weights for the logits, on the last layer
+  float* wcls;
 } TransformerWeights;
 
 typedef struct {
-    // current wave of activations
-    float *x; // activation at current time stamp (dim,)
-    float *xb; // same, but inside a residual branch (dim,)
-    float *xb2; // an additional buffer just for convenience (dim,)
-    float *hb; // buffer for hidden dimension in the ffn (hidden_dim,)
-    float *hb2; // buffer for hidden dimension in the ffn (hidden_dim,)
-    float *q; // query (dim,)
-    float *k; // key (dim,)
-    float *v; // value (dim,)
-    float *att; // buffer for scores/attention values (n_heads, seq_len)
-    float *logits; // output logits
-    // kv cache
-    float* key_cache;   // (layer, seq_len, dim)
-    float* value_cache; // (layer, seq_len, dim)
+  Tensor *tensor_wq;
+  Tensor *tensor_wk;
+  Tensor *tensor_wv;
+
+  // current wave of activations
+  Tensor *tensor_x;
+  // float *x; // activation at current time stamp (dim,)
+  Tensor *tensor_xb;
+  float *xb; // same, but inside a residual branch (dim,)
+  Tensor *tensor_xb2;
+  float *xb2; // an additional buffer just for convenience (dim,)
+  Tensor *tensor_hb;
+  float *hb; // buffer for hidden dimension in the ffn (hidden_dim,)
+  Tensor *tensor_hb2;
+  float *hb2; // buffer for hidden dimension in the ffn (hidden_dim,)
+  Tensor *tensor_q;
+  float *q; // query (dim,)
+  Tensor *tensor_k;
+  float *k; // key (dim,)
+  Tensor *tensor_v;
+  float *v; // value (dim,)
+  float *att; // buffer for scores/attention values (n_heads, seq_len)
+  float *logits; // output logits
+  // kv cache
+  float* key_cache;   // (layer, seq_len, dim)
+  float* value_cache; // (layer, seq_len, dim)
 } RunState;
 
 typedef struct {
-    Config config; // the hyperparameters of the architecture (the blueprint)
-    TransformerWeights weights; // the weights of the model
-    RunState state; // buffers for the "wave" of activations in the forward pass
-    // some more state needed to properly clean up the memory mapping (sigh)
-    int fd; // file descriptor for memory mapping
-    float* data; // memory mapped data pointer
-    ssize_t file_size; // size of the checkpoint file in bytes
+  Config config; // the hyperparameters of the architecture (the blueprint)
+  TransformerWeights weights; // the weights of the model
+  RunState state; // buffers for the "wave" of activations in the forward pass
+  // some more state needed to properly clean up the memory mapping (sigh)
+  int fd; // file descriptor for memory mapping
+  float* data; // memory mapped data pointer
+  ssize_t file_size; // size of the checkpoint file in bytes
 } Transformer;
 
 
-typedef struct {
-    Tensor *tensor_s_xb;
-
-    Tensor *tensor_s_q;
-    Tensor *tensor_s_k;
-    Tensor *tensor_s_v;
-
-    Tensor *tensor_w_wq;
-    Tensor *tensor_w_wk;
-    Tensor *tensor_w_wv;
-
-} Model;
-
-
-Model model;
-
 void malloc_run_state(RunState* s, Config* p) {
-    // we calloc instead of malloc to keep valgrind happy
-    int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
-    s->x = calloc(p->dim, sizeof(float));
-    s->xb = calloc(p->dim, sizeof(float));
-    s->xb2 = calloc(p->dim, sizeof(float));
-    s->hb = calloc(p->hidden_dim, sizeof(float));
-    s->hb2 = calloc(p->hidden_dim, sizeof(float));
-    s->q = calloc(p->dim, sizeof(float));
-    s->key_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
-    s->value_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
-    s->att = calloc(p->n_heads * p->seq_len, sizeof(float));
-    s->logits = calloc(p->vocab_size, sizeof(float));
-    // ensure all mallocs went fine
-    if (!s->x || !s->xb || !s->xb2 || !s->hb || !s->hb2 || !s->q
-     || !s->key_cache || !s->value_cache || !s->att || !s->logits) {
-        fprintf(stderr, "malloc failed!\n");
-        exit(EXIT_FAILURE);
-    }
+  // we calloc instead of malloc to keep valgrind happy
+  int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
+  // s->x = calloc(p->dim, sizeof(float));
+  s->xb = calloc(p->dim, sizeof(float));
+  s->xb2 = calloc(p->dim, sizeof(float));
+  s->hb = calloc(p->hidden_dim, sizeof(float));
+  s->hb2 = calloc(p->hidden_dim, sizeof(float));
+  s->q = calloc(p->dim, sizeof(float));
+  s->key_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
+  s->value_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
+  s->att = calloc(p->n_heads * p->seq_len, sizeof(float));
+  s->logits = calloc(p->vocab_size, sizeof(float));
+  // ensure all mallocs went fine
+  // if (!s->x || !s->xb || !s->xb2 || !s->hb || !s->hb2 || !s->q
+  //   || !s->key_cache || !s->value_cache || !s->att || !s->logits) {
+  //     fprintf(stderr, "malloc failed!\n");
+  //     exit(EXIT_FAILURE);
+  // }
+  
+  s->tensor_x = NN_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
+  s->tensor_xb = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, s->xb);
+  s->tensor_xb2 = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, s->xb2);
+  s->tensor_hb = NN_tensor(1, (size_t[]){p->hidden_dim}, DTYPE_F32, s->xb);
+  s->tensor_hb2 = NN_tensor(1, (size_t[]){p->hidden_dim}, DTYPE_F32, s->xb2);
+
+  s->tensor_q = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, s->q);
+  s->tensor_k = NN_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, s->k);
+  s->tensor_v = NN_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, s->v);
+
+  
+  s->tensor_wq = NN_tensor(2, (size_t[]){p->dim, p->dim}, DTYPE_F32, NULL);
+  s->tensor_wk = NN_tensor(2, (size_t[]){kv_dim, p->dim}, DTYPE_F32, NULL);
+  s->tensor_wv = NN_tensor(2, (size_t[]){kv_dim, p->dim}, DTYPE_F32, NULL);
+  
 }
 
 void free_run_state(RunState* s) {
-    free(s->x);
-    free(s->xb);
-    free(s->xb2);
-    free(s->hb);
-    free(s->hb2);
-    free(s->q);
-    free(s->att);
-    free(s->logits);
-    free(s->key_cache);
-    free(s->value_cache);
+  // free(s->x);
+  free(s->xb);
+  free(s->xb2);
+  free(s->hb);
+  free(s->hb2);
+  free(s->q);
+  free(s->att);
+  free(s->logits);
+  free(s->key_cache);
+  free(s->value_cache);
 }
 
 void memory_map_weights(TransformerWeights *w, Config* p, float* ptr, int shared_weights) {
-    int head_size = p->dim / p->n_heads;
-    // make sure the multiplications below are done in 64bit to fit the parameter counts of 13B+ models
-    unsigned long long n_layers = p->n_layers;
-    w->token_embedding_table = ptr;
-    ptr += p->vocab_size * p->dim;
-    w->rms_att_weight = ptr;
-    ptr += n_layers * p->dim;
-    w->wq = ptr;
-    ptr += n_layers * p->dim * (p->n_heads * head_size);
-    w->wk = ptr;
-    ptr += n_layers * p->dim * (p->n_kv_heads * head_size);
-    w->wv = ptr;
-    ptr += n_layers * p->dim * (p->n_kv_heads * head_size);
-    w->wo = ptr;
-    ptr += n_layers * (p->n_heads * head_size) * p->dim;
-    w->rms_ffn_weight = ptr;
-    ptr += n_layers * p->dim;
-    w->w1 = ptr;
-    ptr += n_layers * p->dim * p->hidden_dim;
-    w->w2 = ptr;
-    ptr += n_layers * p->hidden_dim * p->dim;
-    w->w3 = ptr;
-    ptr += n_layers * p->dim * p->hidden_dim;
-    w->rms_final_weight = ptr;
-    ptr += p->dim;
-    ptr += p->seq_len * head_size / 2; // skip what used to be freq_cis_real (for RoPE)
-    ptr += p->seq_len * head_size / 2; // skip what used to be freq_cis_imag (for RoPE)
-    w->wcls = shared_weights ? w->token_embedding_table : ptr;
+  int head_size = p->dim / p->n_heads;
+  // make sure the multiplications below are done in 64bit to fit the parameter counts of 13B+ models
+  unsigned long long n_layers = p->n_layers;
+  w->token_embedding_table = ptr;
+  ptr += p->vocab_size * p->dim;
+  w->rms_att_weight = ptr;
+  ptr += n_layers * p->dim;
+  w->wq = ptr;
+  ptr += n_layers * p->dim * (p->n_heads * head_size);
+  w->wk = ptr;
+  ptr += n_layers * p->dim * (p->n_kv_heads * head_size);
+  w->wv = ptr;
+  ptr += n_layers * p->dim * (p->n_kv_heads * head_size);
+  w->wo = ptr;
+  ptr += n_layers * (p->n_heads * head_size) * p->dim;
+  w->rms_ffn_weight = ptr;
+  ptr += n_layers * p->dim;
+  w->w1 = ptr;
+  ptr += n_layers * p->dim * p->hidden_dim;
+  w->w2 = ptr;
+  ptr += n_layers * p->hidden_dim * p->dim;
+  w->w3 = ptr;
+  ptr += n_layers * p->dim * p->hidden_dim;
+  w->rms_final_weight = ptr;
+  ptr += p->dim;
+  ptr += p->seq_len * head_size / 2; // skip what used to be freq_cis_real (for RoPE)
+  ptr += p->seq_len * head_size / 2; // skip what used to be freq_cis_imag (for RoPE)
+  w->wcls = shared_weights ? w->token_embedding_table : ptr;
 }
 
 void read_checkpoint(Config* config, TransformerWeights* weights,
-                     int* fd, float** data, ssize_t* file_size) {
-    memcpy(config, checkpoint_data, sizeof(Config));
+                    int* fd, float** data, ssize_t* file_size) {
+  memcpy(config, checkpoint_data, sizeof(Config));
 
-    // negative vocab size is hacky way of signaling unshared weights. bit yikes.
-    int shared_weights = config->vocab_size > 0 ? 1 : 0;
-    config->vocab_size = abs(config->vocab_size);
-    *file_size = (size_t)checkpoint_end - (size_t)checkpoint_start;
+  // negative vocab size is hacky way of signaling unshared weights. bit yikes.
+  int shared_weights = config->vocab_size > 0 ? 1 : 0;
+  config->vocab_size = abs(config->vocab_size);
+  *file_size = (size_t)checkpoint_end - (size_t)checkpoint_start;
 
-    *data = (float *)checkpoint_data;
+  *data = (float *)checkpoint_data;
 
-    float* weights_ptr = *data + sizeof(Config)/sizeof(float);
-    memory_map_weights(weights, config, weights_ptr, shared_weights);
+  float* weights_ptr = *data + sizeof(Config)/sizeof(float);
+  memory_map_weights(weights, config, weights_ptr, shared_weights);
 }
 
 // void init(Model *model) {
@@ -192,67 +204,14 @@ void free_transformer(Transformer* t) {
   free_run_state(&t->state);
 }
 
-// ----------------------------------------------------------------------------
-// neural net blocks; the dynamics of the Transformer
 
-void rmsnorm(float* o, float* x, float* weight, int size) {  
-  Tensor *out = NN_tensor(1, (size_t[]){size}, DTYPE_F32, o);
-  Tensor *x_tensor = NN_tensor(1, (size_t[]){size}, DTYPE_F32, x);
-  Tensor *w_tensor = NN_tensor(1, (size_t[]){size}, DTYPE_F32, weight);
-
-  NN_rms_norm(out, x_tensor, w_tensor, 1e-5);
-}
-
-void softmax(float* x, int size) {
-    // find max value (for numerical stability)
-    // float max_val = x[0];
-    // for (int i = 1; i < size; i++) {
-    //     if (x[i] > max_val) {
-    //         max_val = x[i];
-    //     }
-    // }
-    // // exp and sum
-    // float sum = 0.0f;
-    // for (int i = 0; i < size; i++) {
-    //     x[i] = expf(x[i] - max_val);
-    //     sum += x[i];
-    // }
-    // // normalize
-    // for (int i = 0; i < size; i++) {
-    //     x[i] /= sum;
-    // }
-    Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
-    NN_softmax(out, out, 1);
-}
-
-void matmul(float* xout, float* x, float* w, int n, int d) {
-    // W (d,n) @ x (n,) -> xout (d,)
-    // by far the most amount of time is spent inside this little function
-
-  
-    // int i;
-    // #pragma omp parallel for private(i)
-    // for (i = 0; i < d; i++) {
-    //     float val = 0.0f;
-    //     for (int j = 0; j < n; j++) {
-    //         val += w[i * n + j] * x[j];
-    //     }
-    //     xout[i] = val;
-    // }
-
-    Tensor *out = NN_tensor(2, (size_t[]){d, 1}, DTYPE_F32, xout);
-    Tensor *a = NN_tensor(2, (size_t[]){d, n}, DTYPE_F32, w);
-    Tensor *b = NN_tensor(2, (size_t[]){1, n}, DTYPE_F32, x);
-
-    NN_matmul_t(out, a, b);
-}
 
 float* forward(Transformer* transformer, int token, int pos) {
   // a few convenience variables
   Config* p = &transformer->config;
   TransformerWeights* w = &transformer->weights;
   RunState* s = &transformer->state;
-  float *x = s->x;
+  
   int dim = p->dim;
   int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
   int kv_mul = p->n_heads / p->n_kv_heads; // integer multiplier of the kv sharing in multiquery
@@ -261,18 +220,17 @@ float* forward(Transformer* transformer, int token, int pos) {
 
   // copy the token embedding into x
   float* content_row = w->token_embedding_table + token * dim;
-  memcpy(x, content_row, dim*sizeof(*x));
+  memcpy(s->tensor_x->data, content_row, dim*sizeof(float));
 
-  Tensor *x_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
-  Tensor *s_xb_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, s->xb);
-  Tensor *s_hb_tensor = NN_tensor(1, (size_t[]){hidden_dim}, DTYPE_F32, s->hb);
-  Tensor *s_hb2_tensor = NN_tensor(1, (size_t[]){hidden_dim}, DTYPE_F32, s->hb2);
+  s->tensor_xb->data = s->xb;
+  s->tensor_hb->data = s->hb;
+  s->tensor_hb2->data = s->hb2;
     
   // forward all the layers
   for(unsigned long long l = 0; l < p->n_layers; l++) {
     // attention rmsnorm
     Tensor *w_rms_att_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_att_weight + l*dim);
-    NN_rms_norm(s_xb_tensor, x_tensor, w_rms_att_tensor, 1e-5);
+    NN_rms_norm(s->tensor_xb, s->tensor_x, w_rms_att_tensor, 1e-5);
 
     // key and value point to the kv cache
     int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
@@ -285,17 +243,17 @@ float* forward(Transformer* transformer, int token, int pos) {
       // matmul(s->k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
       // matmul(s->v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
 
-      model.tensor_s_q->data = transformer->state.q;
-      model.tensor_s_k->data = transformer->state.k;
-      model.tensor_s_v->data = transformer->state.v;
+      s->tensor_q->data = transformer->state.q;
+      s->tensor_k->data = transformer->state.k;
+      s->tensor_v->data = transformer->state.v;
 
-      model.tensor_w_wq->data = w->wq + l*dim*dim;
-      model.tensor_w_wk->data = w->wk + l*dim*kv_dim;
-      model.tensor_w_wv->data = w->wv + l*dim*kv_dim;
+      s->tensor_wq->data = w->wq + l*dim*dim;
+      s->tensor_wk->data = w->wk + l*dim*kv_dim;
+      s->tensor_wv->data = w->wv + l*dim*kv_dim;
       
-      NN_matmul(model.tensor_s_q, model.tensor_w_wq, model.tensor_s_xb);
-      NN_matmul(model.tensor_s_k, model.tensor_w_wk, model.tensor_s_xb);
-      NN_matmul(model.tensor_s_v, model.tensor_w_wv, model.tensor_s_xb);
+      NN_matmul(s->tensor_q, s->tensor_wq, s->tensor_xb);
+      NN_matmul(s->tensor_k, s->tensor_wk, s->tensor_xb);
+      NN_matmul(s->tensor_v, s->tensor_wv, s->tensor_xb);
     }
 
 
@@ -361,20 +319,20 @@ float* forward(Transformer* transformer, int token, int pos) {
 
     // final matmul to get the output of the attention
     // matmul(s->xb2, s->xb, w->wo + l*dim*dim, dim, dim);
-    Tensor *s_xb2_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, s->xb2);
+    
     Tensor *wo = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wo + l*dim*dim);
-    NN_matmul(s_xb2_tensor, wo, s_xb_tensor);
+    NN_matmul(s->tensor_xb2, wo, s->tensor_xb);
 
     // residual connection back into x
-    for (int i = 0; i < dim; i++) {
-        x[i] += s->xb2[i];
+    for (int i = 0; i < dim; i += 1) {
+      ((float *)s->tensor_x->data)[i] += ((float *)s->tensor_xb2->data)[i];
     }
 
     // ffn rmsnorm
-    // Tensor *s_xb_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, s->xb);
-    // Tensor *x_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
+    // Tensor *s->tensor_xb = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, s->xb);
+    // Tensor *tensor_x = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
     Tensor *w_rms_ffn_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_ffn_weight + l*dim);
-    NN_rms_norm(s_xb_tensor, x_tensor, w_rms_ffn_tensor, 1e-5);
+    NN_rms_norm(s->tensor_xb, s->tensor_x, w_rms_ffn_tensor, 1e-5);
 
     // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
     // first calculate self.w1(x) and self.w3(x)
@@ -382,34 +340,34 @@ float* forward(Transformer* transformer, int token, int pos) {
     Tensor *w_w3_tensor = NN_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w3 + l*dim*hidden_dim);
     // matmul(s->hb, s->xb, w->w1 + l*dim*hidden_dim, dim, hidden_dim);
     // matmul(s->hb2, s->xb, w->w3 + l*dim*hidden_dim, dim, hidden_dim);
-    NN_matmul(s_hb_tensor, w_w1_tensor, s_xb_tensor);
-    NN_matmul(s_hb2_tensor, w_w3_tensor, s_xb_tensor);
+    NN_matmul(s->tensor_hb, w_w1_tensor, s->tensor_xb);
+    NN_matmul(s->tensor_hb2, w_w3_tensor, s->tensor_xb);
 
     // SwiGLU non-linearity
     for (int i = 0; i < hidden_dim; i++) {
-        float val = s->hb[i];
-        // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
-        val *= (1.0f / (1.0f + expf(-val)));
-        // elementwise multiply with w3(x)
-        val *= s->hb2[i];
-        s->hb[i] = val;
+      float val = s->hb[i];
+      // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
+      val *= (1.0f / (1.0f + expf(-val)));
+      // elementwise multiply with w3(x)
+      val *= s->hb2[i];
+      s->hb[i] = val;
     }
 
     // final matmul to get the output of the ffn
     Tensor *w_w2_tensor = NN_tensor(2, (size_t[]){dim, hidden_dim}, DTYPE_F32, w->w2 + l*dim*hidden_dim);
     // matmul(s->xb, s->hb, w->w2 + l*dim*hidden_dim, hidden_dim, dim);
-    NN_matmul(s_xb_tensor, w_w2_tensor, s_hb_tensor);
+    NN_matmul(s->tensor_xb, w_w2_tensor, s->tensor_hb);
 
     // residual connection
-    for (int i = 0; i < dim; i++) {
-        x[i] += s->xb[i];
+    for (int i = 0; i < dim; i += 1) {
+      ((float *)s->tensor_x->data)[i] += ((float *)s->tensor_xb->data)[i];
     }
   }
 
   // final rmsnorm
-  // Tensor *x_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
+  // Tensor *tensor_x = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
   Tensor *w_rms_final_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_final_weight);
-  NN_rms_norm(x_tensor, x_tensor, w_rms_final_tensor, 1e-5);
+  NN_rms_norm(s->tensor_x, s->tensor_x, w_rms_final_tensor, 1e-5);
 
   // rmsnorm(x, x, w->rms_final_weight, dim);
 
@@ -417,7 +375,7 @@ float* forward(Transformer* transformer, int token, int pos) {
   Tensor *s_logits_tensor = NN_tensor(1, (size_t[]){p->vocab_size}, DTYPE_F32, s->logits);
   Tensor *w_cls_tensor = NN_tensor(2, (size_t[]){p->vocab_size, p->dim}, DTYPE_F32, w->wcls);
   // matmul(s->logits, x, w->wcls, p->dim, p->vocab_size);
-  NN_matmul(s_logits_tensor, w_cls_tensor, x_tensor);
+  NN_matmul(s_logits_tensor, w_cls_tensor, s->tensor_x);
 
   return s->logits;
 }
@@ -743,15 +701,15 @@ void init_sampler(Sampler* sampler, int vocab_size, float temperature, float top
 }
 
 void free_sampler(Sampler* sampler) {
-    free(sampler->probindex);
+  free(sampler->probindex);
 }
 
 unsigned int random_u32(unsigned long long *state) {
-    // xorshift rng: https://en.wikipedia.org/wiki/Xorshift#xorshift.2A
-    *state ^= *state >> 12;
-    *state ^= *state << 25;
-    *state ^= *state >> 27;
-    return (*state * 0x2545F4914F6CDD1Dull) >> 32;
+  // xorshift rng: https://en.wikipedia.org/wiki/Xorshift#xorshift.2A
+  *state ^= *state >> 12;
+  *state ^= *state << 25;
+  *state ^= *state >> 27;
+  return (*state * 0x2545F4914F6CDD1Dull) >> 32;
 }
 float random_f32(unsigned long long *state) { // random float32 in [0,1)
     return (random_u32(state) >> 8) / 16777216.0f;
@@ -812,31 +770,9 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
       exit(EXIT_FAILURE);
   }
 
-  {
-    Config* p = &transformer->config;
-    TransformerWeights* w = &transformer->weights;
-    RunState* s = &transformer->state;
-    float *x = s->x;
-    int dim = p->dim;
-    int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
-    int kv_mul = p->n_heads / p->n_kv_heads; // integer multiplier of the kv sharing in multiquery
-    int hidden_dim =  p->hidden_dim;
-    int head_size = dim / p->n_heads;
-
-    model.tensor_s_xb = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.xb);
-
-    model.tensor_s_q = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.q);
-    model.tensor_s_k = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.k);
-    model.tensor_s_v = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.v);
-
-    
-    model.tensor_w_wq = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wq);
-    model.tensor_w_wk = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wk);
-    model.tensor_w_wv = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wv);
-    
-  }
-
-
+  transformer->state.tensor_wq->data = transformer->weights.wq;
+  transformer->state.tensor_wk->data = transformer->weights.wk;
+  transformer->state.tensor_wv->data = transformer->weights.wv;
 
   // start the main loop
   long start = 0;  // used to time our code, only initialized after first iteration
