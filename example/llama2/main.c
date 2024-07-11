@@ -85,6 +85,23 @@ typedef struct {
     ssize_t file_size; // size of the checkpoint file in bytes
 } Transformer;
 
+
+typedef struct {
+    Tensor *tensor_s_xb;
+
+    Tensor *tensor_s_q;
+    Tensor *tensor_s_k;
+    Tensor *tensor_s_v;
+
+    Tensor *tensor_w_wq;
+    Tensor *tensor_w_wk;
+    Tensor *tensor_w_wv;
+
+} Model;
+
+
+Model model;
+
 void malloc_run_state(RunState* s, Config* p) {
     // we calloc instead of malloc to keep valgrind happy
     int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
@@ -215,24 +232,24 @@ void rmsnorm(float* o, float* x, float* weight, int size) {
 
 void softmax(float* x, int size) {
     // find max value (for numerical stability)
-    float max_val = x[0];
-    for (int i = 1; i < size; i++) {
-        if (x[i] > max_val) {
-            max_val = x[i];
-        }
-    }
-    // exp and sum
-    float sum = 0.0f;
-    for (int i = 0; i < size; i++) {
-        x[i] = expf(x[i] - max_val);
-        sum += x[i];
-    }
-    // normalize
-    for (int i = 0; i < size; i++) {
-        x[i] /= sum;
-    }
-    // Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
-    // NN_softmax(out, out, 1);
+    // float max_val = x[0];
+    // for (int i = 1; i < size; i++) {
+    //     if (x[i] > max_val) {
+    //         max_val = x[i];
+    //     }
+    // }
+    // // exp and sum
+    // float sum = 0.0f;
+    // for (int i = 0; i < size; i++) {
+    //     x[i] = expf(x[i] - max_val);
+    //     sum += x[i];
+    // }
+    // // normalize
+    // for (int i = 0; i < size; i++) {
+    //     x[i] /= sum;
+    // }
+    Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
+    NN_softmax(out, out, 1);
 }
 
 void matmul(float* xout, float* x, float* w, int n, int d) {
@@ -240,21 +257,21 @@ void matmul(float* xout, float* x, float* w, int n, int d) {
     // by far the most amount of time is spent inside this little function
 
   
-    int i;
-    #pragma omp parallel for private(i)
-    for (i = 0; i < d; i++) {
-        float val = 0.0f;
-        for (int j = 0; j < n; j++) {
-            val += w[i * n + j] * x[j];
-        }
-        xout[i] = val;
-    }
+    // int i;
+    // #pragma omp parallel for private(i)
+    // for (i = 0; i < d; i++) {
+    //     float val = 0.0f;
+    //     for (int j = 0; j < n; j++) {
+    //         val += w[i * n + j] * x[j];
+    //     }
+    //     xout[i] = val;
+    // }
 
-    // Tensor *out = NN_tensor(2, (size_t[]){d, 1}, DTYPE_F32, xout);
-    // Tensor *a = NN_tensor(2, (size_t[]){d, n}, DTYPE_F32, w);
-    // Tensor *b = NN_tensor(2, (size_t[]){1, n}, DTYPE_F32, x);
+    Tensor *out = NN_tensor(2, (size_t[]){d, 1}, DTYPE_F32, xout);
+    Tensor *a = NN_tensor(2, (size_t[]){d, n}, DTYPE_F32, w);
+    Tensor *b = NN_tensor(2, (size_t[]){1, n}, DTYPE_F32, x);
 
-    // NN_matmul_t(out, a, b);
+    NN_matmul_t(out, a, b);
 }
 
 float* forward(Transformer* transformer, int token, int pos) {
@@ -286,15 +303,24 @@ float* forward(Transformer* transformer, int token, int pos) {
 
         // qkv matmuls for this position
         
-        // Tensor *tensor_s_q = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, s->q);
-        // Tensor *tensor_s_xb = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, s->xb);
-        // Tensor *tensor_w_wq = NN_tensor(2, (size_t[]){1, dim}, DTYPE_F32, w->wq + l*dim*dim);
-        
-        // NN_matmul_t(tensor_s_q, tensor_s_xb, tensor_w_wq);
 
-        matmul(s->q, s->xb, w->wq + l*dim*dim, dim, dim);
-        matmul(s->k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
-        matmul(s->v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
+        // model.tensor_s_xb->data = transformer->state.xb;
+        
+        model.tensor_s_q->data = transformer->state.q;
+        model.tensor_s_k->data = transformer->state.k;
+        model.tensor_s_v->data = transformer->state.v;
+
+        model.tensor_w_wq->data = w->wq + l*dim*dim;
+        model.tensor_w_wk->data = w->wk + l*dim*kv_dim;
+        model.tensor_w_wv->data = w->wv + l*dim*kv_dim;
+        
+        NN_matmul(model.tensor_s_q, model.tensor_w_wq, model.tensor_s_xb);
+        NN_matmul(model.tensor_s_k, model.tensor_w_wk, model.tensor_s_xb);
+        NN_matmul(model.tensor_s_v, model.tensor_w_wv, model.tensor_s_xb);
+
+        // matmul(s->q, s->xb, w->wq + l*dim*dim, dim, dim);
+        // matmul(s->k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
+        // matmul(s->v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
 
         // RoPE relative positional encoding: complex-valued rotate q and k in each head
         for (int i = 0; i < dim; i+=2) {
@@ -801,6 +827,32 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         exit(EXIT_FAILURE);
     }
 
+    {
+        Config* p = &transformer->config;
+        TransformerWeights* w = &transformer->weights;
+        RunState* s = &transformer->state;
+        float *x = s->x;
+        int dim = p->dim;
+        int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
+        int kv_mul = p->n_heads / p->n_kv_heads; // integer multiplier of the kv sharing in multiquery
+        int hidden_dim =  p->hidden_dim;
+        int head_size = dim / p->n_heads;
+
+        model.tensor_s_xb = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.xb);
+
+        model.tensor_s_q = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.q);
+        model.tensor_s_k = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.k);
+        model.tensor_s_v = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.v);
+
+        
+        model.tensor_w_wq = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wq);
+        model.tensor_w_wk = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wk);
+        model.tensor_w_wv = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wv);
+        
+    }
+
+
+
     // start the main loop
     long start = 0;  // used to time our code, only initialized after first iteration
     int next;        // will store the next token in the sequence
@@ -812,7 +864,7 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         size_t cycles = READ_CSR("mcycle");
         float* logits = forward(transformer, token, pos);
         cycles = READ_CSR("mcycle") - cycles;
-        printf("forward taking %d cycles\n", cycles);
+        printf("forward taking %ld cycles\n", cycles);
 
         // advance the state machine
         if (pos < num_prompt_tokens - 1) {
