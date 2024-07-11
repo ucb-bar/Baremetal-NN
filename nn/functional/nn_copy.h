@@ -10,6 +10,8 @@
 /**
  * Copies values from one tensor to another
  * 
+ * If the data types of the two tensors are different, the values are casted to the destination data type
+ * 
  * @param dst: destination tensor
  * @param src: source tensor
  */
