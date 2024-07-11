@@ -58,6 +58,7 @@ if (RVV)
     ./impl/rvv/mul.c
     ./impl/rvv/mul1.c
     ./impl/rvv/neg.c
+    ./impl/rvv/rms_norm.c
     ./impl/rvv/sub.c
     ./impl/rvv/transpose.c
     )
@@ -97,6 +98,7 @@ add_library(nn
   ./functional/nn_min.c
   ./functional/nn_minimum.c
   ./functional/nn_mul.c
+  ./functional/nn_mv.c
   ./functional/nn_neg.c
   ./functional/nn_relu.c
   ./functional/nn_relu6.c

@@ -1,13 +1,20 @@
 
 #include "nn_rms_norm.h"
 
-void NN_rms_norm(Tensor *y, Tensor *x, Tensor *w) {
+void NN_rms_norm(Tensor *y, Tensor *x, Tensor *w, float eps) {
+  assert(y->ndim == 1);
+  assert(x->ndim == 1);
+  assert(w->ndim == 1);
+  assert(y->size == x->size);
+  assert(y->size == w->size);
+
   switch (x->dtype) {
     case DTYPE_F32:
-      NN__rms_norm_f32(x->shape[0] * x->shape[1],
+      NN__rms_norm_f32(y->shape[0],
         (float *)y->data, 1,
         (float *)x->data, 1,
-        (float *)w->data, 1
+        (float *)w->data, 1,
+        &eps
       );
       return;
 
