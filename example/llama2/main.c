@@ -195,25 +195,12 @@ void free_transformer(Transformer* t) {
 // ----------------------------------------------------------------------------
 // neural net blocks; the dynamics of the Transformer
 
-void rmsnorm(float* o, float* x, float* weight, int size) {
-  // // calculate sum of squares
-  // float ss = 0.0f;
-  // for (int j = 0; j < size; j++) {
-  //     ss += x[j] * x[j];
-  // }
-  // ss /= size;
-  // ss += 1e-5f;
-  // ss = 1.0f / sqrtf(ss);
-  // // normalize and scale
-  // for (int j = 0; j < size; j++) {
-  //     o[j] = weight[j] * (ss * x[j]);
-  // }
-  
-  Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, o);
-  Tensor *x_tensor = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
-  Tensor *w_tensor = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, weight);
+void rmsnorm(float* o, float* x, float* weight, int size) {  
+  Tensor *out = NN_tensor(1, (size_t[]){size}, DTYPE_F32, o);
+  Tensor *x_tensor = NN_tensor(1, (size_t[]){size}, DTYPE_F32, x);
+  Tensor *w_tensor = NN_tensor(1, (size_t[]){size}, DTYPE_F32, weight);
 
-  NN_rms_norm(out, x_tensor, w_tensor);
+  NN_rms_norm(out, x_tensor, w_tensor, 1e-5);
 }
 
 void softmax(float* x, int size) {
@@ -276,11 +263,16 @@ float* forward(Transformer* transformer, int token, int pos) {
   float* content_row = w->token_embedding_table + token * dim;
   memcpy(x, content_row, dim*sizeof(*x));
 
+  Tensor *x_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
+  Tensor *s_xb_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, s->xb);
+  Tensor *s_hb_tensor = NN_tensor(1, (size_t[]){hidden_dim}, DTYPE_F32, s->hb);
+  Tensor *s_hb2_tensor = NN_tensor(1, (size_t[]){hidden_dim}, DTYPE_F32, s->hb2);
+    
   // forward all the layers
   for(unsigned long long l = 0; l < p->n_layers; l++) {
-
     // attention rmsnorm
-    rmsnorm(s->xb, x, w->rms_att_weight + l*dim, dim);
+    Tensor *w_rms_att_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_att_weight + l*dim);
+    NN_rms_norm(s_xb_tensor, x_tensor, w_rms_att_tensor, 1e-5);
 
     // key and value point to the kv cache
     int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
@@ -368,7 +360,10 @@ float* forward(Transformer* transformer, int token, int pos) {
     }
 
     // final matmul to get the output of the attention
-    matmul(s->xb2, s->xb, w->wo + l*dim*dim, dim, dim);
+    // matmul(s->xb2, s->xb, w->wo + l*dim*dim, dim, dim);
+    Tensor *s_xb2_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, s->xb2);
+    Tensor *wo = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wo + l*dim*dim);
+    NN_matmul(s_xb2_tensor, wo, s_xb_tensor);
 
     // residual connection back into x
     for (int i = 0; i < dim; i++) {
@@ -376,12 +371,19 @@ float* forward(Transformer* transformer, int token, int pos) {
     }
 
     // ffn rmsnorm
-    rmsnorm(s->xb, x, w->rms_ffn_weight + l*dim, dim);
+    // Tensor *s_xb_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, s->xb);
+    // Tensor *x_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
+    Tensor *w_rms_ffn_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_ffn_weight + l*dim);
+    NN_rms_norm(s_xb_tensor, x_tensor, w_rms_ffn_tensor, 1e-5);
 
     // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
     // first calculate self.w1(x) and self.w3(x)
-    matmul(s->hb, s->xb, w->w1 + l*dim*hidden_dim, dim, hidden_dim);
-    matmul(s->hb2, s->xb, w->w3 + l*dim*hidden_dim, dim, hidden_dim);
+    Tensor *w_w1_tensor = NN_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w1 + l*dim*hidden_dim);
+    Tensor *w_w3_tensor = NN_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w3 + l*dim*hidden_dim);
+    // matmul(s->hb, s->xb, w->w1 + l*dim*hidden_dim, dim, hidden_dim);
+    // matmul(s->hb2, s->xb, w->w3 + l*dim*hidden_dim, dim, hidden_dim);
+    NN_matmul(s_hb_tensor, w_w1_tensor, s_xb_tensor);
+    NN_matmul(s_hb2_tensor, w_w3_tensor, s_xb_tensor);
 
     // SwiGLU non-linearity
     for (int i = 0; i < hidden_dim; i++) {
@@ -394,7 +396,9 @@ float* forward(Transformer* transformer, int token, int pos) {
     }
 
     // final matmul to get the output of the ffn
-    matmul(s->xb, s->hb, w->w2 + l*dim*hidden_dim, hidden_dim, dim);
+    Tensor *w_w2_tensor = NN_tensor(2, (size_t[]){dim, hidden_dim}, DTYPE_F32, w->w2 + l*dim*hidden_dim);
+    // matmul(s->xb, s->hb, w->w2 + l*dim*hidden_dim, hidden_dim, dim);
+    NN_matmul(s_xb_tensor, w_w2_tensor, s_hb_tensor);
 
     // residual connection
     for (int i = 0; i < dim; i++) {
@@ -403,10 +407,18 @@ float* forward(Transformer* transformer, int token, int pos) {
   }
 
   // final rmsnorm
-  rmsnorm(x, x, w->rms_final_weight, dim);
+  // Tensor *x_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, x);
+  Tensor *w_rms_final_tensor = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_final_weight);
+  NN_rms_norm(x_tensor, x_tensor, w_rms_final_tensor, 1e-5);
+
+  // rmsnorm(x, x, w->rms_final_weight, dim);
 
   // classifier into logits
-  matmul(s->logits, x, w->wcls, p->dim, p->vocab_size);
+  Tensor *s_logits_tensor = NN_tensor(1, (size_t[]){p->vocab_size}, DTYPE_F32, s->logits);
+  Tensor *w_cls_tensor = NN_tensor(2, (size_t[]){p->vocab_size, p->dim}, DTYPE_F32, w->wcls);
+  // matmul(s->logits, x, w->wcls, p->dim, p->vocab_size);
+  NN_matmul(s_logits_tensor, w_cls_tensor, x_tensor);
+
   return s->logits;
 }
 

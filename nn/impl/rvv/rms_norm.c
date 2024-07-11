@@ -6,16 +6,22 @@
 
 void NN__rms_norm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw, float eps) {
   // calculate sum of squares
-  float ss;
-  NN__sqr_f32(n, y, incy, x, incx);
-  NN__sum_f32(n, &ss, y, incy);
-
+  
+  float ss = 0.0f;
+  
+  // this is somehow not working
+  // NN__sqr_f32(n, y, incy, x, incx);
+  // NN__sum_f32(n, &ss, y, incy);
+  
+  for (size_t i = 0; i < n; i += 1) {
+    ss += x[i * incx] * x[i * incx];
+  }
   ss /= n;
   ss += eps;
-  ss = 1.0f / sqrtf(ss);
 
   // normalize and scale
-  NN__mul1_f32(n, y, incy, x, incx, ss);
+  // y = (x / ss) * w
+  NN__mul1_f32(n, y, incy, x, incx, 1.0f / sqrtf(ss));
   NN__mul_f32(n, y, incy, y, incy, w, incw);
 }
 
