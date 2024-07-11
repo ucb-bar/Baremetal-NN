@@ -13,6 +13,7 @@
 // Transformer model
 
 #include "nn.h"
+#include "rv.h"
 
 
 // load the weight data block from the model.bin file
@@ -173,7 +174,7 @@ void read_checkpoint(Config* config, TransformerWeights* weights,
     // *data = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, *fd, 0);
     // if (*data == MAP_FAILED) { fprintf(stderr, "mmap failed!\n"); exit(EXIT_FAILURE); }
 
-    *data = checkpoint_data;
+    *data = (float *)checkpoint_data;
 
     float* weights_ptr = *data + sizeof(Config)/sizeof(float);
     memory_map_weights(weights, config, weights_ptr, shared_weights);
@@ -213,52 +214,50 @@ void rmsnorm(float* o, float* x, float* weight, int size) {
 }
 
 void softmax(float* x, int size) {
-    // // find max value (for numerical stability)
-    // float max_val = x[0];
-    // for (int i = 1; i < size; i++) {
-    //     if (x[i] > max_val) {
-    //         max_val = x[i];
-    //     }
-    // }
-    // // exp and sum
-    // float sum = 0.0f;
-    // for (int i = 0; i < size; i++) {
-    //     x[i] = expf(x[i] - max_val);
-    //     sum += x[i];
-    // }
-    // // normalize
-    // for (int i = 0; i < size; i++) {
-    //     x[i] /= sum;
-    // }
-    Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
-    NN_softmax(out, out, 0);
+    // find max value (for numerical stability)
+    float max_val = x[0];
+    for (int i = 1; i < size; i++) {
+        if (x[i] > max_val) {
+            max_val = x[i];
+        }
+    }
+    // exp and sum
+    float sum = 0.0f;
+    for (int i = 0; i < size; i++) {
+        x[i] = expf(x[i] - max_val);
+        sum += x[i];
+    }
+    // normalize
+    for (int i = 0; i < size; i++) {
+        x[i] /= sum;
+    }
+    // Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
+    // NN_softmax(out, out, 1);
 }
 
 void matmul(float* xout, float* x, float* w, int n, int d) {
     // W (d,n) @ x (n,) -> xout (d,)
     // by far the most amount of time is spent inside this little function
 
-    Tensor *out = NN_tensor(2, (size_t[]){d, 1}, DTYPE_F32, xout);
-    Tensor *a = NN_tensor(2, (size_t[]){d, n}, DTYPE_F32, w);
-    Tensor *b = NN_tensor(2, (size_t[]){1, n}, DTYPE_F32, x);
+  
+    int i;
+    #pragma omp parallel for private(i)
+    for (i = 0; i < d; i++) {
+        float val = 0.0f;
+        for (int j = 0; j < n; j++) {
+            val += w[i * n + j] * x[j];
+        }
+        xout[i] = val;
+    }
 
+    // Tensor *out = NN_tensor(2, (size_t[]){d, 1}, DTYPE_F32, xout);
+    // Tensor *a = NN_tensor(2, (size_t[]){d, n}, DTYPE_F32, w);
+    // Tensor *b = NN_tensor(2, (size_t[]){1, n}, DTYPE_F32, x);
 
-    NN_matmul_t(out, a, b);
-
-
-    // int i;
-    // #pragma omp parallel for private(i)
-    // for (i = 0; i < d; i++) {
-    //     float val = 0.0f;
-    //     for (int j = 0; j < n; j++) {
-    //         val += w[i * n + j] * x[j];
-    //     }
-    //     xout[i] = val;
-    // }
+    // NN_matmul_t(out, a, b);
 }
 
 float* forward(Transformer* transformer, int token, int pos) {
-
     // a few convenience variables
     Config* p = &transformer->config;
     TransformerWeights* w = &transformer->weights;
@@ -286,6 +285,13 @@ float* forward(Transformer* transformer, int token, int pos) {
         s->v = s->value_cache + loff + pos * kv_dim;
 
         // qkv matmuls for this position
+        
+        // Tensor *tensor_s_q = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, s->q);
+        // Tensor *tensor_s_xb = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, s->xb);
+        // Tensor *tensor_w_wq = NN_tensor(2, (size_t[]){1, dim}, DTYPE_F32, w->wq + l*dim*dim);
+        
+        // NN_matmul_t(tensor_s_q, tensor_s_xb, tensor_w_wq);
+
         matmul(s->q, s->xb, w->wq + l*dim*dim, dim, dim);
         matmul(s->k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
         matmul(s->v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
@@ -330,7 +336,10 @@ float* forward(Transformer* transformer, int token, int pos) {
             }
 
             // softmax the scores to get attention weights, from 0..pos inclusively
-            softmax(att, pos + 1);
+            // softmax(att, pos + 1);
+            
+            Tensor *att_tensor = NN_tensor(2, (size_t[]){1, pos + 1}, DTYPE_F32, att);
+            NN_softmax(att_tensor, att_tensor, 1);
 
             // weighted sum of the values, store back into xb
             float* xb = s->xb + h * head_size;
@@ -747,7 +756,11 @@ int sample(Sampler* sampler, float* logits) {
         // apply the temperature to the logits
         for (int q=0; q<sampler->vocab_size; q++) { logits[q] /= sampler->temperature; }
         // apply softmax to the logits to get the probabilities for next token
-        softmax(logits, sampler->vocab_size);
+        // softmax(logits, sampler->vocab_size);
+        
+        Tensor *logits_tensor = NN_tensor(2, (size_t[]){1, sampler->vocab_size}, DTYPE_F32, logits);
+        NN_softmax(logits_tensor, logits_tensor, 1);
+        
         // flip a (float) coin (this is our source of entropy for sampling)
         float coin = random_f32(&sampler->rng_state);
         // we sample from this distribution to get the next token
@@ -796,7 +809,10 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     while (pos < steps) {
 
         // forward the transformer to get logits for the next token
+        size_t cycles = READ_CSR("mcycle");
         float* logits = forward(transformer, token, pos);
+        cycles = READ_CSR("mcycle") - cycles;
+        printf("forward taking %d cycles\n", cycles);
 
         // advance the state machine
         if (pos < num_prompt_tokens - 1) {
