@@ -59,11 +59,8 @@ int main() {
 
   NN_interpolate(img, &model->decode_conv6_2, (float []){0.125, 0.25});
 
-  
-  
   printf("output:\n");
-  show_ASCII_image(img);
-  // showASCIIImage(&model->decode_conv6_2);
+  show_ASCII_image(img, 0, 0);
 
   return 0;
 }
