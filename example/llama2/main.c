@@ -169,27 +169,12 @@ void memory_map_weights(TransformerWeights *w, Config* p, float* ptr, int shared
 
 void read_checkpoint(Config* config, TransformerWeights* weights,
                      int* fd, float** data, ssize_t* file_size) {
-    // use checkpoint_data instead of checkpoint
-    // FILE *file = fopen(checkpoint, "rb");
-    // if (!file) { fprintf(stderr, "Couldn't open file %s\n", checkpoint); exit(EXIT_FAILURE); }
-    // read in the config header
-    // if (fread(config, sizeof(Config), 1, file) != 1) { exit(EXIT_FAILURE); }
     memcpy(config, checkpoint_data, sizeof(Config));
 
     // negative vocab size is hacky way of signaling unshared weights. bit yikes.
     int shared_weights = config->vocab_size > 0 ? 1 : 0;
     config->vocab_size = abs(config->vocab_size);
-    // figure out the file size
-    // fseek(file, 0, SEEK_END); // move file pointer to end of file
-    // *file_size = ftell(file); // get the file size, in bytes
-    // fclose(file);
     *file_size = (size_t)checkpoint_end - (size_t)checkpoint_start;
-
-    // memory map the Transformer weights into the data pointer
-    // *fd = open(checkpoint, O_RDONLY); // open in read only mode
-    // if (*fd == -1) { fprintf(stderr, "open failed!\n"); exit(EXIT_FAILURE); }
-    // *data = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, *fd, 0);
-    // if (*data == MAP_FAILED) { fprintf(stderr, "mmap failed!\n"); exit(EXIT_FAILURE); }
 
     *data = (float *)checkpoint_data;
 
@@ -197,37 +182,38 @@ void read_checkpoint(Config* config, TransformerWeights* weights,
     memory_map_weights(weights, config, weights_ptr, shared_weights);
 }
 
-void build_transformer(Transformer *t) {
-    // read in the Config and the Weights from the checkpoint
-    read_checkpoint(&t->config, &t->weights, &t->fd, &t->data, &t->file_size);
-    // allocate the RunState buffers
-    malloc_run_state(&t->state, &t->config);
+// void init(Model *model) {
+void init_transformer(Transformer *t) {
+  read_checkpoint(&t->config, &t->weights, &t->fd, &t->data, &t->file_size);
+  malloc_run_state(&t->state, &t->config);
 }
 
 void free_transformer(Transformer* t) {
-    // close the memory mapping
-    // if (t->data != MAP_FAILED) { munmap(t->data, t->file_size); }
-    // if (t->fd != -1) { close(t->fd); }
-    // free the RunState buffers
-    free_run_state(&t->state);
+  free_run_state(&t->state);
 }
 
 // ----------------------------------------------------------------------------
 // neural net blocks; the dynamics of the Transformer
 
 void rmsnorm(float* o, float* x, float* weight, int size) {
-    // calculate sum of squares
-    float ss = 0.0f;
-    for (int j = 0; j < size; j++) {
-        ss += x[j] * x[j];
-    }
-    ss /= size;
-    ss += 1e-5f;
-    ss = 1.0f / sqrtf(ss);
-    // normalize and scale
-    for (int j = 0; j < size; j++) {
-        o[j] = weight[j] * (ss * x[j]);
-    }
+  // // calculate sum of squares
+  // float ss = 0.0f;
+  // for (int j = 0; j < size; j++) {
+  //     ss += x[j] * x[j];
+  // }
+  // ss /= size;
+  // ss += 1e-5f;
+  // ss = 1.0f / sqrtf(ss);
+  // // normalize and scale
+  // for (int j = 0; j < size; j++) {
+  //     o[j] = weight[j] * (ss * x[j]);
+  // }
+  
+  Tensor *out = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, o);
+  Tensor *x_tensor = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, x);
+  Tensor *w_tensor = NN_tensor(2, (size_t[]){1, size}, DTYPE_F32, weight);
+
+  NN_rms_norm(out, x_tensor, w_tensor);
 }
 
 void softmax(float* x, int size) {
@@ -275,154 +261,153 @@ void matmul(float* xout, float* x, float* w, int n, int d) {
 }
 
 float* forward(Transformer* transformer, int token, int pos) {
-    // a few convenience variables
-    Config* p = &transformer->config;
-    TransformerWeights* w = &transformer->weights;
-    RunState* s = &transformer->state;
-    float *x = s->x;
-    int dim = p->dim;
-    int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
-    int kv_mul = p->n_heads / p->n_kv_heads; // integer multiplier of the kv sharing in multiquery
-    int hidden_dim =  p->hidden_dim;
-    int head_size = dim / p->n_heads;
+  // a few convenience variables
+  Config* p = &transformer->config;
+  TransformerWeights* w = &transformer->weights;
+  RunState* s = &transformer->state;
+  float *x = s->x;
+  int dim = p->dim;
+  int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
+  int kv_mul = p->n_heads / p->n_kv_heads; // integer multiplier of the kv sharing in multiquery
+  int hidden_dim =  p->hidden_dim;
+  int head_size = dim / p->n_heads;
 
-    // copy the token embedding into x
-    float* content_row = w->token_embedding_table + token * dim;
-    memcpy(x, content_row, dim*sizeof(*x));
+  // copy the token embedding into x
+  float* content_row = w->token_embedding_table + token * dim;
+  memcpy(x, content_row, dim*sizeof(*x));
 
-    // forward all the layers
-    for(unsigned long long l = 0; l < p->n_layers; l++) {
+  // forward all the layers
+  for(unsigned long long l = 0; l < p->n_layers; l++) {
 
-        // attention rmsnorm
-        rmsnorm(s->xb, x, w->rms_att_weight + l*dim, dim);
+    // attention rmsnorm
+    rmsnorm(s->xb, x, w->rms_att_weight + l*dim, dim);
 
-        // key and value point to the kv cache
-        int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
-        s->k = s->key_cache + loff + pos * kv_dim;
-        s->v = s->value_cache + loff + pos * kv_dim;
+    // key and value point to the kv cache
+    int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
+    s->k = s->key_cache + loff + pos * kv_dim;
+    s->v = s->value_cache + loff + pos * kv_dim;
 
-        // qkv matmuls for this position
-        
+    // qkv matmuls for this position
+    {
+      // matmul(s->q, s->xb, w->wq + l*dim*dim, dim, dim);
+      // matmul(s->k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
+      // matmul(s->v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
 
-        // model.tensor_s_xb->data = transformer->state.xb;
-        
-        model.tensor_s_q->data = transformer->state.q;
-        model.tensor_s_k->data = transformer->state.k;
-        model.tensor_s_v->data = transformer->state.v;
+      model.tensor_s_q->data = transformer->state.q;
+      model.tensor_s_k->data = transformer->state.k;
+      model.tensor_s_v->data = transformer->state.v;
 
-        model.tensor_w_wq->data = w->wq + l*dim*dim;
-        model.tensor_w_wk->data = w->wk + l*dim*kv_dim;
-        model.tensor_w_wv->data = w->wv + l*dim*kv_dim;
-        
-        NN_matmul(model.tensor_s_q, model.tensor_w_wq, model.tensor_s_xb);
-        NN_matmul(model.tensor_s_k, model.tensor_w_wk, model.tensor_s_xb);
-        NN_matmul(model.tensor_s_v, model.tensor_w_wv, model.tensor_s_xb);
+      model.tensor_w_wq->data = w->wq + l*dim*dim;
+      model.tensor_w_wk->data = w->wk + l*dim*kv_dim;
+      model.tensor_w_wv->data = w->wv + l*dim*kv_dim;
+      
+      NN_matmul(model.tensor_s_q, model.tensor_w_wq, model.tensor_s_xb);
+      NN_matmul(model.tensor_s_k, model.tensor_w_wk, model.tensor_s_xb);
+      NN_matmul(model.tensor_s_v, model.tensor_w_wv, model.tensor_s_xb);
+    }
 
-        // matmul(s->q, s->xb, w->wq + l*dim*dim, dim, dim);
-        // matmul(s->k, s->xb, w->wk + l*dim*kv_dim, dim, kv_dim);
-        // matmul(s->v, s->xb, w->wv + l*dim*kv_dim, dim, kv_dim);
 
-        // RoPE relative positional encoding: complex-valued rotate q and k in each head
-        for (int i = 0; i < dim; i+=2) {
-            int head_dim = i % head_size;
-            float freq = 1.0f / powf(10000.0f, head_dim / (float)head_size);
-            float val = pos * freq;
-            float fcr = cosf(val);
-            float fci = sinf(val);
-            int rotn = i < kv_dim ? 2 : 1; // how many vectors? 2 = q & k, 1 = q only
-            for (int v = 0; v < rotn; v++) {
-                float* vec = v == 0 ? s->q : s->k; // the vector to rotate (query or key)
-                float v0 = vec[i];
-                float v1 = vec[i+1];
-                vec[i]   = v0 * fcr - v1 * fci;
-                vec[i+1] = v0 * fci + v1 * fcr;
-            }
-        }
-
-        // multihead attention. iterate over all heads
-        int h;
-        #pragma omp parallel for private(h)
-        for (h = 0; h < p->n_heads; h++) {
-            // get the query vector for this head
-            float* q = s->q + h * head_size;
-            // attention scores for this head
-            float* att = s->att + h * p->seq_len;
-            // iterate over all timesteps, including the current one
-            for (int t = 0; t <= pos; t++) {
-                // get the key vector for this head and at this timestep
-                float* k = s->key_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
-                // calculate the attention score as the dot product of q and k
-                float score = 0.0f;
-                for (int i = 0; i < head_size; i++) {
-                    score += q[i] * k[i];
-                }
-                score /= sqrtf(head_size);
-                // save the score to the attention buffer
-                att[t] = score;
-            }
-
-            // softmax the scores to get attention weights, from 0..pos inclusively
-            // softmax(att, pos + 1);
-            
-            Tensor *att_tensor = NN_tensor(2, (size_t[]){1, pos + 1}, DTYPE_F32, att);
-            NN_softmax(att_tensor, att_tensor, 1);
-
-            // weighted sum of the values, store back into xb
-            float* xb = s->xb + h * head_size;
-            memset(xb, 0, head_size * sizeof(float));
-            for (int t = 0; t <= pos; t++) {
-                // get the value vector for this head and at this timestep
-                float* v = s->value_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
-                // get the attention weight for this timestep
-                float a = att[t];
-                // accumulate the weighted value into xb
-                for (int i = 0; i < head_size; i++) {
-                    xb[i] += a * v[i];
-                }
-            }
-        }
-
-        // final matmul to get the output of the attention
-        matmul(s->xb2, s->xb, w->wo + l*dim*dim, dim, dim);
-
-        // residual connection back into x
-        for (int i = 0; i < dim; i++) {
-            x[i] += s->xb2[i];
-        }
-
-        // ffn rmsnorm
-        rmsnorm(s->xb, x, w->rms_ffn_weight + l*dim, dim);
-
-        // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
-        // first calculate self.w1(x) and self.w3(x)
-        matmul(s->hb, s->xb, w->w1 + l*dim*hidden_dim, dim, hidden_dim);
-        matmul(s->hb2, s->xb, w->w3 + l*dim*hidden_dim, dim, hidden_dim);
-
-        // SwiGLU non-linearity
-        for (int i = 0; i < hidden_dim; i++) {
-            float val = s->hb[i];
-            // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
-            val *= (1.0f / (1.0f + expf(-val)));
-            // elementwise multiply with w3(x)
-            val *= s->hb2[i];
-            s->hb[i] = val;
-        }
-
-        // final matmul to get the output of the ffn
-        matmul(s->xb, s->hb, w->w2 + l*dim*hidden_dim, hidden_dim, dim);
-
-        // residual connection
-        for (int i = 0; i < dim; i++) {
-            x[i] += s->xb[i];
+    // RoPE relative positional encoding: complex-valued rotate q and k in each head
+    for (int i = 0; i < dim; i+=2) {
+        int head_dim = i % head_size;
+        float freq = 1.0f / powf(10000.0f, head_dim / (float)head_size);
+        float val = pos * freq;
+        float fcr = cosf(val);
+        float fci = sinf(val);
+        int rotn = i < kv_dim ? 2 : 1; // how many vectors? 2 = q & k, 1 = q only
+        for (int v = 0; v < rotn; v++) {
+            float* vec = v == 0 ? s->q : s->k; // the vector to rotate (query or key)
+            float v0 = vec[i];
+            float v1 = vec[i+1];
+            vec[i]   = v0 * fcr - v1 * fci;
+            vec[i+1] = v0 * fci + v1 * fcr;
         }
     }
 
-    // final rmsnorm
-    rmsnorm(x, x, w->rms_final_weight, dim);
+    // multihead attention. iterate over all heads
+    int h;
+    #pragma omp parallel for private(h)
+    for (h = 0; h < p->n_heads; h++) {
+        // get the query vector for this head
+        float* q = s->q + h * head_size;
+        // attention scores for this head
+        float* att = s->att + h * p->seq_len;
+        // iterate over all timesteps, including the current one
+        for (int t = 0; t <= pos; t++) {
+            // get the key vector for this head and at this timestep
+            float* k = s->key_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
+            // calculate the attention score as the dot product of q and k
+            float score = 0.0f;
+            for (int i = 0; i < head_size; i++) {
+                score += q[i] * k[i];
+            }
+            score /= sqrtf(head_size);
+            // save the score to the attention buffer
+            att[t] = score;
+        }
 
-    // classifier into logits
-    matmul(s->logits, x, w->wcls, p->dim, p->vocab_size);
-    return s->logits;
+        // softmax the scores to get attention weights, from 0..pos inclusively
+        // softmax(att, pos + 1);
+        
+        Tensor *att_tensor = NN_tensor(2, (size_t[]){1, pos + 1}, DTYPE_F32, att);
+        NN_softmax(att_tensor, att_tensor, 1);
+
+        // weighted sum of the values, store back into xb
+        float* xb = s->xb + h * head_size;
+        memset(xb, 0, head_size * sizeof(float));
+        for (int t = 0; t <= pos; t++) {
+            // get the value vector for this head and at this timestep
+            float* v = s->value_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
+            // get the attention weight for this timestep
+            float a = att[t];
+            // accumulate the weighted value into xb
+            for (int i = 0; i < head_size; i++) {
+                xb[i] += a * v[i];
+            }
+        }
+    }
+
+    // final matmul to get the output of the attention
+    matmul(s->xb2, s->xb, w->wo + l*dim*dim, dim, dim);
+
+    // residual connection back into x
+    for (int i = 0; i < dim; i++) {
+        x[i] += s->xb2[i];
+    }
+
+    // ffn rmsnorm
+    rmsnorm(s->xb, x, w->rms_ffn_weight + l*dim, dim);
+
+    // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
+    // first calculate self.w1(x) and self.w3(x)
+    matmul(s->hb, s->xb, w->w1 + l*dim*hidden_dim, dim, hidden_dim);
+    matmul(s->hb2, s->xb, w->w3 + l*dim*hidden_dim, dim, hidden_dim);
+
+    // SwiGLU non-linearity
+    for (int i = 0; i < hidden_dim; i++) {
+        float val = s->hb[i];
+        // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
+        val *= (1.0f / (1.0f + expf(-val)));
+        // elementwise multiply with w3(x)
+        val *= s->hb2[i];
+        s->hb[i] = val;
+    }
+
+    // final matmul to get the output of the ffn
+    matmul(s->xb, s->hb, w->w2 + l*dim*hidden_dim, hidden_dim, dim);
+
+    // residual connection
+    for (int i = 0; i < dim; i++) {
+        x[i] += s->xb[i];
+    }
+  }
+
+  // final rmsnorm
+  rmsnorm(x, x, w->rms_final_weight, dim);
+
+  // classifier into logits
+  matmul(s->logits, x, w->wcls, p->dim, p->vocab_size);
+  return s->logits;
 }
 
 // ----------------------------------------------------------------------------
@@ -446,91 +431,79 @@ int compare_tokens(const void *a, const void *b) {
     return strcmp(((TokenIndex*)a)->str, ((TokenIndex*)b)->str);
 }
 
-void build_tokenizer(Tokenizer* t, int vocab_size) {
-    // i should have written the vocab_size into the tokenizer file... sigh
-    t->vocab_size = vocab_size;
-    // malloc space to hold the scores and the strings
-    t->vocab = (char**)malloc(vocab_size * sizeof(char*));
-    t->vocab_scores = (float*)malloc(vocab_size * sizeof(float));
-    t->sorted_vocab = NULL; // initialized lazily
-    for (int i = 0; i < 256; i++) {
-        t->byte_pieces[i * 2] = (unsigned char)i;
-        t->byte_pieces[i * 2 + 1] = '\0';
-    }
-    // read in the file
+void init_tokenizer(Tokenizer* t, int vocab_size) {
+  // i should have written the vocab_size into the tokenizer file... sigh
+  t->vocab_size = vocab_size;
+  // malloc space to hold the scores and the strings
+  t->vocab = (char**)malloc(vocab_size * sizeof(char*));
+  t->vocab_scores = (float*)malloc(vocab_size * sizeof(float));
+  t->sorted_vocab = NULL; // initialized lazily
+  for (int i = 0; i < 256; i++) {
+    t->byte_pieces[i * 2] = (unsigned char)i;
+    t->byte_pieces[i * 2 + 1] = '\0';
+  }
 
-    char *tokenizer_ptr = tokenizer_data;
+  char *tokenizer_ptr = tokenizer_data;
 
-    // read from tokenizer_data instead of tokenizer_path
+  t->max_token_length = *(int*)tokenizer_ptr;
+  tokenizer_ptr += sizeof(int);
 
-    // FILE *file = fopen(tokenizer_path, "rb");
-    // if (!file) { fprintf(stderr, "couldn't load %s\n", tokenizer_path); exit(EXIT_FAILURE); }
-    // if (fread(&t->max_token_length, sizeof(int), 1, file) != 1) { fprintf(stderr, "failed read\n"); exit(EXIT_FAILURE); }
-    t->max_token_length = *(int*)tokenizer_ptr;
+  int len;
+  for (int i = 0; i < vocab_size; i++) {
+    t->vocab_scores[i] = *(float*)(tokenizer_ptr);
+    tokenizer_ptr += sizeof(float);
+
+    len = *(int*)(tokenizer_ptr);
     tokenizer_ptr += sizeof(int);
 
-    int len;
-    for (int i = 0; i < vocab_size; i++) {
-        // if (fread(t->vocab_scores + i, sizeof(float), 1, file) != 1) { fprintf(stderr, "failed read\n"); exit(EXIT_FAILURE);}
-        t->vocab_scores[i] = *(float*)(tokenizer_ptr);
-        tokenizer_ptr += sizeof(float);
-  
+    t->vocab[i] = (char *)malloc(len + 1);
+    
+    memcpy(t->vocab[i], tokenizer_ptr, len);
+    tokenizer_ptr += len;
 
-        // if (fread(&len, sizeof(int), 1, file) != 1) { fprintf(stderr, "failed read\n"); exit(EXIT_FAILURE); }
-        len = *(int*)(tokenizer_ptr);
-        tokenizer_ptr += sizeof(int);
-
-        t->vocab[i] = (char *)malloc(len + 1);
-        
-        // if (fread(t->vocab[i], len, 1, file) != 1) { fprintf(stderr, "failed read\n"); exit(EXIT_FAILURE); }
-        memcpy(t->vocab[i], tokenizer_ptr, len);
-        tokenizer_ptr += len;
-
-        t->vocab[i][len] = '\0'; // add the string terminating token
-    }
-
-    // fclose(file);
+    t->vocab[i][len] = '\0'; // add the string terminating token
+  }
 }
 
 void free_tokenizer(Tokenizer* t) {
-    for (int i = 0; i < t->vocab_size; i++) { free(t->vocab[i]); }
-    free(t->vocab);
-    free(t->vocab_scores);
-    free(t->sorted_vocab);
+  for (int i = 0; i < t->vocab_size; i++) { free(t->vocab[i]); }
+  free(t->vocab);
+  free(t->vocab_scores);
+  free(t->sorted_vocab);
 }
 
 char* decode(Tokenizer* t, int prev_token, int token) {
-    char *piece = t->vocab[token];
-    // following BOS (1) token, sentencepiece decoder strips any leading whitespace (see PR #89)
-    if (prev_token == 1 && piece[0] == ' ') { piece++; }
-    // careful, some tokens designate raw bytes, and look like e.g. '<0x01>'
-    // parse this and convert and return the actual byte
-    unsigned char byte_val;
-    if (sscanf(piece, "<0x%02hhX>", &byte_val) == 1) {
-        piece = (char*)t->byte_pieces + byte_val * 2;
-    }
-    return piece;
+  char *piece = t->vocab[token];
+  // following BOS (1) token, sentencepiece decoder strips any leading whitespace (see PR #89)
+  if (prev_token == 1 && piece[0] == ' ') { piece++; }
+  // careful, some tokens designate raw bytes, and look like e.g. '<0x01>'
+  // parse this and convert and return the actual byte
+  unsigned char byte_val;
+  if (sscanf(piece, "<0x%02hhX>", &byte_val) == 1) {
+    piece = (char*)t->byte_pieces + byte_val * 2;
+  }
+  return piece;
 }
 
 void safe_printf(char *piece) {
-    // piece might be a raw byte token, and we only want to print printable chars or whitespace
-    // because some of the other bytes can be various control codes, backspace, etc.
-    if (piece == NULL) { return; }
-    if (piece[0] == '\0') { return; }
-    if (piece[1] == '\0') {
-        unsigned char byte_val = piece[0];
-        if (!(isprint(byte_val) || isspace(byte_val))) {
-            return; // bad byte, don't print it
-        }
-    }
-    printf("%s", piece);
+  // piece might be a raw byte token, and we only want to print printable chars or whitespace
+  // because some of the other bytes can be various control codes, backspace, etc.
+  if (piece == NULL) { return; }
+  if (piece[0] == '\0') { return; }
+  if (piece[1] == '\0') {
+      unsigned char byte_val = piece[0];
+      if (!(isprint(byte_val) || isspace(byte_val))) {
+          return; // bad byte, don't print it
+      }
+  }
+  printf("%s", piece);
 }
 
 int str_lookup(char *str, TokenIndex *sorted_vocab, int vocab_size) {
-    // efficiently find the perfect match for str in vocab, return its index or -1 if not found
-    TokenIndex tok = { .str = str }; // acts as the key to search for
-    TokenIndex *res = bsearch(&tok, sorted_vocab, vocab_size, sizeof(TokenIndex), compare_tokens);
-    return res != NULL ? res->id : -1;
+  // efficiently find the perfect match for str in vocab, return its index or -1 if not found
+  TokenIndex tok = { .str = str }; // acts as the key to search for
+  TokenIndex *res = bsearch(&tok, sorted_vocab, vocab_size, sizeof(TokenIndex), compare_tokens);
+  return res != NULL ? res->id : -1;
 }
 
 void encode(Tokenizer* t, char *text, int8_t bos, int8_t eos, int *tokens, int *n_tokens) {
@@ -748,13 +721,13 @@ int sample_topp(float* probabilities, int n, float topp, ProbIndex* probindex, f
     return probindex[last_idx].index; // in case of rounding errors
 }
 
-void build_sampler(Sampler* sampler, int vocab_size, float temperature, float topp, unsigned long long rng_seed) {
-    sampler->vocab_size = vocab_size;
-    sampler->temperature = temperature;
-    sampler->topp = topp;
-    sampler->rng_state = rng_seed;
-    // buffer only used with nucleus sampling; may not need but it's ~small
-    sampler->probindex = malloc(sampler->vocab_size * sizeof(ProbIndex));
+void init_sampler(Sampler* sampler, int vocab_size, float temperature, float topp, unsigned long long rng_seed) {
+  sampler->vocab_size = vocab_size;
+  sampler->temperature = temperature;
+  sampler->topp = topp;
+  sampler->rng_state = rng_seed;
+  // buffer only used with nucleus sampling; may not need but it's ~small
+  sampler->probindex = malloc(sampler->vocab_size * sizeof(ProbIndex));
 }
 
 void free_sampler(Sampler* sampler) {
@@ -815,89 +788,89 @@ long time_in_ms() {
 // generation loop
 
 void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, char *prompt, int steps) {
-    char *empty_prompt = "";
-    if (prompt == NULL) { prompt = empty_prompt; }
+  char *empty_prompt = "";
+  if (prompt == NULL) { prompt = empty_prompt; }
 
-    // encode the (string) prompt into tokens sequence
-    int num_prompt_tokens = 0;
-    int* prompt_tokens = (int*)malloc((strlen(prompt)+3) * sizeof(int)); // +3 for '\0', ?BOS, ?EOS
-    encode(tokenizer, prompt, 1, 0, prompt_tokens, &num_prompt_tokens);
-    if (num_prompt_tokens < 1) {
-        fprintf(stderr, "something is wrong, expected at least 1 prompt token\n");
-        exit(EXIT_FAILURE);
+  // encode the (string) prompt into tokens sequence
+  int num_prompt_tokens = 0;
+  int* prompt_tokens = (int*)malloc((strlen(prompt)+3) * sizeof(int)); // +3 for '\0', ?BOS, ?EOS
+  encode(tokenizer, prompt, 1, 0, prompt_tokens, &num_prompt_tokens);
+  if (num_prompt_tokens < 1) {
+      fprintf(stderr, "something is wrong, expected at least 1 prompt token\n");
+      exit(EXIT_FAILURE);
+  }
+
+  {
+    Config* p = &transformer->config;
+    TransformerWeights* w = &transformer->weights;
+    RunState* s = &transformer->state;
+    float *x = s->x;
+    int dim = p->dim;
+    int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
+    int kv_mul = p->n_heads / p->n_kv_heads; // integer multiplier of the kv sharing in multiquery
+    int hidden_dim =  p->hidden_dim;
+    int head_size = dim / p->n_heads;
+
+    model.tensor_s_xb = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.xb);
+
+    model.tensor_s_q = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.q);
+    model.tensor_s_k = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.k);
+    model.tensor_s_v = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.v);
+
+    
+    model.tensor_w_wq = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wq);
+    model.tensor_w_wk = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wk);
+    model.tensor_w_wv = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wv);
+    
+  }
+
+
+
+  // start the main loop
+  long start = 0;  // used to time our code, only initialized after first iteration
+  int next;        // will store the next token in the sequence
+  int token = prompt_tokens[0]; // kick off with the first token in the prompt
+  int pos = 0;     // position in the sequence
+  while (pos < steps) {
+
+    // forward the transformer to get logits for the next token
+    size_t cycles = READ_CSR("mcycle");
+    float* logits = forward(transformer, token, pos);
+    cycles = READ_CSR("mcycle") - cycles;
+    printf("forward taking %ld cycles\n", cycles);
+
+    // advance the state machine
+    if (pos < num_prompt_tokens - 1) {
+        // if we are still processing the input prompt, force the next prompt token
+        next = prompt_tokens[pos + 1];
+    } else {
+        // otherwise sample the next token from the logits
+        next = sample(sampler, logits);
     }
+    pos++;
 
-    {
-        Config* p = &transformer->config;
-        TransformerWeights* w = &transformer->weights;
-        RunState* s = &transformer->state;
-        float *x = s->x;
-        int dim = p->dim;
-        int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
-        int kv_mul = p->n_heads / p->n_kv_heads; // integer multiplier of the kv sharing in multiquery
-        int hidden_dim =  p->hidden_dim;
-        int head_size = dim / p->n_heads;
+    // data-dependent terminating condition: the BOS (=1) token delimits sequences
+    if (next == 1) { break; }
 
-        model.tensor_s_xb = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.xb);
-
-        model.tensor_s_q = NN_tensor(2, (size_t[]){dim, 1}, DTYPE_F32, transformer->state.q);
-        model.tensor_s_k = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.k);
-        model.tensor_s_v = NN_tensor(2, (size_t[]){kv_dim, 1}, DTYPE_F32, transformer->state.v);
-
-        
-        model.tensor_w_wq = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wq);
-        model.tensor_w_wk = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wk);
-        model.tensor_w_wv = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wv);
-        
-    }
-
-
-
-    // start the main loop
-    long start = 0;  // used to time our code, only initialized after first iteration
-    int next;        // will store the next token in the sequence
-    int token = prompt_tokens[0]; // kick off with the first token in the prompt
-    int pos = 0;     // position in the sequence
-    while (pos < steps) {
-
-        // forward the transformer to get logits for the next token
-        size_t cycles = READ_CSR("mcycle");
-        float* logits = forward(transformer, token, pos);
-        cycles = READ_CSR("mcycle") - cycles;
-        printf("forward taking %ld cycles\n", cycles);
-
-        // advance the state machine
-        if (pos < num_prompt_tokens - 1) {
-            // if we are still processing the input prompt, force the next prompt token
-            next = prompt_tokens[pos + 1];
-        } else {
-            // otherwise sample the next token from the logits
-            next = sample(sampler, logits);
-        }
-        pos++;
-
-        // data-dependent terminating condition: the BOS (=1) token delimits sequences
-        if (next == 1) { break; }
-
-        // print the token as string, decode it with the Tokenizer object
-        char* piece = decode(tokenizer, token, next);
-        safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
-        // fflush(stdout);
-        printf("\n");
-        token = next;
-
-        // init the timer here because the first iteration can be slower
-        if (start == 0) { start = time_in_ms(); }
-    }
+    // print the token as string, decode it with the Tokenizer object
+    char* piece = decode(tokenizer, token, next);
+    safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
+    // fflush(stdout);
     printf("\n");
+    token = next;
 
-    // report achieved tok/s (pos-1 because the timer starts after first iteration)
-    if (pos > 1) {
-        long end = time_in_ms();
-        fprintf(stderr, "achieved tok/s: %f\n", (pos-1) / (double)(end-start)*1000);
-    }
+    // init the timer here because the first iteration can be slower
+    if (start == 0) { start = time_in_ms(); }
+  }
+  printf("\n");
 
-    free(prompt_tokens);
+  // report achieved tok/s (pos-1 because the timer starts after first iteration)
+  if (pos > 1) {
+      long end = time_in_ms();
+      fprintf(stderr, "achieved tok/s: %f\n", (pos-1) / (double)(end-start)*1000);
+  }
+
+  free(prompt_tokens);
 }
 
 void read_stdin(const char* guide, char* buffer, size_t bufsize) {
@@ -1036,16 +1009,16 @@ int main() {
 
     // build the Transformer via the model .bin file
     Transformer transformer;
-    build_transformer(&transformer);
+    init_transformer(&transformer);
     if (steps == 0 || steps > transformer.config.seq_len) steps = transformer.config.seq_len; // override to ~max length
 
     // build the Tokenizer via the tokenizer .bin file
     Tokenizer tokenizer;
-    build_tokenizer(&tokenizer, transformer.config.vocab_size);
+    init_tokenizer(&tokenizer, transformer.config.vocab_size);
 
     // build the Sampler
     Sampler sampler;
-    build_sampler(&sampler, transformer.config.vocab_size, temperature, topp, rng_seed);
+    init_sampler(&sampler, transformer.config.vocab_size, temperature, topp, rng_seed);
 
     printf("Llama 2: a small transformer model for text generation\n");
     // run!

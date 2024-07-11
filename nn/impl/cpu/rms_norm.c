@@ -1,7 +1,7 @@
-#include "rmsnorm.h"
+#include "rms_norm.h"
 
 
-__attribute__((weak)) void NN__rmsnorm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw) {
+__attribute__((weak)) void NN__rms_norm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw) {
   // calculate sum of squares
   float ss = 0.0f;
   for (size_t i = 0; i < n; i += 1) {

@@ -30,6 +30,7 @@
 #include "nn_neg.h"
 #include "nn_relu.h"
 #include "nn_relu6.h"
+#include "nn_rms_norm.h"
 #include "nn_softmax.h"
 #include "nn_sub.h"
 #include "nn_sum.h"
