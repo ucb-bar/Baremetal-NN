@@ -1,6 +1,4 @@
 
-option(AVX "Use AVX implementation" OFF)
-option(RVV "Use RISCV vector extension implementation" OFF)
 
 set(cpu_impl 
   ./impl/cpu/abs.c
@@ -21,7 +19,7 @@ set(cpu_impl
   ./impl/cpu/mul1.c
   ./impl/cpu/neg.c
   ./impl/cpu/norm.c
-  ./impl/cpu/rmsnorm.c
+  ./impl/cpu/rms_norm.c
   ./impl/cpu/sgn.c
   ./impl/cpu/softmax.c
   ./impl/cpu/sqr.c
@@ -58,6 +56,7 @@ if (RVV)
     ./impl/rvv/mul.c
     ./impl/rvv/mul1.c
     ./impl/rvv/neg.c
+    ./impl/rvv/rms_norm.c
     ./impl/rvv/sub.c
     ./impl/rvv/transpose.c
     )
@@ -97,14 +96,15 @@ add_library(nn
   ./functional/nn_min.c
   ./functional/nn_minimum.c
   ./functional/nn_mul.c
+  ./functional/nn_mv.c
   ./functional/nn_neg.c
   ./functional/nn_relu.c
   ./functional/nn_relu6.c
+  ./functional/nn_rms_norm.c
   ./functional/nn_softmax.c
   ./functional/nn_sub.c
   ./functional/nn_sum.c
   ./functional/nn_transpose.c
-  ./functional/nn_unfold.c
 
   ${rvv_impl}
   ${gemmini_impl}
@@ -117,11 +117,11 @@ target_include_directories(nn PUBLIC
   ./impl)
 
 if (X86)
-  message("NN: Building for x86")
+  message(STATUS "nn: Building for x86")
   target_link_libraries(nn target-x86)
     
 elseif (RISCV)
-  message("NN: Building for RISC-V")
+  message(STATUS "nn: Building for RISC-V")
   target_link_libraries(nn target-riscv)
 endif ()
 

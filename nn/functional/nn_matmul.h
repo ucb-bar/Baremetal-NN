@@ -5,6 +5,7 @@
 
 #include "nn_tensor.h"
 #include "nn_mm.h"
+#include "nn_mv.h"
 
 
 /**

@@ -16,7 +16,7 @@
 #include "termimg.h"
 
 // load the weight data block from the model.bin file
-INCLUDE_FILE(".rodata", "../input.bin", model_input);
+INCLUDE_FILE(".rodata", "./input.bin", model_input);
 extern uint8_t model_input_data[];
 extern size_t model_input_start[];
 extern size_t model_input_end[];

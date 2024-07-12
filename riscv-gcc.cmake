@@ -1,4 +1,7 @@
 
+# set the RISCV option to ON
+option(RISCV            "Build for RISC-V"                  ON)
+
 # CMake toolchain definition for RISC-V GCC toolchain
 set(CMAKE_SYSTEM_NAME       "Generic"   CACHE STRING "")
 set(CMAKE_SYSTEM_PROCESSOR  "riscv"     CACHE STRING "")
@@ -14,4 +17,3 @@ set(CMAKE_OBJCOPY       "${TOOLCHAIN_PREFIX}objcopy")
 set(CMAKE_SIZE          "${TOOLCHAIN_PREFIX}size")
 set(CMAKE_STRIP         "${TOOLCHAIN_PREFIX}ld")
 
-set(RISCV               ON)

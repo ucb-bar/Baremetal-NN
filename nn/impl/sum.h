@@ -10,6 +10,7 @@ void NN__sum_u8_to_i32(size_t n,
     int32_t *result,
     uint8_t *x, size_t incx
     );
+
 void NN__sum_i16_to_i32(size_t n,
     int32_t *result,
     int16_t *x, size_t incx

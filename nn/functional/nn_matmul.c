@@ -2,7 +2,13 @@
 #include "nn_matmul.h"
 
 
+// for mv() operation, NN_matmul(mat, vec) is equivalent to NN_matmul_t(vec, mat)
+
 void NN_matmul(Tensor *out, Tensor *a, Tensor *b) {
+  if (a->ndim == 2 && b->ndim == 1) {
+    NN_mv(out, a, b);
+    return;
+  }
   if (a->ndim == 2 && b->ndim == 2) {
     NN_mm(out, a, b);
     return;
@@ -13,6 +19,10 @@ void NN_matmul(Tensor *out, Tensor *a, Tensor *b) {
 }
 
 void NN_matmul_t(Tensor *out, Tensor *a, Tensor *b) {
+  if (a->ndim == 1 && b->ndim == 2) {
+    NN_mv(out, b, a);
+    return;
+  }
   if (a->ndim == 2 && b->ndim == 2) {
     NN_mm_t(out, a, b);
     return;

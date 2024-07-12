@@ -21,6 +21,8 @@ void NN__add_i8(size_t n, int8_t *z, size_t incz, int8_t *x, size_t incx, int8_t
 void NN__add_f16(size_t n, float16_t *z, size_t incz, float16_t *x, size_t incx, float16_t *y, size_t incy) {
   while (n > 0) {
     size_t vl;
+
+    printf("hi\n");
     
     // size_t vl = __riscv_vsetvl_e16m1(n);
     asm volatile("vsetvli %0, %1, e16, m1, ta, ma" : "=r"(vl) : "r"(n));
