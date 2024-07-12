@@ -1,9 +1,6 @@
 
 #include "nn_norm.h"
 
-#ifdef RVV
-  #include <riscv_vector.h>
-#endif
 
 void NN_norm(Tensor *result, Tensor *x) {
   assert(x->ndim == 2);

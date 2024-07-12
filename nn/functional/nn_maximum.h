@@ -2,9 +2,6 @@
 #define __NN_MAXIMUM_H
 
 #include <assert.h>
-#ifdef RVV
-  #include <riscv_vector.h>
-#endif
 
 #include "nn_tensor.h"
 #include "maximum.h"

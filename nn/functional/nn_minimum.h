@@ -2,9 +2,6 @@
 #define __NN_MINIMUM_H
 
 #include <assert.h>
-#ifdef RVV
-  #include <riscv_vector.h>
-#endif
 
 #include "nn_tensor.h"
 #include "minimum.h"
