@@ -1,17 +1,17 @@
-project(test LANGUAGES C)
+project(tests LANGUAGES C)
 
-add_executable(test src/generated.c)
-target_include_directories(test PUBLIC inc)
+add_executable(tests src/generated.c)
+target_include_directories(tests PUBLIC inc)
 
-target_compile_features(test INTERFACE c_std_11)
+target_compile_features(tests INTERFACE c_std_11)
 
 if (X86)
-  target_link_libraries(test PUBLIC target-x86)
+  target_link_libraries(tests PUBLIC target-x86)
 elseif (RISCV)
-  target_link_libraries(test PUBLIC target-riscv)
+  target_link_libraries(tests PUBLIC target-riscv)
 endif()
 
 
-target_link_libraries(test PUBLIC nn)
-target_link_libraries(test PUBLIC m)
+target_link_libraries(tests PUBLIC nn)
+target_link_libraries(tests PUBLIC m)
 

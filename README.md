@@ -10,29 +10,77 @@ Baremetal-NN is a tool for converting PyTorch models into raw C codes that can b
 
 ## Run Test
 
+### Building for x86
+
 ```bash
-cd test/
-mkdir build/
-cd build/
-cmake .. -DRISCV=ON
+# clean previous build, if any
+rm -rf ./build/
 ```
 
-Running with RVV
-
 ```bash
-cmake .. -DRISCV=ON -DRVV=ON
-make
-spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./example 
+cmake . -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
+cmake --build ./build/ --target tests
+./build/tests/tests
 ```
 
-Running with Gemmini
+### Building for RISC-V
 
 ```bash
-cmake .. -DRISCV=ON -DGEMMINI=ON
-make
+# clean previous build, if any
+rm -rf ./build/
+```
+
+```bash
+# make sure $RISCV is set
+cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug
+cmake --build ./build/ --target all
+spike ./build/tests/tests 
+```
+
+### Building for RISC-V with Vector Support
+
+```bash
+# clean previous build, if any
+rm -rf ./build/
+```
+
+```bash
+# make sure $RISCV is set
+cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV=ON
+cmake --build ./build/ --target all
+spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./build/tests/tests
+```
+
+Running with FP16 support
+
+```bash
+spike --isa=rv64gcv_zicntr_zvfh --varch=vlen:512,elen:32 ./build/tests/tests
+```
+
+### Building for RISC-V with Gemmini
+
+```bash
+# clean previous build, if any
+rm -rf ./build/
+```
+
+```bash
+cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D GEMMINI=ON
+cmake --build ./build/ --target all
 spike --extension=gemmini ./example
 ```
 
+### Cleaning build files
+
+```
+cmake --build ./build/ --target clean
+```
+
+### Cleaning CMake files
+
+```
+rm -rf ./build/
+```
 
 
 ## Convert the model
