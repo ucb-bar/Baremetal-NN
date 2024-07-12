@@ -1,6 +1,4 @@
 
-option(AVX "Use AVX implementation" OFF)
-option(RVV "Use RISCV vector extension implementation" OFF)
 
 set(cpu_impl 
   ./impl/cpu/abs.c
@@ -107,7 +105,6 @@ add_library(nn
   ./functional/nn_sub.c
   ./functional/nn_sum.c
   ./functional/nn_transpose.c
-  ./functional/nn_unfold.c
 
   ${rvv_impl}
   ${gemmini_impl}
@@ -120,11 +117,11 @@ target_include_directories(nn PUBLIC
   ./impl)
 
 if (X86)
-  message("NN: Building for x86")
+  message(STATUS "nn: Building for x86")
   target_link_libraries(nn target-x86)
     
 elseif (RISCV)
-  message("NN: Building for RISC-V")
+  message(STATUS "nn: Building for RISC-V")
   target_link_libraries(nn target-riscv)
 endif ()
 

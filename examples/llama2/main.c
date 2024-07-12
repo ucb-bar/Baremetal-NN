@@ -17,12 +17,12 @@
 
 
 // load the weight data block from the model.bin file
-INCLUDE_FILE(".rodata", "../checkpoints/tokenizer.bin", tokenizer);
+INCLUDE_FILE(".rodata", "./checkpoints/tokenizer.bin", tokenizer);
 extern uint8_t tokenizer_data[];
 extern size_t tokenizer_start[];
 extern size_t tokenizer_end[];
 
-INCLUDE_FILE(".rodata", "../checkpoints/stories15M.bin", checkpoint);
+INCLUDE_FILE(".rodata", "./checkpoints/stories15M.bin", checkpoint);
 extern uint8_t checkpoint_data[];
 extern size_t checkpoint_start[];
 extern size_t checkpoint_end[];

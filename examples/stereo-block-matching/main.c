@@ -9,12 +9,12 @@
 #include "termimg.h"
 
 
-INCLUDE_FILE(".rodata", "../data/left.bin", left);
+INCLUDE_FILE(".rodata", "./data/left.bin", left);
 extern uint8_t left_data[];
 extern size_t left_start[];
 extern size_t left_end[];
 
-INCLUDE_FILE(".rodata", "../data/right.bin", right);
+INCLUDE_FILE(".rodata", "./data/right.bin", right);
 extern uint8_t right_data[];
 extern size_t right_start[];
 extern size_t right_end[];
