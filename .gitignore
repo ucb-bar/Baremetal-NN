@@ -2,8 +2,6 @@
 .conda-env/
 .vscode/
 
-example/mnist/data/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -29,6 +27,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+examples/mnist/data/
 
-example/llama2/checkpoints/stories15M.bin
+examples/llama2/checkpoints/stories15M.bin
 
