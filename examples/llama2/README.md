@@ -6,6 +6,15 @@ wget -P checkpoints/ https://huggingface.co/karpathy/tinyllamas/resolve/main/sto
 ```
 
 
+```bash
+cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RISCV=ON -D RVV=ON -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug
+
+cmake --build ./build/ --target clean
+cmake --build ./build/ --target llama2
+spike --isa=rv64gcv_zicntr_zvfh --varch=vlen:128,elen:32 --misaligned ./build/examples/llama2/llama2
+```
+
+
 
 
 # Performance Benchmark
