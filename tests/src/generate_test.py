@@ -1,6 +1,7 @@
 import random
 
 import torch
+import torchtune
 import jinja2
 
 
@@ -31,6 +32,14 @@ def rand16(shape):
     return (torch.rand(shape, dtype=torch.float16, device=device) - 0.5) * 2
 
 
+def functional_rms_norm(x, w, eps):
+    with torch.no_grad():
+        layer = torchtune.modules.RMSNorm(dim=x.shape[0], eps=eps)
+        layer.scale[:] = w
+        o = layer(x)
+    return o
+
+
 test_pattern = [
     # ("abs",         lambda a: torch.abs(a),             [("a", rand((7, 7))),                                           ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 7)))               ]),
@@ -58,7 +67,7 @@ test_pattern = [
     # ("linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), 
     #     [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((1, 5)))                                                  ]),
     # ("linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b),
-    #     [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((5, )))                                                   ]),
+    #     [("x", rand((7, ))), ("w", rand((5, 7))), ("b", rand((5, )))                                                   ]),
     # ("relu",        lambda x: torch.nn.functional.relu(x),
     #     [("x", rand((7, 7)))                                                                                            ]),
     # ("softmax",     lambda a: torch.nn.functional.softmax(a, dim=0),
@@ -69,6 +78,8 @@ test_pattern = [
     #     [("x", rand((7, 7))+1), ("-1", None)                                                                            ]),
     # ("relu6",       lambda x: torch.nn.functional.relu6(x),    
     #     [("x", rand((7, 7)))                                                                                            ]),
+    # ("rms_norm",     lambda x, w: functional_rms_norm(x, w, 1e-6), 
+    #     [("x", rand((69, ))), ("w", rand((69, ))), ("1e-6", None)                                                       ]),
     # ("conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=0, dilation=1, groups=1).permute((0, 2, 3, 1)),
     #     [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, ))), 
     #      ("(size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1", None)                                              ]),
@@ -138,7 +149,7 @@ def format_tensor(name: str, tensor: torch.Tensor):
     dim = len(tensor.shape)
     shape = ", ".join([str(s) for s in tensor.shape])
     dtype = type_to_str(tensor.dtype)
-    data_np = tensor.cpu().contiguous().numpy()
+    data_np = tensor.detach().cpu().contiguous().numpy()
     data = ",".join([hex(b) for b in data_np.flatten().tobytes()])
     human_readable = str(data_np).replace("\n", " ")[:80]
     tensor_str = env.from_string("""
@@ -166,10 +177,6 @@ def generate_test_pattern(op, function, inputs):
             dim = len(value.shape)
             shape = ", ".join([str(s) for s in value.shape])
             dtype = type_to_str(value.dtype)
-            data_np = value.cpu().contiguous().numpy()
-            data = ", ".join([str(b) for b in data_np.flatten().tobytes()])
-
-            human_readable = str(data_np).replace("\n", " ")[:80]
             tensor_str = format_tensor(name, value)
             
             tensor_constructors.append(tensor_str)

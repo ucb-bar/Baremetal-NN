@@ -21,7 +21,7 @@ set(cpu_impl
   ./impl/cpu/mul1.c
   ./impl/cpu/neg.c
   ./impl/cpu/norm.c
-  ./impl/cpu/rmsnorm.c
+  ./impl/cpu/rms_norm.c
   ./impl/cpu/sgn.c
   ./impl/cpu/softmax.c
   ./impl/cpu/sqr.c
@@ -58,6 +58,7 @@ if (RVV)
     ./impl/rvv/mul.c
     ./impl/rvv/mul1.c
     ./impl/rvv/neg.c
+    ./impl/rvv/rms_norm.c
     ./impl/rvv/sub.c
     ./impl/rvv/transpose.c
     )
@@ -97,9 +98,11 @@ add_library(nn
   ./functional/nn_min.c
   ./functional/nn_minimum.c
   ./functional/nn_mul.c
+  ./functional/nn_mv.c
   ./functional/nn_neg.c
   ./functional/nn_relu.c
   ./functional/nn_relu6.c
+  ./functional/nn_rms_norm.c
   ./functional/nn_softmax.c
   ./functional/nn_sub.c
   ./functional/nn_sum.c
