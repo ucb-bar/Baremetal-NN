@@ -22,7 +22,7 @@ void NN_matmul(Tensor *out, Tensor *a, Tensor *b);
 /**
  * Matrix multiplication with transposed B
  * 
- * C = A @ B
+ * C = A @ B.T
  *
  * @param out: the output tensor of shape (m, n)
  * @param a: the input tensor of shape (m, k)
