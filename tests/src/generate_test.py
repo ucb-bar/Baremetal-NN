@@ -78,8 +78,8 @@ test_pattern = [
     #     [("x", rand((7, 7))+1), ("-1", None)                                                                            ]),
     # ("relu6",       lambda x: torch.nn.functional.relu6(x),    
     #     [("x", rand((7, 7)))                                                                                            ]),
-    ("rms_norm",     lambda x, w: functional_rms_norm(x, w, 1e-6), 
-        [("x", rand((69, ))), ("w", rand((69, ))), ("1e-6", None)                                                       ]),
+    # ("rms_norm",     lambda x, w: functional_rms_norm(x, w, 1e-6), 
+    #     [("x", rand((69, ))), ("w", rand((69, ))), ("1e-6", None)                                                       ]),
     # ("conv2d",      lambda x, w, b: torch.nn.functional.conv2d(x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=0, dilation=1, groups=1).permute((0, 2, 3, 1)),
     #     [("x", rand((1, 16, 16, 3))), ("w", rand((3, 3, 3, 6))), ("b", rand((6, ))), 
     #      ("(size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1", None)                                              ]),
@@ -100,15 +100,15 @@ test_pattern = [
     # ("layer_norm",   lambda x, w, b: torch.nn.functional.layer_norm(x, (x.shape[1], ), w, b, eps=1e-05), 
     #     [("x", rand((6, 5))), ("1", None), ("w", rand((5))), ("b", rand((5))), ("1e-05", None)                      ]),
 
-    # ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 7))),                                         ]),
-    # ("add",         lambda a, b: a + b,                 [("a", rand16((6, 7))),       ("b", rand16((6, 7)))             ]),
-    # ("matmul_t",    lambda a, b: a @ b.T,               [("a", rand16((6, 7))),       ("b", rand16((5, 7)))             ]),
-    # ("matmul",      lambda a, b: a @ b,                 [("a", rand16((6, 7))),       ("b", rand16((7, 5)))             ]),
+    ("abs",         lambda a: torch.abs(a),             [("a", rand16((1, 7))),                                         ]),
+    ("add",         lambda a, b: a + b,                 [("a", rand16((6, 7))),       ("b", rand16((6, 7)))             ]),
+    ("matmul_t",    lambda a, b: a @ b.T,               [("a", rand16((6, 7))),       ("b", rand16((5, 7)))             ]),
+    ("matmul",      lambda a, b: a @ b,                 [("a", rand16((6, 7))),       ("b", rand16((7, 5)))             ]),
     
-    # ("linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), 
-    #     [("x", rand16((6, 7))), ("w", rand16((5, 7))), ("b", rand16((1, 5)))                                            ]),
-    # ("relu",        lambda x: torch.nn.functional.relu(x),
-    #     [("x", rand16((7, 7)))                                                                                          ]),
+    ("linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), 
+        [("x", rand16((6, 7))), ("w", rand16((5, 7))), ("b", rand16((1, 5)))                                            ]),
+    ("relu",        lambda x: torch.nn.functional.relu(x),
+        [("x", rand16((7, 7)))                                                                                          ]),
     
 ]
 

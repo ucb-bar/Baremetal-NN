@@ -53,4 +53,9 @@ forward taking 12593055 cycles
 ```
 
 
+replacing float arrays to tensors
+```
+forward taking 11274729 cycles
+```
+
 

@@ -52,6 +52,14 @@ Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype) {
   return t;
 }
 
+Tensor *NN_full(size_t ndim, const size_t *shape, DataType dtype, float value) {
+  Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
+
+  NN_fill(t, value);
+
+  return t;
+}
+
 Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype) {
   Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
 
@@ -83,6 +91,36 @@ Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype) {
       break;
     default:
       printf("[ERROR] Unsupported data type: %d\n", dtype);
+  }
+
+  return t;
+}
+
+Tensor *NN_arange(size_t ndim, const size_t *shape, DataType dtype, float start, float step) {
+  assert(ndim == 1);
+
+  Tensor *t = NN_tensor(ndim, shape, dtype, NULL);
+
+  for (size_t i = 0; i < t->size; i += 1) {
+    switch (dtype) {
+      case DTYPE_U8:
+        ((uint8_t *)t->data)[i] = (uint8_t)(start + i * step);
+        break;
+      case DTYPE_I8:
+        ((int8_t *)t->data)[i] = (int8_t)(start + i * step);
+        break;
+      case DTYPE_U16:
+        ((uint16_t *)t->data)[i] = (uint16_t)(start + i * step);
+        break;
+      case DTYPE_I32:
+        ((int32_t *)t->data)[i] = (int32_t)(start + i * step);
+        break;
+      case DTYPE_F32:
+        ((float *)t->data)[i] = start + i * step;
+        break;
+      default:
+        printf("[ERROR] Unsupported data type: %d\n", dtype);
+    }
   }
 
   return t;

@@ -64,22 +64,17 @@ typedef struct {
   Tensor *tensor_wv;
 
   // current wave of activations
-  Tensor *tensor_x;
-  // float *x; // activation at current time stamp (dim,)
-  Tensor *tensor_xb;
-  float *xb; // same, but inside a residual branch (dim,)
-  Tensor *tensor_xb2;
-  float *xb2; // an additional buffer just for convenience (dim,)
-  Tensor *tensor_hb;
-  float *hb; // buffer for hidden dimension in the ffn (hidden_dim,)
-  Tensor *tensor_hb2;
-  float *hb2; // buffer for hidden dimension in the ffn (hidden_dim,)
-  Tensor *tensor_q;
-  float *q; // query (dim,)
-  Tensor *tensor_k;
-  float *k; // key (dim,)
-  Tensor *tensor_v;
-  float *v; // value (dim,)
+  Tensor *tensor_x;     // activation at current time stamp (dim,)
+  Tensor *tensor_xb;    // same, but inside a residual branch (dim,)
+  Tensor *tensor_xb2;   // an additional buffer just for convenience (dim,)
+  Tensor *tensor_hb;    // buffer for hidden dimension in the ffn (hidden_dim,)
+  Tensor *tensor_hb2;   // buffer for hidden dimension in the ffn (hidden_dim,)
+  Tensor *tensor_q;     // query (dim,)
+  float *q; 
+  Tensor *tensor_k;     // key (dim,)
+  float *k; 
+  Tensor *tensor_v;     // value (dim,)
+  float *v; 
   float *att; // buffer for scores/attention values (n_heads, seq_len)
   float *logits; // output logits
   // kv cache
@@ -92,7 +87,7 @@ typedef struct {
   TransformerWeights weights; // the weights of the model
   RunState state; // buffers for the "wave" of activations in the forward pass
   // some more state needed to properly clean up the memory mapping (sigh)
-  int fd; // file descriptor for memory mapping
+  
   float* data; // memory mapped data pointer
   ssize_t file_size; // size of the checkpoint file in bytes
 } Transformer;
@@ -101,28 +96,19 @@ typedef struct {
 void malloc_run_state(RunState* s, Config* p) {
   // we calloc instead of malloc to keep valgrind happy
   int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
-  // s->x = calloc(p->dim, sizeof(float));
-  s->xb = calloc(p->dim, sizeof(float));
-  s->xb2 = calloc(p->dim, sizeof(float));
-  s->hb = calloc(p->hidden_dim, sizeof(float));
-  s->hb2 = calloc(p->hidden_dim, sizeof(float));
   s->q = calloc(p->dim, sizeof(float));
   s->key_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
   s->value_cache = calloc(p->n_layers * p->seq_len * kv_dim, sizeof(float));
   s->att = calloc(p->n_heads * p->seq_len, sizeof(float));
   s->logits = calloc(p->vocab_size, sizeof(float));
-  // ensure all mallocs went fine
-  // if (!s->x || !s->xb || !s->xb2 || !s->hb || !s->hb2 || !s->q
-  //   || !s->key_cache || !s->value_cache || !s->att || !s->logits) {
-  //     fprintf(stderr, "malloc failed!\n");
-  //     exit(EXIT_FAILURE);
-  // }
+
+
   
   s->tensor_x = NN_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
-  s->tensor_xb = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, s->xb);
-  s->tensor_xb2 = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, s->xb2);
-  s->tensor_hb = NN_tensor(1, (size_t[]){p->hidden_dim}, DTYPE_F32, s->xb);
-  s->tensor_hb2 = NN_tensor(1, (size_t[]){p->hidden_dim}, DTYPE_F32, s->xb2);
+  s->tensor_xb = NN_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
+  s->tensor_xb2 = NN_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
+  s->tensor_hb = NN_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
+  s->tensor_hb2 = NN_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
 
   s->tensor_q = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, s->q);
   s->tensor_k = NN_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, s->k);
@@ -137,10 +123,10 @@ void malloc_run_state(RunState* s, Config* p) {
 
 void free_run_state(RunState* s) {
   // free(s->x);
-  free(s->xb);
-  free(s->xb2);
-  free(s->hb);
-  free(s->hb2);
+  // free(s->xb);
+  // free(s->xb2);
+  // free(s->hb);
+  // free(s->hb2);
   free(s->q);
   free(s->att);
   free(s->logits);
@@ -179,8 +165,12 @@ void memory_map_weights(TransformerWeights *w, Config* p, float* ptr, int shared
   w->wcls = shared_weights ? w->token_embedding_table : ptr;
 }
 
-void read_checkpoint(Config* config, TransformerWeights* weights,
-                    int* fd, float** data, ssize_t* file_size) {
+void read_checkpoint(Transformer* t) {
+  Config* config = &t->config;
+  TransformerWeights* weights = &t->weights;
+  float** data = &t->data;
+  ssize_t* file_size = &t->file_size;
+
   memcpy(config, checkpoint_data, sizeof(Config));
 
   // negative vocab size is hacky way of signaling unshared weights. bit yikes.
@@ -196,7 +186,7 @@ void read_checkpoint(Config* config, TransformerWeights* weights,
 
 // void init(Model *model) {
 void init_transformer(Transformer *t) {
-  read_checkpoint(&t->config, &t->weights, &t->fd, &t->data, &t->file_size);
+  read_checkpoint(t);
   malloc_run_state(&t->state, &t->config);
 }
 
@@ -222,10 +212,7 @@ float* forward(Transformer* transformer, int token, int pos) {
   float* content_row = w->token_embedding_table + token * dim;
   memcpy(s->tensor_x->data, content_row, dim*sizeof(float));
 
-  s->tensor_xb->data = s->xb;
-  s->tensor_hb->data = s->hb;
-  s->tensor_hb2->data = s->hb2;
-    
+
   // forward all the layers
   for(unsigned long long l = 0; l < p->n_layers; l++) {
     // attention rmsnorm
@@ -303,7 +290,7 @@ float* forward(Transformer* transformer, int token, int pos) {
         NN_softmax(att_tensor, att_tensor, 1);
 
         // weighted sum of the values, store back into xb
-        float* xb = s->xb + h * head_size;
+        float* xb = ((float *)s->tensor_xb->data) + h * head_size;
         memset(xb, 0, head_size * sizeof(float));
         for (int t = 0; t <= pos; t++) {
             // get the value vector for this head and at this timestep
@@ -345,12 +332,12 @@ float* forward(Transformer* transformer, int token, int pos) {
 
     // SwiGLU non-linearity
     for (int i = 0; i < hidden_dim; i++) {
-      float val = s->hb[i];
+      float val = ((float *)s->tensor_hb->data)[i];
       // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
       val *= (1.0f / (1.0f + expf(-val)));
       // elementwise multiply with w3(x)
-      val *= s->hb2[i];
-      s->hb[i] = val;
+      val *= ((float *)s->tensor_hb2->data)[i];
+      ((float *)s->tensor_hb->data)[i] = val;
     }
 
     // final matmul to get the output of the ffn
