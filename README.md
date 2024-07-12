@@ -12,8 +12,9 @@ Baremetal-NN is a tool for converting PyTorch models into raw C codes that can b
 
 ### Building for x86
 
+first, we clean any previous builds
+
 ```bash
-# clean previous build, if any
 rm -rf ./build/
 ```
 
@@ -25,8 +26,9 @@ cmake --build ./build/ --target tests
 
 ### Building for RISC-V
 
+first, we clean any previous builds
+
 ```bash
-# clean previous build, if any
 rm -rf ./build/
 ```
 
@@ -39,8 +41,9 @@ spike ./build/tests/tests
 
 ### Building for RISC-V with Vector Support
 
+first, we clean any previous builds
+
 ```bash
-# clean previous build, if any
 rm -rf ./build/
 ```
 
@@ -59,8 +62,9 @@ spike --isa=rv64gcv_zicntr_zvfh --varch=vlen:512,elen:32 ./build/tests/tests
 
 ### Building for RISC-V with Gemmini
 
+first, we clean any previous builds
+
 ```bash
-# clean previous build, if any
 rm -rf ./build/
 ```
 
