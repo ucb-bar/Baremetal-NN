@@ -134,7 +134,7 @@ void NN_add_inplace(Tensor *b, Tensor *a) {
   );
 }
 
-void NN_add_inplace1(Tensor *b, float scalar) {
+void NN_add1_inplace(Tensor *b, float scalar) {
   switch (b->dtype) {
     case DTYPE_F32:
       NN__acc1_f32(b->size, (float *)b->data, 1, scalar);

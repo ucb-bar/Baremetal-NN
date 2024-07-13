@@ -52,15 +52,7 @@ void NN_add_inplace(Tensor *b, Tensor *a);
  * @param b: the target tensor
  * @param scalar: scalar value
  */
-void NN_add_inplace1(Tensor *b, float scalar);
-
-void NN_add_1d(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_add_2d(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_add_3d(Tensor *out, Tensor *a, Tensor *b);
-
-void NN_add_4d(Tensor *out, Tensor *a, Tensor *b);
+void NN_add1_inplace(Tensor *b, float scalar);
 
 
 #endif // __NN_ADD_H
