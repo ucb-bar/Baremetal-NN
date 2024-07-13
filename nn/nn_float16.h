@@ -10,7 +10,7 @@
 #endif
 
 
-#ifdef _Float16
+#ifdef FLT16_MAX
   typedef _Float16  float16_t;
 #else
   typedef union {
@@ -28,7 +28,7 @@
  * @return The single-precision floating-point number.
  */
 static inline float NN_half_to_float(float16_t h) {
-  #ifdef _Float16
+  #ifdef FLT16_MAX
     return (float)h;
   #else
     // from https://github.com/AcademySoftwareFoundation/Imath/blob/main/src/Imath/half.h
@@ -94,7 +94,7 @@ static inline float NN_half_to_float(float16_t h) {
  * @return The half-precision floating-point number.
  */
 static inline float16_t NN_float_to_half(float f) {
-  #ifdef _Float16
+  #ifdef FLT16_MAX
     return (_Float16)f;
   #else
     // from https://github.com/AcademySoftwareFoundation/Imath/blob/main/src/Imath/half.h
