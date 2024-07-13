@@ -51,13 +51,13 @@ rm -rf ./build/
 # make sure $RISCV is set
 cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV=ON
 cmake --build ./build/ --target all
-spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./build/tests/tests
+spike --isa=--isa=rv64gcv_zicntr_zfh --varch=vlen:512,elen:32 ./build/tests/tests
 ```
 
 Running with FP16 support
 
 ```bash
-spike --isa=rv64gcv_zicntr_zvfh --varch=vlen:512,elen:32 ./build/tests/tests
+spike --isa=--isa=rv64gcv_zicntr_zfh_zvfh --varch=vlen:512,elen:32 ./build/tests/tests
 ```
 
 ### Building for RISC-V with Gemmini
