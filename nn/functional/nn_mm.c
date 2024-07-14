@@ -2,7 +2,7 @@
 #include "nn_mm.h"
 
 
-void NN_mm(Tensor *out, Tensor *a, Tensor *b) {
+void NN_mm(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(a->ndim == 2);
   assert(b->ndim == 2);
   assert(a->shape[1] == b->shape[0]);
@@ -43,7 +43,7 @@ void NN_mm(Tensor *out, Tensor *a, Tensor *b) {
   );
 }
 
-void NN_mm_t(Tensor *out, Tensor *a, Tensor *b) {
+void NN_mm_t(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(a->ndim == 2);
   assert(b->ndim == 2);
   assert(a->shape[1] == b->shape[1]);

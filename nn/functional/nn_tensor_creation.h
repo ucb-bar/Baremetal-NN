@@ -70,15 +70,5 @@ Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype);
  */
 Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype);
 
-/**
- * Returns this tensor cast to the type of the given tensor.
- * 
- * This is equivalent to NN_copy() if the data types are the same.
- * 
- * @param out: the output tensor
- * @param in: the input tensor
- */
-void NN_as_type(Tensor *out, Tensor *in);
-
 
 #endif // __NN_TENSOR_CREATION

@@ -4,7 +4,7 @@
 
 // for mv() operation, NN_matmul(mat, vec) is equivalent to NN_matmul_t(vec, mat)
 
-void NN_matmul(Tensor *out, Tensor *a, Tensor *b) {
+void NN_matmul(Tensor *out, const Tensor *a, const Tensor *b) {
   if (a->ndim == 2 && b->ndim == 1) {
     NN_mv(out, a, b);
     return;
@@ -18,7 +18,7 @@ void NN_matmul(Tensor *out, Tensor *a, Tensor *b) {
   );
 }
 
-void NN_matmul_t(Tensor *out, Tensor *a, Tensor *b) {
+void NN_matmul_t(Tensor *out, const Tensor *a, const Tensor *b) {
   if (a->ndim == 1 && b->ndim == 2) {
     NN_mv(out, b, a);
     return;

@@ -9,12 +9,12 @@
 
 void NN__norm_f32(size_t n,
     float *result,
-    float *x, size_t incx
+    const float *x, size_t incx
     );
 
 void NN__norm_inv_f32(size_t n,
     float *result,
-    float *x, size_t incx
+    const float *x, size_t incx
     );
 
 

@@ -2,7 +2,7 @@
 #include "nn_elu.h"
 
 
-void NN_elu(Tensor *y, Tensor *x, float alpha) {
+void NN_elu(Tensor *y, const Tensor *x, float alpha) {
   assert(y->ndim == x->ndim);
   assert(y->dtype == x->dtype);
   assert(y->size == x->size);

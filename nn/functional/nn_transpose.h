@@ -14,7 +14,7 @@
  * @param out: the output tensor of shape (n, m)
  * @param a: the input tensor of shape (m, n)
  */
-void NN_transpose(Tensor *out, Tensor *a);
+void NN_transpose(Tensor *out, const Tensor *a);
 
 
 #endif // __NN_TRANSPOSE_H

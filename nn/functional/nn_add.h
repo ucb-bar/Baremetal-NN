@@ -23,7 +23,7 @@
  * @param a: the input tensor
  * @param b: the input tensor
  */
-void NN_add(Tensor *out, Tensor *a, Tensor *b);
+void NN_add(Tensor *out, const Tensor *a, const Tensor *b);
 
 /**
  * Returns the element-wise addition of the input tensor with a scalar.
@@ -32,7 +32,7 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b);
  * @param in: the input tensor
  * @param scalar: scalar value
  */
-void NN_add1(Tensor *out, Tensor *in, float scalar);
+void NN_add1(Tensor *out, const Tensor *in, float scalar);
 
 /**
  * Element-wise addition
@@ -44,7 +44,7 @@ void NN_add1(Tensor *out, Tensor *in, float scalar);
  * @param b: the target tensor
  * @param a: the input tensor
  */
-void NN_add_inplace(Tensor *b, Tensor *a);
+void NN_add_inplace(Tensor *b, const Tensor *a);
 
 /**
  * Returns the element-wise addition of the input tensor with a scalar.

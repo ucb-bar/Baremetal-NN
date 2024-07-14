@@ -2,9 +2,9 @@
 #include "nn_layer_norm.h"
 
 void NN_layer_norm(
-  Tensor *out, Tensor *in,
+  Tensor *out, const Tensor *in,
   size_t normalized_dims,
-  Tensor *weight, Tensor *bias,
+  const Tensor *weight, const Tensor *bias,
   const float eps) {
   assert(out->dtype == in->dtype && in->dtype == DTYPE_F32);
   assert(out->ndim == in->ndim);

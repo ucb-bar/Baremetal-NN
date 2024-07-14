@@ -2,7 +2,7 @@
 #include "nn_sum.h"
 
 
-void NN_sum(Tensor *out, Tensor *tensor) {
+void NN_sum(Tensor *out, const Tensor *tensor) {
   int32_t result_i32;
   switch (tensor->dtype) {
     case DTYPE_U8:

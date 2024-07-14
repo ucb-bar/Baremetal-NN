@@ -2,7 +2,7 @@
 #include "nn_max.h"
 
 
-void NN_max(Tensor *scalar, Tensor *tensor) {
+void NN_max(Tensor *scalar, const Tensor *tensor) {
   assert(scalar->dtype == tensor->dtype);
 
   switch (tensor->dtype) {

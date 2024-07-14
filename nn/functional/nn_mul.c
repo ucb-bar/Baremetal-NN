@@ -1,7 +1,7 @@
 
 #include "nn_mul.h"
 
-void NN_mul(Tensor *out, Tensor *a, Tensor *b) {
+void NN_mul(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(b->ndim == a->ndim);
   assert(out->ndim == a->ndim);
   assert(b->dtype == a->dtype);
@@ -23,7 +23,7 @@ void NN_mul(Tensor *out, Tensor *a, Tensor *b) {
   );
 }
 
-void NN_mul1(Tensor *out, Tensor *in, float scalar) {
+void NN_mul1(Tensor *out, const Tensor *in, float scalar) {
   assert(out->ndim == in->ndim);
   assert(in->dtype == DTYPE_F32);
   assert(out->dtype == DTYPE_F32);

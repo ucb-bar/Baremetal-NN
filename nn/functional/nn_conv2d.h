@@ -12,7 +12,7 @@
  * @param out: the output tensor of shape (batch_size, height, width, channels)
  * @param in: the input tensor of shape (batch_size, channels, height, width)
  */
-void NN_nchw_to_nhwc(Tensor *out, Tensor *in);
+void NN_nchw_to_nhwc(Tensor *out, const Tensor *in);
 
 /**
  * Converts a tensor from NHWC (Channel-last) to NCHW (PyTorch) format.
@@ -20,7 +20,7 @@ void NN_nchw_to_nhwc(Tensor *out, Tensor *in);
  * @param out: the output tensor of shape (batch_size, channels, height, width)
  * @param in: the input tensor of shape (batch_size, height, width, channels)
  */
-void NN_nhwc_to_nchw(Tensor *out, Tensor *in);
+void NN_nhwc_to_nchw(Tensor *out, const Tensor *in);
 
 /**
  * Applies a 2D convolution over an input signal composed of several input planes.
@@ -35,8 +35,8 @@ void NN_nhwc_to_nchw(Tensor *out, Tensor *in);
  * @param groups: number of blocked connections from input channels to output channels
  */
 void NN_conv2d(
-  Tensor *out, Tensor *in, 
-  Tensor *weight, Tensor *bias, 
+  Tensor *out, const Tensor *in,
+  const Tensor *weight, const Tensor *bias,
   const size_t *stride, const size_t *padding, const size_t *dilation, size_t groups
   );
 

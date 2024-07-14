@@ -20,15 +20,15 @@
  * @param a: the input tensor
  * @param b: the input tensor
  */
-void NN_sub(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub(Tensor *out, const Tensor *a, const Tensor *b);
 
-void NN_sub_1d(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub_1d(Tensor *out, const Tensor *a, const Tensor *b);
 
-void NN_sub_2d(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub_2d(Tensor *out, const Tensor *a, const Tensor *b);
 
-void NN_sub_3d(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub_3d(Tensor *out, const Tensor *a, const Tensor *b);
 
-void NN_sub_4d(Tensor *out, Tensor *a, Tensor *b);
+void NN_sub_4d(Tensor *out, const Tensor *a, const Tensor *b);
 
 
 #endif // __NN_SUB_H

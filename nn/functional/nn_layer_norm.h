@@ -14,9 +14,9 @@
 
 
 void NN_layer_norm(
-  Tensor *out, Tensor *in,
+  Tensor *out, const Tensor *in,
   size_t normalized_dims,
-  Tensor *weight, Tensor *bias,
+  const Tensor *weight, const Tensor *bias,
   const float eps);
 
 

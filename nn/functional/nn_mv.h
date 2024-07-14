@@ -18,7 +18,7 @@
  * @param a: the input tensor of shape (n, m)
  * @param v: the input vector tensor of shape (m,)
  */
-void NN_mv(Tensor *out, Tensor *a, Tensor *v);
+void NN_mv(Tensor *out, const Tensor *a, const Tensor *v);
 
 
 #endif // __NN_MV_H

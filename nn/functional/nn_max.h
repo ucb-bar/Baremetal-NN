@@ -14,7 +14,7 @@
  * @param out: the output scalar tensor
  * @param tensor: the input tensor
  */
-void NN_max(Tensor *scalar, Tensor *tensor);
+void NN_max(Tensor *scalar, const Tensor *tensor);
 
 
 #endif // __NN_MAX_H

@@ -2,7 +2,7 @@
 #include "nn_abs.h"
 
 
-void NN_abs(Tensor *out, Tensor *in) {
+void NN_abs(Tensor *out, const Tensor *in) {
   assert(out->ndim == in->ndim);
   assert(out->dtype == in->dtype);
   assert(out->size == in->size);

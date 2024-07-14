@@ -2,7 +2,7 @@
 #include "nn_mv.h"
 
 
-void NN_mv(Tensor *out, Tensor *a, Tensor *v) {
+void NN_mv(Tensor *out, const Tensor *a, const Tensor *v) {
   assert(a->ndim == 2);
   assert(v->ndim == 1);
   assert(v->shape[0] == a->shape[1]);

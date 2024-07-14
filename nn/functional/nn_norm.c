@@ -2,7 +2,7 @@
 #include "nn_norm.h"
 
 
-void NN_norm(Tensor *result, Tensor *x) {
+void NN_norm(Tensor *result, const Tensor *x) {
   assert(x->ndim == 2);
   assert(NN_is_scalar(result));
   assert(result->dtype == x->dtype);

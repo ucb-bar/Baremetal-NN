@@ -2,7 +2,7 @@
 #include "nn_clip.h"
 
 
-void NN_clip(Tensor *y, Tensor *x, float min, float max) {
+void NN_clip(Tensor *y, const Tensor *x, float min, float max) {
   assert(y->ndim == x->ndim);
   assert(y->dtype == x->dtype);
   assert(y->size == x->size);

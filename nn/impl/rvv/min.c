@@ -4,7 +4,7 @@
 #ifdef RVV
 
 
-void NN__min_f32(size_t n, float *result, float *x, size_t incx) {
+void NN__min_f32(size_t n, float *result, const float *x, size_t incx) {
   vfloat32m1_t vec_min = __riscv_vfmv_s_f_f32m1(FLT_MAX, 1);
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);

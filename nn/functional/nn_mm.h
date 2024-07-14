@@ -18,7 +18,7 @@
  * @param a: the input tensor of shape (m, k)
  * @param b: the input tensor of shape (k, n)
  */
-void NN_mm(Tensor *out, Tensor *a, Tensor *b);
+void NN_mm(Tensor *out, const Tensor *a, const Tensor *b);
 
 /**
  * Performs a matrix multiplication with transposed B.
@@ -31,7 +31,7 @@ void NN_mm(Tensor *out, Tensor *a, Tensor *b);
  * @param a: the input tensor of shape (m, k)
  * @param b: the input tensor of shape (n, k)
  */
-void NN_mm_t(Tensor *out, Tensor *a, Tensor *b);
+void NN_mm_t(Tensor *out, const Tensor *a, const Tensor *b);
 
 
 #endif // __NN_MM_H

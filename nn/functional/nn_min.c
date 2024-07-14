@@ -2,7 +2,7 @@
 #include "nn_min.h"
 
 
-void NN_min(Tensor *scalar, Tensor *tensor) {
+void NN_min(Tensor *scalar, const Tensor *tensor) {
   assert(scalar->dtype == tensor->dtype);
 
   switch (tensor->dtype) {

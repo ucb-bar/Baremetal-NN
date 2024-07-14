@@ -9,20 +9,20 @@
 
 void NN__add_i8(size_t n,
     int8_t *z, size_t incz,
-    int8_t *x, size_t incx,
-    int8_t *y, size_t incy
+    const int8_t *x, size_t incx,
+    const int8_t *y, size_t incy
     );
 
 void NN__add_f16(size_t n,
     float16_t *z, size_t incz,
-    float16_t *x, size_t incx,
-    float16_t *y, size_t incy
+    const float16_t *x, size_t incx,
+    const float16_t *y, size_t incy
     );
 
 void NN__add_f32(size_t n,
     float *z, size_t incz,
-    float *x, size_t incx,
-    float *y, size_t incy
+    const float *x, size_t incx,
+    const float *y, size_t incy
     );
 
 

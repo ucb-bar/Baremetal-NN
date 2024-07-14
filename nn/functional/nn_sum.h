@@ -13,7 +13,7 @@
  * @param out: the output scalar tensor
  * @param tensor: the input tensor
  */
-void NN_sum(Tensor *out, Tensor *tensor);
+void NN_sum(Tensor *out, const Tensor *tensor);
 
 
 #endif // __NN_SUM_H

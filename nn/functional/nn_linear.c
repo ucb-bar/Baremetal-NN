@@ -2,7 +2,7 @@
 #include "nn_linear.h"
 
 
-void NN_linear(Tensor *y, Tensor *x, Tensor *w, Tensor *b) {
+void NN_linear(Tensor *y, const Tensor *x, const Tensor *w, const Tensor *b) {
   NN_matmul_t(y, x, w);
 
   if (b != NULL) {

@@ -1,7 +1,7 @@
 
 #include "nn_rms_norm.h"
 
-void NN_rms_norm(Tensor *y, Tensor *x, Tensor *w, float eps) {
+void NN_rms_norm(Tensor *y, const Tensor *x, const Tensor *w, float eps) {
   assert(y->ndim == 1);
   assert(x->ndim == 1);
   assert(w->ndim == 1);

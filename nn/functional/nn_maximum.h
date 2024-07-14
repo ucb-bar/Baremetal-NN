@@ -14,7 +14,7 @@
  * @param a: the input tensor
  * @param b: the input tensor
  */
-void NN_maximum(Tensor *out, Tensor *a, Tensor *b);
+void NN_maximum(Tensor *out, const Tensor *a, const Tensor *b);
 
 
 #endif // __NN_MAXIMUM_H

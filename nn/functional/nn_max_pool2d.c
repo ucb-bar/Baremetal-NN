@@ -2,7 +2,7 @@
 
 #include "nn_max_pool2d.h"
 
-void NN_max_pool2d(Tensor *out, Tensor *in, const size_t *kernel_size) {
+void NN_max_pool2d(Tensor *out, const Tensor *in, const size_t *kernel_size) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);

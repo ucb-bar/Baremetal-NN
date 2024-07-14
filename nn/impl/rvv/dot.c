@@ -4,7 +4,7 @@
 #ifdef RVV
 
 
-void NN__dot_f16(size_t n, float16_t *result, float16_t *x, size_t incx, float16_t *y, size_t incy) {
+void NN__dot_f16(size_t n, float16_t *result, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
   size_t vlmax;
   // size_t vlmax = __riscv_vsetvlmax_e16m1();
   asm volatile("vsetvli %0, zero, e16, m1, ta, ma" : "=r"(vlmax) : "r"(n));
@@ -45,7 +45,7 @@ void NN__dot_f16(size_t n, float16_t *result, float16_t *x, size_t incx, float16
   
 }
 
-void NN__dot_f32(size_t n, float *result, float *x, size_t incx, float *y, size_t incy) {
+void NN__dot_f32(size_t n, float *result, const float *x, size_t incx, const float *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e32m1();
 
   vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);

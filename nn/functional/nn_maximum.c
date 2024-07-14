@@ -2,7 +2,7 @@
 #include "nn_maximum.h"
 
 
-void NN_maximum(Tensor *out, Tensor *a, Tensor *b) {
+void NN_maximum(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(b->ndim == a->ndim);
   assert(out->ndim == a->ndim);
   assert(b->dtype == a->dtype);
