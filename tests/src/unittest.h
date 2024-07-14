@@ -20,7 +20,7 @@ static void enable_accelerator_features() {
     // enable vector operation
     unsigned long mstatus;
     asm volatile("csrr %0, mstatus" : "=r"(mstatus));
-    mstatus |= 0x00000600 | 0x00006000 | 0x00018000;
+    mstatus |= 0x00000400 | 0x00004000 | 0x00010000;
     asm volatile("csrw mstatus, %0"::"r"(mstatus));
   #endif
 }

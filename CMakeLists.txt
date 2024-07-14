@@ -47,7 +47,7 @@ set(WRAP_SPECS_FILE     "htif_wrap.specs")
 set(SPECS_FILE          "htif_nano.specs")
 set(LIBGLOSS_DIR        "$ENV{RISCV}/riscv64-unknown-elf/lib/")
 
-set(MARCH               "rv64gcv_zfh_zvfh")
+set(MARCH               "rv64gcv_zfh_zvfh_zvfhmin")
 set(MABI                "lp64d")
 set(MCMODEL             "medany")
 
@@ -59,6 +59,8 @@ target_compile_options(target-riscv INTERFACE -fno-common -fno-builtin-printf)
 target_compile_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcmodel=${MCMODEL})
 target_compile_options(target-riscv INTERFACE -Wl,-Map=output.map -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 target_compile_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
+
+target_compile_definitions(target-riscv INTERFACE FLT16_MAX=65504.0f)
 
 target_link_options(target-riscv INTERFACE -static)
 target_link_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcmodel=${MCMODEL})

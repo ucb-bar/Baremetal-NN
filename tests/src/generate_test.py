@@ -41,9 +41,9 @@ def functional_rms_norm(x, w, eps):
 
 
 test_pattern = [
-    # ("abs",         lambda a: torch.abs(a),             [("a", rand((7, 7))),                                           ]),
-    # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 7)))               ]),
-    # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((1, 7)))               ]),
+    ("abs",         lambda a: torch.abs(a),             [("a", rand((7, 7))),                                           ]),
+    ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 7)))               ]),
+    ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((1, 7)))               ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 1)))               ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((7, )))                ]),
     # ("add_inplace", lambda a, b: a + b,                 [("actual", torch.zeros((7, 7))),   ("b", rand((7, 7)))         ]),
