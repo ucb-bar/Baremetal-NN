@@ -18,6 +18,6 @@
  * @param w: weight tensor of shape (out_features, in_features)
  * @param b: bias tensor of shape (1, out_features), or NULL if no bias is applied
  */
-void NN_linear(Tensor *y, Tensor *x, Tensor *w, Tensor *b);
+void NN_linear(Tensor *y, const Tensor *x, const Tensor *w, const Tensor *b);
 
 #endif // __NN_Linear_H

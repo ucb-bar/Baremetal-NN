@@ -1,7 +1,7 @@
 
 #include "nn_copy.h"
 
-void NN_copy(Tensor *dst, Tensor *src) {
+void NN_copy(Tensor *dst, const Tensor *src) {
   assert(dst->ndim == src->ndim);
   assert(dst->size == src->size);
   

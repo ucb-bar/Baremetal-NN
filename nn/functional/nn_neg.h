@@ -15,7 +15,7 @@
  * @param out: the output tensor
  * @param input: the input tensor
  */
-void NN_neg(Tensor *out, Tensor *input);
+void NN_neg(Tensor *out, const Tensor *input);
 
 void NN_neg_inplace(Tensor *tensor);
 

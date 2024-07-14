@@ -2,9 +2,9 @@
 #include "nn_batch_norm2d.h"
 
 void NN_batch_norm2d(
-  Tensor *out, Tensor *in, 
-  Tensor *weight, Tensor *bias,
-  float eps, Tensor *running_mean, Tensor *running_var) {
+  Tensor *out, const Tensor *in, 
+  const Tensor *weight, const Tensor *bias,
+  float eps, const Tensor *running_mean, const Tensor *running_var) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);

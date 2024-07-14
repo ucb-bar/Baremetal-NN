@@ -16,7 +16,7 @@
  * @param y: the output tensor
  * @param x: the input tensor
  */
-void NN_relu6(Tensor *y, Tensor *x);
+void NN_relu6(Tensor *y, const Tensor *x);
 
 void NN_relu6_inplace(Tensor *x);
 

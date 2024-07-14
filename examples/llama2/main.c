@@ -263,7 +263,6 @@ float* forward(Transformer* transformer, int token, int pos) {
 
     // multihead attention. iterate over all heads
     int h;
-    #pragma omp parallel for private(h)
     for (h = 0; h < p->n_heads; h++) {
         // get the query vector for this head
         float* q = s->q + h * head_size;
@@ -400,7 +399,7 @@ void init_tokenizer(Tokenizer* t, int vocab_size) {
     t->byte_pieces[i * 2 + 1] = '\0';
   }
 
-  char *tokenizer_ptr = tokenizer_data;
+  uint8_t *tokenizer_ptr = tokenizer_data;
 
   t->max_token_length = *(int*)tokenizer_ptr;
   tokenizer_ptr += sizeof(int);
@@ -839,9 +838,9 @@ void chat(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler,
 
     // start the main loop
     int8_t user_turn = 1; // user starts
-    int next;        // will store the next token in the sequence
-    int token;       // stores the current token to feed into the transformer
-    int prev_token;
+    int next = 0;        // will store the next token in the sequence
+    int token = 0;       // stores the current token to feed into the transformer
+    int prev_token = 0;
     int pos = 0;     // position in the sequence
     while (pos < steps) {
 

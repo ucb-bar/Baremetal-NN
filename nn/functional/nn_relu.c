@@ -2,7 +2,7 @@
 #include "nn_relu.h"
 
 
-void NN_relu(Tensor *y, Tensor *x) {
+void NN_relu(Tensor *y, const Tensor *x) {
   assert(y->ndim == x->ndim);
   assert(y->dtype == x->dtype);
   assert(y->size == x->size);

@@ -8,7 +8,7 @@
 
 void NN__max_f32(size_t n,
     float *result,
-    float *x, size_t incx
+    const float *x, size_t incx
     );
 
 

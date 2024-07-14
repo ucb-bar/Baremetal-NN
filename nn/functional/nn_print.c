@@ -42,7 +42,7 @@ void NN_print_f32(float v, int16_t num_digits) {
   }
 }
 
-void NN_print_shape(Tensor *tensor) {
+void NN_print_shape(const Tensor *tensor) {
   printf("(");
   for (size_t i = 0; i < tensor->ndim; i += 1) {
     printf("%d", (int)tensor->shape[i]);
@@ -56,7 +56,7 @@ void NN_print_shape(Tensor *tensor) {
 /**
  * Print the tensor with torch.Tensor style
  */
-void NN_printf(Tensor *tensor) {
+void NN_printf(const Tensor *tensor) {
   printf("[");
 
   switch (tensor->ndim) {

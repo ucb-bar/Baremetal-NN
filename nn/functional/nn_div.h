@@ -17,7 +17,7 @@
  * @param a: the input tensor
  * @param b: the input tensor
  */
-void NN_div(Tensor *out, Tensor *a, Tensor *b);
+void NN_div(Tensor *out, const Tensor *a, const Tensor *b);
 
 
 #endif // __NN_DIV_H

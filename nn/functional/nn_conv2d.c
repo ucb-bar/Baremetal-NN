@@ -6,7 +6,7 @@
 #endif
 
 
-void NN_nchw_to_nhwc(Tensor *out, Tensor *in) {
+void NN_nchw_to_nhwc(Tensor *out, const Tensor *in) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);
@@ -34,7 +34,7 @@ void NN_nchw_to_nhwc(Tensor *out, Tensor *in) {
   }
 }
 
-void NN_nhwc_to_nchw(Tensor *out, Tensor *in) {
+void NN_nhwc_to_nchw(Tensor *out, const Tensor *in) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(in->dtype == DTYPE_F32);
@@ -63,8 +63,8 @@ void NN_nhwc_to_nchw(Tensor *out, Tensor *in) {
 }
 
 void NN_conv2d(
-  Tensor *out, Tensor *in,
-  Tensor *weight, Tensor *bias,
+  Tensor *out, const Tensor *in,
+  const Tensor *weight, const Tensor *bias,
   const size_t *stride, const size_t *padding, const size_t *dilation, size_t groups) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);

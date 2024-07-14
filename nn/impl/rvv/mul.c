@@ -4,7 +4,7 @@
 #ifdef RVV
 
 
-void NN__mul_f32(size_t n, float *z, size_t incz, float *x, size_t incx, float *y, size_t incy) {
+void NN__mul_f32(size_t n, float *z, size_t incz, const float *x, size_t incx, const float *y, size_t incy) {
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);
     vfloat32m1_t vec_x = __riscv_vlse32_v_f32m1(x, sizeof(float) * incx, vl);

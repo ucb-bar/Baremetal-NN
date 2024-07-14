@@ -10,7 +10,7 @@
  * @param out: output tensor of shape (n, m)
  * @param a: input tensor of shape (m, n)
  */
-void NN_transpose(Tensor *out, Tensor *a) {
+void NN_transpose(Tensor *out, const Tensor *a) {
   assert(a->ndim == 2);
   assert(out->ndim == a->ndim);
   assert(out->dtype == a->dtype);

@@ -15,7 +15,7 @@
  * @param dst: destination tensor
  * @param src: source tensor
  */
-void NN_copy(Tensor *dst, Tensor *src);
+void NN_copy(Tensor *dst, const Tensor *src);
 
 
 #endif // __NN_COPY_H

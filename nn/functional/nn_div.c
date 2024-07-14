@@ -1,7 +1,7 @@
 
 #include "nn_div.h"
 
-void NN_div(Tensor *out, Tensor *a, Tensor *b) {
+void NN_div(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(b->ndim == a->ndim);
   assert(out->ndim == a->ndim);
   assert(b->dtype == a->dtype);

@@ -14,7 +14,7 @@
  * @param x: the input tensor of shape (m, n)
  * @param y: the output tensor of shape (m, n)
  */
-void NN_rms_norm(Tensor *y, Tensor *x, Tensor *w, float eps);
+void NN_rms_norm(Tensor *y, const Tensor *x, const Tensor *w, float eps);
 
 
 #endif // __NN_RMS_NORM_H

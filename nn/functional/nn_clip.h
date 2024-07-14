@@ -19,7 +19,7 @@
  * @param min: lower-bound of the range to be clamped to
  * @param max: upper-bound of the range to be clamped to
  */
-void NN_clip(Tensor *y, Tensor *x, float min, float max);
+void NN_clip(Tensor *y, const Tensor *x, float min, float max);
 
 void NN_clip_inplace(Tensor *x, float min, float max);
 

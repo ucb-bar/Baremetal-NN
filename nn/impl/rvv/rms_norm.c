@@ -4,7 +4,7 @@
 #ifdef RVV
 
 
-void NN__rms_norm_f32(size_t n, float* y, size_t incy, float* x, size_t incx, float* w, size_t incw, float eps) {
+void NN__rms_norm_f32(size_t n, float* y, size_t incy, const float* x, size_t incx, const float* w, size_t incw, float eps) {
   // calculate sum of squares
   
   float ss = 0.0f;

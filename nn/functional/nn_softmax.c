@@ -2,7 +2,7 @@
 #include "nn_softmax.h"
 
 
-void NN_softmax(Tensor *out, Tensor *tensor, int dim) {
+void NN_softmax(Tensor *out, const Tensor *tensor, int dim) {
   assert(out->dtype == tensor->dtype);
 
   if (dim < 0) {

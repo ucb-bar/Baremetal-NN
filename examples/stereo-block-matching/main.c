@@ -47,7 +47,7 @@ int square(char x) {
 }
 
 // Core function computing stereoBM
-Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int max_disparity, size_t half_block_size) {
+Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int max_disparity, int half_block_size) {
   // allocate data for disparity, use calloc for 0 initialization
   int SAD = 0;
   int min_SAD = INT32_MAX;
@@ -93,9 +93,9 @@ Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int ma
         // }
 
         // tensor version
-        size_t row = i - half_block_size;
+        // size_t row = i - half_block_size;
         size_t col = j - half_block_size;
-        for (size_t row = i - half_block_size; row < half_block_size + i; row += 1) {
+        for (int row = i - half_block_size; row < half_block_size + i; row += 1) {
 
             left_block->data = ((uint8_t *)left->data) + row*width + col;
             right_block->data = ((uint8_t *)right->data) + row*width + col + offset;

@@ -1,7 +1,7 @@
 
 #include "nn_interpolate.h"
 
-void NN_interpolate(Tensor *out, Tensor *in, const float *scale_factor/*const char* mode*/) {
+void NN_interpolate(Tensor *out, const Tensor *in, const float *scale_factor/*const char* mode*/) {
   assert(in->ndim == 4);
   assert(out->ndim == 4);
   assert(scale_factor[0] > 0);

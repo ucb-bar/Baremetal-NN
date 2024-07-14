@@ -2,7 +2,7 @@
 #include "nn_sub.h"
 
 
-void NN_sub(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(b->ndim == a->ndim);
   assert(out->ndim == a->ndim);
 
@@ -29,7 +29,7 @@ void NN_sub(Tensor *out, Tensor *a, Tensor *b) {
   }
 }
 
-void NN_sub_1d(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_1d(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
 
   if (out->dtype == DTYPE_F32 && a->dtype == DTYPE_F32 && b->dtype == DTYPE_F32) {
@@ -47,7 +47,7 @@ void NN_sub_1d(Tensor *out, Tensor *a, Tensor *b) {
   );
 }
 
-void NN_sub_2d(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_2d(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
   assert(out->shape[1] == a->shape[1] || out->shape[1] == b->shape[1]);
 
@@ -96,7 +96,7 @@ void NN_sub_2d(Tensor *out, Tensor *a, Tensor *b) {
   );
 }
 
-void NN_sub_3d(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_3d(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
   assert(out->shape[1] == a->shape[1] || out->shape[1] == b->shape[1]);
   assert(out->shape[2] == a->shape[2] || out->shape[2] == b->shape[2]);
@@ -126,7 +126,7 @@ void NN_sub_3d(Tensor *out, Tensor *a, Tensor *b) {
   );
 }
 
-void NN_sub_4d(Tensor *out, Tensor *a, Tensor *b) {
+void NN_sub_4d(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(out->shape[0] == a->shape[0] || out->shape[0] == b->shape[0]);
   assert(out->shape[1] == a->shape[1] || out->shape[1] == b->shape[1]);
   assert(out->shape[2] == a->shape[2] || out->shape[2] == b->shape[2]);

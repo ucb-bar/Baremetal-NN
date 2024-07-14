@@ -7,7 +7,7 @@
 
 void NN__softmax_f32(size_t n,
     float *y, size_t incy,
-    float *x, size_t incx
+    const float *x, size_t incx
     );
 
 

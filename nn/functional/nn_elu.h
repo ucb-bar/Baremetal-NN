@@ -19,7 +19,7 @@
  * @param x: input tensor
  * @param alpha: the alpha value for the ELU formulation
  */
-void NN_elu(Tensor *y, Tensor *x, float alpha);
+void NN_elu(Tensor *y, const Tensor *x, float alpha);
 
 void NN_elu_inplace(Tensor *x, float alpha);
 

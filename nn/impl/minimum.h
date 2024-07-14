@@ -7,8 +7,8 @@
 
 void NN__minimum_f32(size_t n,
     float *z, size_t incz,
-    float *x, size_t incx,
-    float *y, size_t incy
+    const float *x, size_t incx,
+    const float *y, size_t incy
     );
 
 

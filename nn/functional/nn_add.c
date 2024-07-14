@@ -2,7 +2,7 @@
 #include "nn_add.h"
 
 
-void NN_add(Tensor *out, Tensor *a, Tensor *b) {
+void NN_add(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(b->ndim <= a->ndim);
 
   switch (b->dtype) {
@@ -96,7 +96,7 @@ void NN_add(Tensor *out, Tensor *a, Tensor *b) {
   );
 }
 
-void NN_add1(Tensor *out, Tensor *a, float b) {
+void NN_add1(Tensor *out, const Tensor *a, float b) {
   assert(out->ndim == a->ndim);
   assert(out->dtype == a->dtype);
   assert(out->size == a->size);
@@ -114,7 +114,7 @@ void NN_add1(Tensor *out, Tensor *a, float b) {
   );
 }
 
-void NN_add_inplace(Tensor *b, Tensor *a) {
+void NN_add_inplace(Tensor *b, const Tensor *a) {
   assert(b->ndim == a->ndim);
   assert(b->dtype == a->dtype);
 

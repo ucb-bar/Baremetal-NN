@@ -15,7 +15,7 @@
  * @param y: the output tensor
  * @param x: the input tensor
  */
-void NN_relu(Tensor *y, Tensor *x);
+void NN_relu(Tensor *y, const Tensor *x);
 
 void NN_relu_inplace(Tensor *x);
 

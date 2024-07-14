@@ -15,7 +15,7 @@
  * @param out: the output tensor
  * @param input: the input tensor
  */
-void NN_abs(Tensor *out, Tensor *input);
+void NN_abs(Tensor *out, const Tensor *input);
 
 void NN_abs_inplace(Tensor *x);
 

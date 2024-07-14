@@ -2,7 +2,7 @@
 #include "nn_neg.h"
 
 
-void NN_neg(Tensor *out, Tensor *in) {
+void NN_neg(Tensor *out, const Tensor *in) {
   assert(out->ndim == in->ndim);
   assert(in->dtype == DTYPE_F32);
   assert(out->dtype == DTYPE_F32);

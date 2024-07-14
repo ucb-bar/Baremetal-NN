@@ -17,10 +17,10 @@ endif()
 #   ../nn/functional 
 #   ../nn/impl)
 
-find_library(LIB_TO_INCLUDE nn ./)
+# find_library(LIB_TO_INCLUDE nn ./)
 
-target_link_libraries(tests PUBLIC ${LIB_TO_INCLUDE})
+# target_link_libraries(tests PUBLIC ${LIB_TO_INCLUDE})
 
-# target_link_libraries(tests PUBLIC nn)
+target_link_libraries(tests PUBLIC nn)
 target_link_libraries(tests PUBLIC m)
 

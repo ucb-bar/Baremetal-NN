@@ -12,7 +12,7 @@
  * 
  * @param tensor: the input tensor of shape (m, n)
  */
-void NN_norm(Tensor *scalar, Tensor *x);
+void NN_norm(Tensor *scalar, const Tensor *x);
 
 
 #endif // __NN_NORM_H

@@ -2,7 +2,7 @@
 #include "nn_minimum.h"
 
 
-void NN_minimum(Tensor *out, Tensor *a, Tensor *b) {
+void NN_minimum(Tensor *out, const Tensor *a, const Tensor *b) {
   assert(b->ndim == a->ndim);
   assert(out->ndim == a->ndim);
   assert(b->dtype == a->dtype);
