@@ -82,4 +82,5 @@ Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype);
  */
 Tensor *NN_arange(size_t ndim, const size_t *shape, DataType dtype, float start, float step);
 
+
 #endif // __NN_TENSOR_CREATION
