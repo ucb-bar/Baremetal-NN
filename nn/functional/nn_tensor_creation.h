@@ -70,5 +70,16 @@ Tensor *NN_ones(size_t ndim, const size_t *shape, DataType dtype);
  */
 Tensor *NN_rand(size_t ndim, const size_t *shape, DataType dtype);
 
+/**
+ * Returns a tensor filled with increasing values.
+ * 
+ * @param ndim: number of dimensions
+ * @param shape: shape of tensor
+ * @param dtype: data type
+ * @param start: starting value
+ * @param step: increment step size
+ * @return Tensor
+ */
+Tensor *NN_arange(size_t ndim, const size_t *shape, DataType dtype, float start, float step);
 
 #endif // __NN_TENSOR_CREATION
