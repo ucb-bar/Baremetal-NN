@@ -105,7 +105,7 @@ the converter will dump out three files:
 
 
 
-### memory layout
+### Memory layout
 
 Baremetal-NN uses the NHWC memory layout and supports up to 4-dimension tensor.
 
@@ -113,12 +113,20 @@ Baremetal-NN uses the NHWC memory layout and supports up to 4-dimension tensor.
 
 ### Code organization
 
-The API functions uses the following naming convention:
+The torch-like functions that operates on Tensor datatypes are under `nn/functional`.
 
-`NN_operator_DataType__Platform`
+The low-level implementations of kernels are under `nn/impl/<device>`.
 
-`operator`: the name of the operator, this should be the same as Torch and NumPy.
+For the low-level functions, the following naming convention is used:
 
-`DataType`: the datatype of the operands. If the datatype of the operands and results are all the same, only one datatype should be specified. Otherwise, it should be in the order of `<Operand 0>_<Operand 1>_..._<Result 0>_<Result 1>_...`
+`void NN__operator_datatype(size_t n, <datatype *output_ptr, size_t increment>, <datatype *input_ptr, size_t increment>);`
 
-`Platform`: the platform-specific implementation. The default scalar CPU implementation omits this field.
+`operator`: the name of the operator, such as `add`, `max`.
+
+`dataType`: the datatype of the operands, such as `i8`, `u16`, `f32`. If the datatype of the results and operands are different, it will be named `<operand 0>_<operand 1>_..._to_<result 0>_...`
+
+`output_ptr` / `input_ptr`: the pointer to the data buffer with the correct type. The correct pointer type saves the repetitive casting within the function source code.
+
+`increment`: the number of element to increment in order to access the next element in the buffer, **in number of elements**, not bytes. (e.g. for `f32` type, increment of 1 will access next element starting from the next 4th byte, and hence the next contiguous fp32 number.)
+
+
