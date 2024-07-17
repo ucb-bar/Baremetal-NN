@@ -3,7 +3,6 @@
 
 #ifdef RVV
 
-
 void NN__neg_f32(size_t n, float *y, size_t incy, const float *x, size_t incx) {
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);

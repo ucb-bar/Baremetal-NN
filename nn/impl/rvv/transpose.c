@@ -3,7 +3,6 @@
 
 #ifdef RVV
 
-
 void NN__transpose_f32(size_t m, size_t n, float *y, const float *x) {
   for (size_t i = 0; i < m; i += 1) {
     size_t k = n;
@@ -17,6 +16,5 @@ void NN__transpose_f32(size_t m, size_t n, float *y, const float *x) {
     }
   }
 }
-
 
 #endif
