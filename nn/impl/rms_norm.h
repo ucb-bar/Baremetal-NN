@@ -9,6 +9,7 @@
 #include "mul1.h"
 #include "mul.h"
 
+
 void NN__rms_norm_f32(size_t n,
     float* y, size_t incy,
     const float* x, size_t incx,

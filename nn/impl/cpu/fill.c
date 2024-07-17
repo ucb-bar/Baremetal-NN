@@ -1,5 +1,6 @@
 #include "fill.h"
 
+
 __attribute__((weak)) void NN__fill_u8(size_t n, uint8_t *x, size_t incx, uint8_t scalar) {
   for (size_t i = 0; i < n; i += 1) {
     x[i * incx] = scalar;
