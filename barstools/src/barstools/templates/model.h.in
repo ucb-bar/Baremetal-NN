@@ -1,6 +1,8 @@
 #ifndef __MODEL_H
 #define __MODEL_H
 
+#include <stdint.h>
+#include <stddef.h>
 #include "nn.h"
 
 
@@ -23,7 +25,7 @@ void forward(Model *model);
  * Initialize the required tensors for the model
  */
 void init(Model *model) {
-  float *array_pointer = (float *)model_weight_data;
+  float *weight_ptr = (float *)model_weight_data;
 
 {{ model_init }}
 }
