@@ -11,7 +11,7 @@ cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RISCV=ON -D RVV=ON -S ./ -B
 
 cmake --build ./build/ --target clean
 cmake --build ./build/ --target llama2
-spike --isa=rv64gcv_zicntr_zvfh --varch=vlen:128,elen:32 --misaligned ./build/examples/llama2/llama2
+spike --isa=rv64gcv_zicntr_zvfh --varch=vlen:512,elen:32 --misaligned ./build/examples/llama2/llama2
 ```
 
 
@@ -67,4 +67,7 @@ replacing float arrays to tensors
 forward taking 11274729 cycles
 ```
 
-
+10811621
+10866877
+10788629
+10784633

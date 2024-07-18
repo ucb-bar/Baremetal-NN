@@ -43,3 +43,11 @@ void NN_mul1(Tensor *out, const Tensor *in, float scalar) {
   );
 }
 
+void NN_mul_inplace(Tensor *b, const Tensor *a) {
+  NN_mul(b, b, a);
+}
+
+void NN_mul1_inplace(Tensor *b, float scalar) {
+  NN_mul1(b, b, scalar);
+}
+
