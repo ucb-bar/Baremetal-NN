@@ -60,7 +60,7 @@ target_compile_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcm
 target_compile_options(target-riscv INTERFACE -Wl,-Map=output.map -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 target_compile_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
-target_compile_definitions(target-riscv INTERFACE FLT16_MAX=65504.0f)
+# target_compile_definitions(target-riscv INTERFACE FLT16_MAX=65504.0f)
 
 target_link_options(target-riscv INTERFACE -static)
 target_link_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcmodel=${MCMODEL})
