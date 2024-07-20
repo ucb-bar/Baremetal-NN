@@ -1,4 +1,4 @@
-#include "norm.h"
+#include "impl/norm.h"
 
 
 __attribute__((weak)) void NN__norm_f32(size_t n, float *result, const float *x, size_t incx) {

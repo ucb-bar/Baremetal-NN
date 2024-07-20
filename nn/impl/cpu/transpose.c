@@ -1,4 +1,4 @@
-#include "transpose.h"
+#include "impl/transpose.h"
 
 
 __attribute__((weak)) void NN__transpose_i8(size_t m, size_t n, int8_t *y, const int8_t *x) {

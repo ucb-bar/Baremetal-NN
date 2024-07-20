@@ -1,4 +1,4 @@
-#include "maximum1.h"
+#include "impl/maximum1.h"
 
 
 __attribute__((weak)) void NN__maximum1_i8(size_t n, int8_t *y, size_t incy, const int8_t *x, size_t incx, int8_t scalar) {

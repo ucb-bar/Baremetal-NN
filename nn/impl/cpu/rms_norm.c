@@ -1,4 +1,4 @@
-#include "rms_norm.h"
+#include "impl/rms_norm.h"
 
 
 __attribute__((weak)) void NN__rms_norm_f32(size_t n, float* y, size_t incy, const float* x, size_t incx, const float* w, size_t incw, float eps) {

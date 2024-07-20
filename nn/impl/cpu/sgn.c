@@ -1,4 +1,4 @@
-#include "sgn.h"
+#include "impl/sgn.h"
 
 
 __attribute__((weak)) void NN__sgn_f32(size_t n, float *y, size_t incy, const float *x, size_t incx) {

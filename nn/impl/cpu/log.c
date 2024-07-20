@@ -1,4 +1,4 @@
-#include "log.h"
+#include "impl/log.h"
 
 
 __attribute__((weak)) void NN__log_f32(size_t n, float *y, size_t incy, const float *x, size_t incx) {

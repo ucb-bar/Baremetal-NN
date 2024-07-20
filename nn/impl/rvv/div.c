@@ -1,5 +1,5 @@
 #include <riscv_vector.h>
-#include "div.h"
+#include "impl/div.h"
 
 #ifdef RVV
 
@@ -45,19 +45,21 @@ void NN__div_i32(size_t n, int32_t *z, size_t incz, const int32_t *x, size_t inc
   }
 }
 
-void NN__div_f16(size_t n, float16_t *z, size_t incz, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
-  while (n > 0) {
-    size_t vl = __riscv_vsetvl_e16m1(n);
-    vfloat16m1_t vec_x = __riscv_vlse16_v_f16m1(x, sizeof(float16_t) * incx, vl);
-    vfloat16m1_t vec_y = __riscv_vlse16_v_f16m1(y, sizeof(float16_t) * incy, vl);
-    vfloat16m1_t vec_z = __riscv_vfdiv_vv_f16m1(vec_x, vec_y, vl);
-    __riscv_vsse16_v_f16m1(z, sizeof(float16_t) * incz, vec_z, vl);
-    x += vl;
-    y += vl;
-    z += vl;
-    n -= vl;
+#ifdef ZVFH
+  void NN__div_f16(size_t n, float16_t *z, size_t incz, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
+    while (n > 0) {
+      size_t vl = __riscv_vsetvl_e16m1(n);
+      vfloat16m1_t vec_x = __riscv_vlse16_v_f16m1(x, sizeof(float16_t) * incx, vl);
+      vfloat16m1_t vec_y = __riscv_vlse16_v_f16m1(y, sizeof(float16_t) * incy, vl);
+      vfloat16m1_t vec_z = __riscv_vfdiv_vv_f16m1(vec_x, vec_y, vl);
+      __riscv_vsse16_v_f16m1(z, sizeof(float16_t) * incz, vec_z, vl);
+      x += vl;
+      y += vl;
+      z += vl;
+      n -= vl;
+    }
   }
-}
+#endif
 
 void NN__div_f32(size_t n, float *z, size_t incz, const float *x, size_t incx, const float *y, size_t incy) {
   while (n > 0) {

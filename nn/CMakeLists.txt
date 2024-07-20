@@ -112,10 +112,7 @@ add_library(nn
   ${cpu_impl}
 )
 
-target_include_directories(nn PUBLIC 
-  ./
-  ./functional 
-  ./impl)
+target_include_directories(nn PUBLIC ./)
 
 if (X86)
   message(STATUS "nn: Building for x86")
