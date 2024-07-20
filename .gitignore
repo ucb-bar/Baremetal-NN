@@ -28,6 +28,5 @@ share/python-wheels/
 MANIFEST
 
 examples/mnist/data/
-
 examples/llama2/checkpoints/stories15M.bin
-
+examples/yolov8/yolov8n.pt
