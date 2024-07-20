@@ -29,5 +29,21 @@ void NN_mul(Tensor *out, const Tensor *a, const Tensor *b);
  */
 void NN_mul1(Tensor *out, const Tensor *in, float scalar);
 
+/**
+ * Returns the element-wise multiplication of the input tensor with a scalar.
+ * 
+ * @param b: the tensor
+ * @param scalar: scalar value
+ */
+void NN_mul_inplace(Tensor *b, const Tensor *a);
+
+/**
+ * Returns the element-wise multiplication of the input tensor with a scalar.
+ * 
+ * @param b: the tensor
+ * @param scalar: scalar value
+ */
+void NN_mul1_inplace(Tensor *b, float scalar);
+
 
 #endif // __NN_MUL_H

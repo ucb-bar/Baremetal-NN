@@ -104,7 +104,6 @@ the converter will dump out three files:
 `model.h`: stores the code representation of the model forward pass.
 
 
-
 ### Memory layout
 
 Baremetal-NN uses the NHWC memory layout and supports up to 4-dimension tensor.

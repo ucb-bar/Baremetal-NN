@@ -102,6 +102,7 @@ add_library(nn
   ./functional/nn_relu6.c
   ./functional/nn_rms_norm.c
   ./functional/nn_softmax.c
+  ./functional/nn_silu.c
   ./functional/nn_sub.c
   ./functional/nn_sum.c
   ./functional/nn_transpose.c
