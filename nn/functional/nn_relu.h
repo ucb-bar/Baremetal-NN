@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "maximum1.h"
+#include "impl/maximum1.h"
 
 
 /**

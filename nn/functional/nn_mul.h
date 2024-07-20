@@ -5,8 +5,8 @@
 #include <float.h>
 
 #include "nn_tensor.h"
-#include "mul.h"
-#include "mul1.h"
+#include "impl/mul.h"
+#include "impl/mul1.h"
 
 
 /**

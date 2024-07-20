@@ -5,7 +5,7 @@
 #include <float.h>
 
 #include "nn_tensor.h"
-#include "div.h"
+#include "impl/div.h"
 
 
 /**
