@@ -44,8 +44,8 @@ target_compile_features(target-riscv INTERFACE c_std_11)
 target_compile_definitions(target-riscv INTERFACE RISCV)
 
 set(WRAP_SPECS_FILE     "htif_wrap.specs")
-set(SPECS_FILE          "nano.specs")
-set(SPEC_FLAGS          "-specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE}")
+set(SPECS_FILE          "htif_nano.specs")
+set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 
 set(MARCH               "rv64gcv_zfh_zvfh_zvfhmin")
 set(MABI                "lp64d")

@@ -19,4 +19,5 @@ endif ()
 target_compile_options(llama2 PRIVATE -O3 -Wall -Wextra)
 
 target_link_libraries(llama2 PUBLIC nn)
+target_link_libraries(llama2 PUBLIC m)
 

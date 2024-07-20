@@ -21,3 +21,4 @@ endif ()
 target_compile_options(fast-depth PRIVATE -O3 -Wall -Wextra)
 
 target_link_libraries(fast-depth PUBLIC nn)
+target_link_libraries(fast-depth PUBLIC m)
