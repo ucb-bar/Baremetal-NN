@@ -39,7 +39,7 @@ void NN__min_i32(size_t n, int32_t *result, const int32_t *x, size_t incx) {
   *result = __riscv_vmv_x_s_i32m1_i32(vec_max);
 }
 
-#ifdef ZVFH
+#ifdef RISCV_ZVFH
   void NN__min_f16(size_t n, float16_t *result, const float16_t *x, size_t incx) {
     vfloat16m1_t vec_max = __riscv_vfmv_v_f_f16m1(-FLT_MAX, 1);
     while (n > 0) {

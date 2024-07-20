@@ -33,7 +33,7 @@ void NN__fill_i32(size_t n, int32_t *x, size_t incx, int32_t scalar) {
   }
 }
 
-#ifdef ZVFH
+#ifdef RISCV_ZVFH
   void NN__fill_f16(size_t n, float16_t *x, size_t incx, float16_t scalar) {
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e16m1(n);

@@ -45,7 +45,7 @@ void NN__add_i32(size_t n, int32_t *z, size_t incz, const int32_t *x, size_t inc
   }
 }
 
-#ifdef ZVFH
+#ifdef RISCV_ZVFH
   void NN__add_f16(size_t n, float16_t *z, size_t incz, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e16m1(n);

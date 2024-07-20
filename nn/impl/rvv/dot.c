@@ -63,7 +63,7 @@ void NN__dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const
   *result = __riscv_vmv_x_s_i32m1_i32(vec_r);
 }
 
-#ifdef ZVFH
+#ifdef RISCV_ZVFH
   void NN__dot_f16(size_t n, float16_t *result, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
     size_t vlmax = __riscv_vsetvlmax_e16m1();
 

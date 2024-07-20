@@ -39,9 +39,9 @@ if (RVV)
   message(STATUS "Using RVV implementation")
   add_compile_definitions(RVV)
   
-  if (ZVFH)
+  if (RISCV_ZVFH)
     message(STATUS "Using Zvfh extension")
-    add_compile_definitions(ZVFH)
+    add_compile_definitions(RISCV_ZVFH)
   endif ()
   
   set(rvv_impl
