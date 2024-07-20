@@ -2,6 +2,7 @@
 #define __NN_SILU_H
 
 #include <assert.h>
+#include <math.h>
 
 #include "nn_tensor.h"
 #include "maximum1.h"
