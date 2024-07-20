@@ -39,6 +39,11 @@ if (RVV)
   message(STATUS "Using RVV implementation")
   add_compile_definitions(RVV)
   
+  if (ZVFH)
+    message(STATUS "Using Zvfh extension")
+    add_compile_definitions(ZVFH)
+  endif ()
+  
   set(rvv_impl
     ./impl/rvv/abs.c
     ./impl/rvv/acc.c

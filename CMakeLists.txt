@@ -24,6 +24,7 @@ option(RISCV                "Build for RISC-V"                  OFF     )
 # accelerator options
 option(AVX                  "Use AVX implementation" OFF)
 option(RVV                  "Use RISCV vector extension implementation" OFF)
+option(ZVFH                 "Use RISCV vector extension with half precision floating point" OFF)
 
 
 add_compile_options(-O1 -Wall -Wextra)
@@ -47,7 +48,17 @@ set(WRAP_SPECS_FILE     "htif_wrap.specs")
 set(SPECS_FILE          "htif_nano.specs")
 set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 
-set(MARCH               "rv64gcv_zfh_zvfh_zvfhmin")
+set(MARCH               "rv64gc")
+if (RVV)
+  list(APPEND MARCH "v")
+  list(APPEND MARCH "_zicntr")
+  
+  if (ZVFH)
+    list(APPEND MARCH "_zfh")
+  endif()
+endif()
+
+list(JOIN MARCH "" MARCH)
 set(MABI                "lp64d")
 set(MCMODEL             "medany")
 
