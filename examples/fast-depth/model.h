@@ -2,7 +2,6 @@
 #define __MODEL_H
 
 #include "nn.h"
-#include "nn_relu.h"
 
 
 // load the weight data block from the model.bin file

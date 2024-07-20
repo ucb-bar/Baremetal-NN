@@ -5,12 +5,12 @@
 #include <math.h>
 
 #include "nn_tensor.h"
-#include "sum.h"
-#include "add.h"
-#include "add1.h"
-#include "mul.h"
-#include "mul1.h"
-#include "sqr.h"
+#include "impl/sum.h"
+#include "impl/add.h"
+#include "impl/add1.h"
+#include "impl/mul.h"
+#include "impl/mul1.h"
+#include "impl/sqr.h"
 
 
 void NN_layer_norm(

@@ -1,4 +1,4 @@
-#include "sum.h"
+#include "impl/sum.h"
 
 
 __attribute__((weak)) void NN__sum_u8_to_i32(size_t n, int32_t *result, const uint8_t *x, size_t incx) {

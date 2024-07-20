@@ -1,4 +1,4 @@
-#include "min.h"
+#include "impl/min.h"
 
 
 __attribute__((weak)) void NN__min_i8(size_t n, int8_t *result, const int8_t *x, size_t incx) {

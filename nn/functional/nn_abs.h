@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "abs.h"
+#include "impl/abs.h"
 
 
 /**

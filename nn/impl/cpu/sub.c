@@ -1,4 +1,4 @@
-#include "sub.h"
+#include "impl/sub.h"
 
 
 __attribute__((weak)) void NN__sub_u8(size_t n, uint8_t *z, size_t incz, const uint8_t *x, size_t incx, const uint8_t *y, size_t incy) {

@@ -1,4 +1,4 @@
-#include "softmax.h"
+#include "impl/softmax.h"
 
 
 __attribute__((weak)) void NN__softmax_f16(size_t n, float16_t *y, size_t incy, const float16_t *x, size_t incx) {

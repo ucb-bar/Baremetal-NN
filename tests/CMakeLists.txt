@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+
 project(tests LANGUAGES C)
 
 add_executable(tests src/generated.c)
@@ -11,15 +13,6 @@ elseif (RISCV)
   target_link_libraries(tests PUBLIC target-riscv)
 endif()
 
-
-# include_directories(
-#   ../nn
-#   ../nn/functional 
-#   ../nn/impl)
-
-# find_library(LIB_TO_INCLUDE nn ./)
-
-# target_link_libraries(tests PUBLIC ${LIB_TO_INCLUDE})
 
 target_link_libraries(tests PUBLIC nn)
 target_link_libraries(tests PUBLIC m)
