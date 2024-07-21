@@ -1,7 +1,7 @@
 import operator
 import os
 import inspect
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Callable
 
 import numpy as np
 import torch
@@ -16,36 +16,6 @@ INDENT = "  "
 
 TEMPLATE_TENSOR_DECLARE = "Tensor {name};\n"
 TEMPLATE_TENSOR_INIT = "NN_init_tensor(&model->{name}, {dim}, (size_t[]){{ {shape} }}, {dtype}, {data});\n"
-
-
-
-def add_linear(ctx, layer_name, output_shape, input_names, weight, bias):
-    ctx.add_data_tensor(
-        "{layer_name}_weight".format(layer_name=layer_name), 
-        weight
-        )
-    
-    if bias is not None:
-        ctx.add_data_tensor(
-            "{layer_name}_bias".format(layer_name=layer_name),
-            bias
-            )
-    
-    ctx.add_output_tensor(
-        layer_name,
-        output_shape
-        )
-    
-    ctx.model_forward += INDENT + "NN_linear(&model->{layer_name}, &model->{input_names[0]}, {weight}, {bias});\n".format(
-        layer_name=layer_name,
-        input_names=input_names,
-        weight="&model->{layer_name}_weight".format(layer_name=layer_name),
-        bias="&model->{layer_name}_bias".format(layer_name=layer_name) if bias is not None else "NULL"
-    )
-
-
-
-
 
 
 class TorchConverter(torch.fx.Interpreter):
@@ -106,19 +76,39 @@ class TorchConverter(torch.fx.Interpreter):
         return graph, gm
 
     @staticmethod
-    def to_functional_torch(module: torch.nn.Module) -> Any:
-        if type(module) == torch.nn.Linear:
-            return torch.nn.functional.linear
-        elif type(module) == torch.nn.Conv2d:
+    def to_functional_torch(module: torch.nn.Module) -> Callable:
+        """
+        This is kinda silly, but I can't find a better way to do this: this function
+        maps a torch.nn.Module to its corresponding torch.nn.functional function.
+        
+        Args:
+            module (torch.nn.Module): A torch.nn.Module.
+        
+        Returns:
+            Callable: The corresponding torch.nn.functional function
+        """
+        # Convolution Layers
+        if type(module) == torch.nn.Conv2d:
             return torch.nn.functional.conv2d
+        
+        # Normalization Layers
         elif type(module) == torch.nn.BatchNorm2d:
             return torch.nn.functional.batch_norm
+        
+        # Non-linear Activations
+        elif type(module) == torch.nn.ELU:
+            return torch.nn.functional.elu
         elif type(module) == torch.nn.ReLU:
             return torch.nn.functional.relu
         elif type(module) == torch.nn.ReLU6:
             return torch.nn.functional.relu6
-        elif type(module) == torch.nn.ELU:
-            return torch.nn.functional.elu
+        elif type(module) == torch.nn.SiLU:
+            return torch.nn.functional.silu
+        
+        # Linear Layers
+        elif type(module) == torch.nn.Linear:
+            return torch.nn.functional.linear
+        
         else:
             print("[WARNING] Unsupported module call:", module)
 
@@ -158,6 +148,15 @@ class TorchConverter(torch.fx.Interpreter):
         self.gm.graph.print_tabular()
         
     def get_module_in_sequential(self, module, indicies):
+        """
+        Get a module in a nn.Sequential layer.
+        
+        This function will recursively unpack the nn.Sequential layers to get the innermost module.
+        
+        Args:
+            module (torch.nn.Sequential): A nn.Sequential layer.
+            indicies (List[int]): A list of indicies of the layers in the nn.Sequential layer.
+        """
         if len(indicies) == 0:
             return module
         return self.get_module_in_sequential(module[indicies[0]], indicies[1:])
@@ -206,49 +205,27 @@ class TorchConverter(torch.fx.Interpreter):
             data="NULL"
         )
     
-
-    
     def trace_functional(self, layer_name, target, args, kwargs, out):
         print("  trace:", layer_name, target)
+        
+        need_output_tensor = True
         
         output_shape = out.shape
         if len(output_shape) == 4:
             output_shape = (output_shape[0], output_shape[2], output_shape[3], output_shape[1])
         
         input_names = self.node_info[layer_name][0]
-
+        
+        # Math operations - Pointwise Ops
         if target == operator.__add__:
             self.model_forward += INDENT + "NN_add(&model->{layer_name}, &model->{input_names[0]}, &model->{input_names[1]});\n".format(
                 layer_name=layer_name,
                 input_names=input_names
             )
-            self.add_output_tensor(layer_name, output_shape)
-        elif target == torch.nn.functional.interpolate:
-            self.model_forward += INDENT + "NN_interpolate(&model->{layer_name}, &model->{input_names[0]}, (float []){{{scale_factor}, {scale_factor}}});\n".format(
-                layer_name=layer_name,
-                input_names=input_names,
-                scale_factor=kwargs.get("scale_factor")
-            )
-            self.add_output_tensor(layer_name, output_shape)
-        elif target == torch.nn.functional.relu:
-            self.model_forward += INDENT + "NN_relu(&model->{layer_name}, &model->{input_names[0]});\n".format(
-                layer_name=layer_name,
-                input_names=input_names
-            )
-            self.add_output_tensor(layer_name, output_shape)
-        elif target == torch.nn.functional.relu6:
-            self.model_forward += INDENT + "NN_relu6(&model->{layer_name}, &model->{input_names[0]});\n".format(
-                layer_name=layer_name,
-                input_names=input_names
-            )
-            self.add_output_tensor(layer_name, output_shape)
+            
+        # Convolution Layers
         elif target == torch.nn.functional.conv2d:
-            weight = args[1]
-            bias = args[2]
-            stride = args[3]
-            padding = args[4]
-            dilation = args[5]
-            groups = args[6]
+            _, weight, bias, stride, padding, dilation, groups = args
             
             if weight is not None:
                 # weight need to be converted from (out_ch, in_ch, kh, kw) to (kh, kw, in_ch, out_ch)
@@ -262,11 +239,7 @@ class TorchConverter(torch.fx.Interpreter):
                     bias
                     )
             
-            self.add_output_tensor(layer_name, output_shape)
-        
-            self.model_forward += INDENT + """NN_conv2d(
-    &model->{layer_name}, &model->{input_names[0]},
-    {weight}, {bias}, (size_t[]){{{stride}}}, (size_t[]){{{padding}}}, (size_t[]){{{dilation}}}, {groups});\n""".format(
+            self.model_forward += INDENT + "NN_conv2d(\n    &model->{layer_name}, &model->{input_names[0]},\n    {weight}, {bias}, (size_t[]){{{stride}}}, (size_t[]){{{padding}}}, (size_t[]){{{dilation}}}, {groups});\n".format(
                 layer_name=layer_name,
                 input_names=input_names,
                 weight="&model->{layer_name}_weight".format(layer_name=layer_name) if weight is not None else "NULL",
@@ -277,17 +250,29 @@ class TorchConverter(torch.fx.Interpreter):
                 groups=groups
             )
             self.prev_layer_name = "{layer_name}".format(layer_name=layer_name)
-        
-        elif target == torch.nn.functional.linear:
-            input_names = input_names
-            weight = args[1]
-            bias = args[2]
-            self.model_forward += INDENT + "NN_linear(&model->{layer_name}, &model->{input_names[0]}, {weight}, {bias});\n".format(
+            
+        # Non-linear Activations
+        elif target == torch.nn.functional.elu:
+            _, eps = args
+            self.model_forward += INDENT + "NN_elu(&model->{layer_name}, &model->{input_names[0]}, {eps});\n".format(
                 layer_name=layer_name,
-                input_names=self.node_info[layer_name][0],
-                weight="&model->{layer_name}_weight".format(layer_name=layer_name),
-                bias="&model->{layer_name}_bias".format(layer_name=layer_name)
+                input_names=input_names,
+                eps=eps
             )
+        elif target == torch.nn.functional.relu:
+            self.model_forward += INDENT + "NN_relu(&model->{layer_name}, &model->{input_names[0]});\n".format(
+                layer_name=layer_name,
+                input_names=input_names
+            )
+        elif target == torch.nn.functional.relu6:
+            self.model_forward += INDENT + "NN_relu6(&model->{layer_name}, &model->{input_names[0]});\n".format(
+                layer_name=layer_name,
+                input_names=input_names
+            )
+        
+        # Linear Layers
+        elif target == torch.nn.functional.linear:
+            _, weight, bias = args
             if weight is not None:
                 # weight need to be converted from (out_ch, in_ch, kh, kw) to (kh, kw, in_ch, out_ch)
                 self.add_data_tensor(
@@ -299,14 +284,22 @@ class TorchConverter(torch.fx.Interpreter):
                     "{layer_name}_bias".format(layer_name=layer_name),
                     bias
                     )
-            
-            self.add_output_tensor(layer_name, output_shape)
-        elif target == torch.nn.functional.elu:
-            self.model_forward += INDENT + "NN_elu(&model->{layer_name}, &model->{input_names[0]}, {eps});\n".format(
+            self.model_forward += INDENT + "NN_linear(&model->{layer_name}, &model->{input_names[0]}, {weight}, {bias});\n".format(
+                layer_name=layer_name,
+                input_names=self.node_info[layer_name][0],
+                weight="&model->{layer_name}_weight".format(layer_name=layer_name),
+                bias="&model->{layer_name}_bias".format(layer_name=layer_name)
+            )
+        
+        # Vision Functions
+        elif target == torch.nn.functional.interpolate:
+            self.model_forward += INDENT + "NN_interpolate(&model->{layer_name}, &model->{input_names[0]}, (float []){{{scale_factor}, {scale_factor}}});\n".format(
                 layer_name=layer_name,
                 input_names=input_names,
-                eps=args[1]
+                scale_factor=kwargs.get("scale_factor")
             )
+        
+        if need_output_tensor:
             self.add_output_tensor(layer_name, output_shape)
 
     def run_node(self, n: torch.fx.node.Node) -> Any:
@@ -330,8 +323,8 @@ class TorchConverter(torch.fx.Interpreter):
                 data="NULL"
             )
             
-        # elif n.op == "get_attr":
-        #     breakpoint()
+        elif n.op == "get_attr":
+            print("get attr:", n.name, n.target)
         
         elif n.op == "call_function":
             print("call function:", n.name, n.target)
@@ -362,17 +355,21 @@ class TorchConverter(torch.fx.Interpreter):
                     layer_name=layer_name
                 )
 
-            if type(module) == torch.nn.Linear:
-                args = (n.args[0], module.weight, module.bias)
-                
+            # Convolution Layers
+            if type(module) == torch.nn.Conv2d:
+                args = (n.args[0], module.weight, module.bias, module.stride, module.padding, module.dilation, module.groups)
+
+            # Normalization Layers
             elif type(module) == torch.nn.BatchNorm2d:
                 args = (n.args[0], module.weight, module.bias, module.running_mean, module.running_var, module.eps)
             
-            elif type(module) == torch.nn.Conv2d:
-                args = (n.args[0], module.weight, module.bias, module.stride, module.padding, module.dilation, module.groups)
-            
+            # Non-linear Activations
             elif type(module) == torch.nn.ELU:
                 args = (n.args[0], module.alpha)
+            
+            # Linear Layers
+            elif type(module) == torch.nn.Linear:
+                args = (n.args[0], module.weight, module.bias)
             
             else:
                 print("[WARNING] Unsupported module call:", n.target)
