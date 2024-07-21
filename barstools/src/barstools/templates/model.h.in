@@ -7,7 +7,7 @@
 
 
 // load the weight data block from the model.bin file
-INCLUDE_FILE(".rodata", "../model.bin", model_weight);
+INCLUDE_FILE(".rodata", "./model.bin", model_weight);
 extern uint8_t model_weight_data[];
 extern size_t model_weight_start[];
 extern size_t model_weight_end[];
