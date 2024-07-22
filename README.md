@@ -85,9 +85,8 @@ rm -rf ./build/
 ```
 
 ```bash
-cmake . -D CMAKE_TOOLCHAIN_FILE=./k230-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV=ON
+cmake . -D CMAKE_TOOLCHAIN_FILE=./k230-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV_ASM=ON
 cmake --build ./build/ --target all
-spike ./build/tests/tests 
 ```
 
 ### Cleaning build files
