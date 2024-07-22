@@ -67,6 +67,17 @@ if (RVV)
     )
 endif ()
 
+if (RVV_ASM)
+  message(STATUS "Using RVV assembly implementation")
+  
+  set(rvv_impl
+    ./impl/rvv/abs.S
+    ./impl/rvv/add.S
+    ./impl/rvv/dot.S
+    ./impl/rvv/maximum1.S
+    )
+endif ()
+
 if (GEMMINI)
   message(STATUS "Using Gemmini implementation")
   add_compile_definitions(GEMMINI)
