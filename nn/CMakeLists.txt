@@ -74,7 +74,6 @@ if (RVV_ASM)
     ./impl/rvv/abs.S
     ./impl/rvv/add.S
     ./impl/rvv/dot.S
-    ./impl/rvv/maximum1.S
     )
 endif ()
 
