@@ -76,6 +76,20 @@ cmake --build ./build/ --target all
 spike --extension=gemmini ./example
 ```
 
+### Building for K230 board
+
+first, we clean any previous builds
+
+```bash
+rm -rf ./build/
+```
+
+```bash
+cmake . -D CMAKE_TOOLCHAIN_FILE=./k230-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV=ON
+cmake --build ./build/ --target all
+spike ./build/tests/tests 
+```
+
 ### Cleaning build files
 
 ```
