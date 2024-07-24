@@ -82,7 +82,7 @@ target_link_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 
-add_subdirectory(nn)
+# add_subdirectory(nn)
 add_subdirectory(tests)
 add_subdirectory(examples)
 

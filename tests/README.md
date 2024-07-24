@@ -16,6 +16,12 @@ class REFV128D64ShuttleTapeoutConfig extends Config(
 
 ```
 
+```bash
+make run-binary-debug CONFIG=REFV128D64ShuttleTapeoutConfig BINARY=../../../../Baremetal-NN/build/tests/tests LOADMEM=1
+```
+
+/scratch/tk/Desktop/q3-tapeout/chipyard/sims/vcs/output/chipyard.harness.TestHarness.REFV128D64ShuttleTapeoutConfig/tests.fsdb
+
 
 
 
