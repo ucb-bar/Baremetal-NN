@@ -11,6 +11,7 @@ if (X86)
   target_link_libraries(tests PUBLIC target-x86)
 elseif (RISCV)
   target_link_libraries(tests PUBLIC target-riscv)
+  set_target_properties(tests PROPERTIES SUFFIX ".elf")
 endif()
 
 

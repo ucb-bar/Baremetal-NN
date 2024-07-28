@@ -16,8 +16,8 @@ if (X86)
 elseif (RISCV)
   message("stereoBM: building for RISC-V")
   target_link_libraries(stereoBM PUBLIC target-riscv)
+  set_target_properties(stereoBM PROPERTIES SUFFIX ".elf")
 endif ()
-
 
 target_compile_options(stereoBM PRIVATE -O3 -Wall -Wextra)
 

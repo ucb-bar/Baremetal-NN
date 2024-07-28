@@ -14,6 +14,7 @@ if (X86)
 elseif (RISCV)
   message(STATUS "llama2: Building for RISC-V")
   target_link_libraries(llama2 PUBLIC target-riscv)
+  set_target_properties(llama2 PROPERTIES SUFFIX ".elf")
 endif ()
 
 target_compile_options(llama2 PRIVATE -O3 -Wall -Wextra)
