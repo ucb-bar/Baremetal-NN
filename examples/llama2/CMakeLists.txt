@@ -22,3 +22,11 @@ target_compile_options(llama2 PRIVATE -O3 -Wall -Wextra)
 target_link_libraries(llama2 PUBLIC nn)
 target_link_libraries(llama2 PUBLIC m)
 
+
+add_custom_target(llama2-dump ALL
+  COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:llama2> > ${CMAKE_BINARY_DIR}/llama2.disassemble.S
+  COMMAND ${CMAKE_OBJDUMP} -h $<TARGET_FILE:llama2> > ${CMAKE_BINARY_DIR}/llama2.sections
+  COMMAND ${CMAKE_OBJDUMP} -t $<TARGET_FILE:llama2> > ${CMAKE_BINARY_DIR}/llama2.symbols
+  DEPENDS llama2
+  COMMENT "Generating dump files for llama2:\n ${CMAKE_BINARY_DIR}/llama2.disassemble.S\n ${CMAKE_BINARY_DIR}/llama2.sections\n ${CMAKE_BINARY_DIR}/llama2.symbols"
+)

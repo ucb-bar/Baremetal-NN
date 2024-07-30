@@ -18,3 +18,11 @@ endif()
 target_link_libraries(tests PUBLIC nn)
 target_link_libraries(tests PUBLIC m)
 
+
+add_custom_target(dump ALL
+  COMMAND ${CMAKE_OBJDUMP} -d $<TARGET_FILE:tests> > ${CMAKE_BINARY_DIR}/tests.disassemble.S
+  COMMAND ${CMAKE_OBJDUMP} -h $<TARGET_FILE:tests> > ${CMAKE_BINARY_DIR}/tests.sections
+  COMMAND ${CMAKE_OBJDUMP} -t $<TARGET_FILE:tests> > ${CMAKE_BINARY_DIR}/tests.symbols
+  DEPENDS tests
+  COMMENT "Generating dump files for tests:\n ${CMAKE_BINARY_DIR}/tests.disassemble.S\n ${CMAKE_BINARY_DIR}/tests.sections\n ${CMAKE_BINARY_DIR}/tests.symbols"
+)
