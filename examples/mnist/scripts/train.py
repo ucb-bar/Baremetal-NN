@@ -28,11 +28,11 @@ def loadDataset(directory="./data", batch_size:int = 4):
 
     return trainloader, testloader
 
-trainloader, testloaderbatch_size = loadDataset()
+trainloader, testloader = loadDataset()
 
 
 model = MNIST_MLP(device=device)
-model = MNIST_CNN(device=device)
+# model = MNIST_CNN(device=device)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
@@ -64,4 +64,11 @@ for epoch in range(2):  # loop over the dataset multiple times
 
 print("Finished Training")
 
+from barstools import TorchConverter
+
+example_input, label = next(iter(testloader))
+TorchConverter(model).convert(example_input, ".")
+
 torch.save(model, "model.pth")
+
+
