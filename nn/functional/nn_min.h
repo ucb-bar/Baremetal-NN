@@ -5,7 +5,7 @@
 #include <float.h>
 
 #include "nn_tensor.h"
-#include "min.h"
+#include "impl/min.h"
 
 
 /**

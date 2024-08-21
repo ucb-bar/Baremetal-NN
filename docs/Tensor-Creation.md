@@ -1,6 +1,6 @@
 # Tensor Creation
 
-A set of factory functions are available for creating a tensor object. These factory functions configure the shape, data type, device and other properties of the new tensor, and optionally populate them according to specific algorithms.
+Tensors can be initialized in various ways. A set of factory functions are available for creating a tensor object. These factory functions configure the shape, data type, device and other properties of the new tensor, and optionally populate them according to specific algorithms.
 
 ## Factory Functions
 
@@ -14,17 +14,45 @@ Tensor *NN_<function-name>(<ndim>, <shape>, <datatype>, <tensor-options>)
 
 The following factory functions are available at the time of this writing:
 
-**tensor**: Returns a tensor with uninitialized values or preallocated buffer.
+#### NN_tensor()
 
-**zeros**: Returns a tensor filled with all zeros.
+Returns a tensor with uninitialized values or preallocated buffer.
 
-**ones**: Returns a tensor filled with all ones.
+When passing NULL as the data buffer, the method will allocate a new chunk of uninitialized data chunk.
 
-**full**: Returns a tensor filled with a single value.
+```c
+Tensor *tensor = NN_tensor(2, (size_t []){ 2, 2 }, DTYPE_F32, NULL);
+```
 
-**rand**: Returns a tensor filled with values drawn from a uniform distribution on [0, 1).
+Alternatively, tensor be created directly from an existing data buffer.
 
-**randint**: Returns a tensor with integers randomly drawn from an interval.
+```c
+// data = [[1, 2], [3, 4]]
+float data[] = { 1, 2, 3, 4 };
+Tensor *tensor = NN_tensor(2, (size_t []){ 2, 2 }, DTYPE_F32, data);
+```
 
-**arange**: Returns a tensor with a sequence of integers.
+#### NN_zeros()
+
+Returns a tensor filled with all zeros.
+
+#### NN_ones()
+
+Returns a tensor filled with all ones.
+
+#### NN_full()
+
+Returns a tensor filled with a single value.
+
+#### NN_rand()
+
+Returns a tensor filled with values drawn from a uniform distribution on [0, 1).
+
+#### NN_randint()
+
+Returns a tensor with integers randomly drawn from an interval.
+
+#### NN_arange()
+
+Returns a tensor with a sequence of integers.
 

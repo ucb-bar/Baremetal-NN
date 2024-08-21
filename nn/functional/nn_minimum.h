@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "minimum.h"
+#include "impl/minimum.h"
 
 
 /**

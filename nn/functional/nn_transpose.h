@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "transpose.h"
+#include "impl/transpose.h"
 
 /**
  * Transpose a 2D tensor

@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "nn_tensor.h"
-#include "softmax.h"
+#include "impl/softmax.h"
 
 
 /**

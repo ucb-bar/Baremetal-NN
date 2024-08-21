@@ -1,4 +1,4 @@
-
+cmake_minimum_required(VERSION 3.10)
 
 set(cpu_impl 
   ./impl/cpu/abs.c
@@ -38,6 +38,11 @@ endif ()
 if (RVV)
   message(STATUS "Using RVV implementation")
   add_compile_definitions(RVV)
+  
+  if (RISCV_ZVFH)
+    message(STATUS "Using Zvfh extension")
+    add_compile_definitions(RISCV_ZVFH)
+  endif ()
   
   set(rvv_impl
     ./impl/rvv/abs.c
@@ -112,10 +117,7 @@ add_library(nn
   ${cpu_impl}
 )
 
-target_include_directories(nn PUBLIC 
-  ./
-  ./functional 
-  ./impl)
+target_include_directories(nn PUBLIC ./)
 
 if (X86)
   message(STATUS "nn: Building for x86")
@@ -128,6 +130,3 @@ endif ()
 
 
 target_link_libraries(nn m)
-
-
-

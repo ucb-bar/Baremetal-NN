@@ -22,8 +22,9 @@ option(X86                  "Build for x86"                     OFF     )
 option(RISCV                "Build for RISC-V"                  OFF     )
 
 # accelerator options
-option(AVX                  "Use AVX implementation" OFF)
-option(RVV                  "Use RISCV vector extension implementation" OFF)
+option(AVX                  "Use AVX implementation"            OFF     )
+option(RVV                  "Use RISCV vector extension"        OFF     )
+option(ZVFH                 "Use RISCV half-precision floating-point vector extension" OFF)
 
 
 add_compile_options(-O1 -Wall -Wextra)
@@ -44,12 +45,25 @@ target_compile_features(target-riscv INTERFACE c_std_11)
 target_compile_definitions(target-riscv INTERFACE RISCV)
 
 set(WRAP_SPECS_FILE     "htif_wrap.specs")
-set(SPECS_FILE          "nano.specs")
-set(SPEC_FLAGS          "-specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE}")
+set(SPECS_FILE          "htif_nano.specs")
+set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 
-set(MARCH               "rv64gcv_zfh_zvfh_zvfhmin")
+set(MARCH               "rv64gc")
 set(MABI                "lp64d")
 set(MCMODEL             "medany")
+
+# generate march flags
+if (RVV)
+  list(APPEND MARCH "v")
+  list(APPEND MARCH "_zicntr")
+  
+  if (ZVFH)
+    list(APPEND MARCH "_zfh")
+    list(APPEND MARCH "_zvfh")
+  endif()
+endif()
+
+list(JOIN MARCH "" MARCH)
 
 if (NOT DEFINED LINKER_SCRIPT)
   set(LINKER_SCRIPT     ${CMAKE_SOURCE_DIR}/toolchain/htif.ld)
