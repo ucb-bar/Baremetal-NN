@@ -39,17 +39,17 @@ void NN__acc1_i32(size_t n, int32_t *result, size_t incx, int32_t scalar) {
   }
 }
 
-// void NN__acc1_f16(size_t n, float16_t *result, size_t incx, float16_t scalar) {
-//   while (n > 0) {
-//     size_t vl = __riscv_vsetvl_e16m1(n);
-//     vfloat16m1_t vec_r = __riscv_vlse16_v_f16m1(result, sizeof(float16_t) * incx, vl);
-//     vfloat16m1_t vec_s = __riscv_vfmv_v_f_f16m1(scalar, vl);
-//     vec_r = __riscv_vfadd_vv_f16m1(vec_r, vec_s, vl);
-//     __riscv_vse16_v_f16m1(result, vec_r, vl);
-//     result += vl;
-//     n -= vl;
-//   }
-// }
+void NN__acc1_f16(size_t n, float16_t *result, size_t incx, float16_t scalar) {
+  while (n > 0) {
+    size_t vl = __riscv_vsetvl_e16m1(n);
+    vfloat16m1_t vec_r = __riscv_vlse16_v_f16m1(result, sizeof(float16_t) * incx, vl);
+    vfloat16m1_t vec_s = __riscv_vfmv_v_f_f16m1(scalar, vl);
+    vec_r = __riscv_vfadd_vv_f16m1(vec_r, vec_s, vl);
+    __riscv_vse16_v_f16m1(result, vec_r, vl);
+    result += vl;
+    n -= vl;
+  }
+}
 
 void NN__acc1_f32(size_t n, float *result, size_t incx, float scalar) {
   while (n > 0) {
