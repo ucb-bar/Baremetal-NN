@@ -38,7 +38,7 @@ void NN_max_pool2d(Tensor *out, const Tensor *in, const size_t *kernel_size) {
                                + h * in->shape[3]
                                + w;
 
-          NN__max_f32(kernel_height * kernel_width, ((float *)out->data) + window_offset, ((float *)out->data) + window_offset, 1);
+          NN_max_f32(kernel_height * kernel_width, ((float *)out->data) + window_offset, ((float *)out->data) + window_offset, 1);
         }
       }
     }

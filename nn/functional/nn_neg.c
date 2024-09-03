@@ -10,7 +10,7 @@ void NN_neg(Tensor *out, const Tensor *in) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__neg_f32(out->size, (float *)out->data, 1, (float *)in->data, 1);
+      NN_neg_f32(out->size, (float *)out->data, 1, (float *)in->data, 1);
       return;
 
     default:

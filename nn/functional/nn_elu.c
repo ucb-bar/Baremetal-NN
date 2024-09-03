@@ -17,7 +17,7 @@ void NN_elu(Tensor *y, const Tensor *x, float alpha) {
           ((float *)y->data)[i] = alpha * (expf(((float *)x->data)[i]) - 1.f);
         }
       }
-      // NN__elu_F32(y->size, (float *)y->data, (float *)x->data, 0.0f);
+      // NN_elu_F32(y->size, (float *)y->data, (float *)x->data, 0.0f);
       return;
 
     default:

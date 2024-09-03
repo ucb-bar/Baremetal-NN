@@ -3,7 +3,7 @@
 
 #ifdef RVV
 
-void NN__max_i8(size_t n, int8_t *result, const int8_t *x, size_t incx) {
+void NN_max_i8(size_t n, int8_t *result, const int8_t *x, size_t incx) {
   vint8m1_t vec_max = __riscv_vmv_v_x_i8m1(INT8_MIN, 1);
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e8m1(n);
@@ -15,7 +15,7 @@ void NN__max_i8(size_t n, int8_t *result, const int8_t *x, size_t incx) {
   *result = __riscv_vmv_x_s_i8m1_i8(vec_max);
 }
 
-void NN__max_i16(size_t n, int16_t *result, const int16_t *x, size_t incx) {
+void NN_max_i16(size_t n, int16_t *result, const int16_t *x, size_t incx) {
   vint16m1_t vec_max = __riscv_vmv_v_x_i16m1(INT16_MIN, 1);
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e16m1(n);
@@ -27,7 +27,7 @@ void NN__max_i16(size_t n, int16_t *result, const int16_t *x, size_t incx) {
   *result = __riscv_vmv_x_s_i16m1_i16(vec_max);
 }
 
-void NN__max_i32(size_t n, int32_t *result, const int32_t *x, size_t incx) {
+void NN_max_i32(size_t n, int32_t *result, const int32_t *x, size_t incx) {
   vint32m1_t vec_max = __riscv_vmv_v_x_i32m1(INT32_MIN, 1);
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);
@@ -40,7 +40,7 @@ void NN__max_i32(size_t n, int32_t *result, const int32_t *x, size_t incx) {
 }
 
 #ifdef RISCV_ZVFH
-  void NN__max_f16(size_t n, float16_t *result, const float16_t *x, size_t incx) {
+  void NN_max_f16(size_t n, float16_t *result, const float16_t *x, size_t incx) {
     vfloat16m1_t vec_max = __riscv_vfmv_v_f_f16m1(-FLT_MAX, 1);
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e16m1(n);
@@ -53,7 +53,7 @@ void NN__max_i32(size_t n, int32_t *result, const int32_t *x, size_t incx) {
   }
 #endif
 
-void NN__max_f32(size_t n, float *result, const float *x, size_t incx) {
+void NN_max_f32(size_t n, float *result, const float *x, size_t incx) {
   vfloat32m1_t vec_max = __riscv_vfmv_s_f_f32m1(-FLT_MAX, 1);
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);

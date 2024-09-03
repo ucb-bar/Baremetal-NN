@@ -11,7 +11,7 @@ void NN_div(Tensor *out, const Tensor *a, const Tensor *b) {
   
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__div_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, (float *)b->data, 1);
+      NN_div_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, (float *)b->data, 1);
       return;
 
     default:

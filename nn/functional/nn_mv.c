@@ -10,7 +10,7 @@ void NN_mv(Tensor *out, const Tensor *a, const Tensor *v) {
 
   if (a->dtype == DTYPE_F16 && v->dtype == DTYPE_F16 && out->dtype == DTYPE_F16) {
     for (size_t i = 0; i < out->shape[0]; i += 1) {
-      NN__dot_f16(a->shape[1], 
+      NN_dot_f16(a->shape[1], 
         (float16_t *)out->data + i, 
         (float16_t *)a->data + i * a->shape[1], 1,
         (float16_t *)v->data, 1
@@ -20,7 +20,7 @@ void NN_mv(Tensor *out, const Tensor *a, const Tensor *v) {
   }
   if (a->dtype == DTYPE_F32 && v->dtype == DTYPE_F32 && out->dtype == DTYPE_F32) {
     for (size_t i = 0; i < out->shape[0]; i += 1) {
-      NN__dot_f32(a->shape[1],
+      NN_dot_f32(a->shape[1],
         (float *)out->data + i, 
         (float *)a->data + i * a->shape[1], 1,
         (float *)v->data, 1

@@ -3,7 +3,7 @@
 
 #ifdef RVV
 
-void NN__dot_i8_to_i32(size_t n, int32_t *result, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {
+void NN_dot_i8_to_i32(size_t n, int32_t *result, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e8m1();
 
   vint16m1_t vec_r = __riscv_vmv_v_x_i16m1(0, vlmax);
@@ -23,7 +23,7 @@ void NN__dot_i8_to_i32(size_t n, int32_t *result, const int8_t *x, size_t incx, 
   *result = __riscv_vmv_x_s_i16m1_i16(vec_r);
 }
 
-void NN__dot_i16_to_i32(size_t n, int32_t *result, const int16_t *x, size_t incx, const int16_t *y, size_t incy) {
+void NN_dot_i16_to_i32(size_t n, int32_t *result, const int16_t *x, size_t incx, const int16_t *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e16m1();
 
   vint32m1_t vec_r = __riscv_vmv_v_x_i32m1(0, vlmax);
@@ -43,7 +43,7 @@ void NN__dot_i16_to_i32(size_t n, int32_t *result, const int16_t *x, size_t incx
   *result = __riscv_vmv_x_s_i32m1_i32(vec_r);
 }
 
-void NN__dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const int32_t *y, size_t incy) {
+void NN_dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const int32_t *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e32m1();
 
   vint32m1_t vec_zero = __riscv_vmv_v_x_i32m1(0, vlmax);
@@ -64,7 +64,7 @@ void NN__dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const
 }
 
 #ifdef RISCV_ZVFH
-  void NN__dot_f16(size_t n, float16_t *result, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
+  void NN_dot_f16(size_t n, float16_t *result, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
     size_t vlmax = __riscv_vsetvlmax_e16m1();
 
     vfloat16m1_t vec_zero = __riscv_vfmv_v_f_f16m1(0, vlmax);
@@ -85,7 +85,7 @@ void NN__dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const
   }
 #endif
 
-void NN__dot_f32(size_t n, float *result, const float *x, size_t incx, const float *y, size_t incy) {
+void NN_dot_f32(size_t n, float *result, const float *x, size_t incx, const float *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e32m1();
 
   vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
