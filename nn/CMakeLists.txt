@@ -52,6 +52,7 @@ if (RVV)
     ./kernel/rvv/acc1.c
     ./kernel/rvv/add.c
     ./kernel/rvv/add1.c
+    ./kernel/rvv/addmm.c
     ./kernel/rvv/div.c
     ./kernel/rvv/dot.c
     ./kernel/rvv/max.c

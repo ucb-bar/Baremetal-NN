@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "float16.h"
+#include "kernel/dot.h"
 
 
 void NN_addmm_t_f32(size_t m, size_t n, size_t k, float *y, const float *x1, const float *x2, const float *x3);
