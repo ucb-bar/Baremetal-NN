@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "impl/dot.h"
+#include "kernel/dot.h"
 
 
 /**

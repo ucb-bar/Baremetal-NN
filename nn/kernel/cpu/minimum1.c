@@ -1,4 +1,4 @@
-#include "impl/minimum1.h"
+#include "kernel/minimum1.h"
 
 
 __attribute__((weak)) void NN_minimum1_i8(size_t n, int8_t *y, size_t incy, const int8_t *x, size_t incx, int8_t scalar) {

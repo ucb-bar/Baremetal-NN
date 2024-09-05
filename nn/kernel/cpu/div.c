@@ -1,4 +1,4 @@
-#include "impl/div.h"
+#include "kernel/div.h"
 
 
 __attribute__((weak)) void NN_div_i8(size_t n, int8_t *z, size_t incz, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {

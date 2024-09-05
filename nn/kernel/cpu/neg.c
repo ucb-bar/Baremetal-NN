@@ -1,4 +1,4 @@
-#include "impl/neg.h"
+#include "kernel/neg.h"
 
 
 __attribute__((weak)) void NN_neg_i8(size_t n, int8_t *y, size_t incy, const int8_t *x, size_t incx) {

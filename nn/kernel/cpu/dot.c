@@ -1,4 +1,4 @@
-#include "impl/dot.h"
+#include "kernel/dot.h"
 
 
 __attribute__((weak)) void NN_dot_i8_to_i32(size_t n, int32_t *result, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {

@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "tensor.h"
-#include "impl/rms_norm.h"
+#include "kernel/rms_norm.h"
 
 
 /**

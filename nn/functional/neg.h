@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "impl/neg.h"
+#include "kernel/neg.h"
 
 
 /**

@@ -4,8 +4,8 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "impl/maximum1.h"
-#include "impl/minimum1.h"
+#include "kernel/maximum1.h"
+#include "kernel/minimum1.h"
 
 
 /**

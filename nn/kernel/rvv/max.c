@@ -1,5 +1,5 @@
 #include <riscv_vector.h>
-#include "impl/max.h"
+#include "kernel/max.h"
 
 #ifdef RVV
 

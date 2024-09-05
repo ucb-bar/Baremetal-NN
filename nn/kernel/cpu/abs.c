@@ -1,4 +1,4 @@
-#include "impl/abs.h"
+#include "kernel/abs.h"
 
 
 __attribute__((weak)) void NN_abs_i8(size_t n, int8_t *y, size_t incy, const int8_t *x, size_t incx) {

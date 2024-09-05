@@ -2,7 +2,7 @@
 #include "conv2d.h"
 
 #ifdef GEMMINI
-  #include "impl/gemmini/gemmini.h"
+  #include "kernel/gemmini/gemmini.h"
 #endif
 
 

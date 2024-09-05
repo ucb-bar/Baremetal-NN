@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "tensor.h"
-#include "impl/fill.h"
+#include "kernel/fill.h"
 
 /**
  * Fills the tensor with the specified value.

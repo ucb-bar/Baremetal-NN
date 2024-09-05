@@ -78,39 +78,39 @@ endif ()
 
 
 add_library(nn
-  ./layer/tensor_creation.c
-  ./layer/print.c
-  ./layer/abs.c
-  ./layer/add.c
-  ./layer/batch_norm2d.c
-  ./layer/conv2d.c
-  ./layer/clip.c
-  ./layer/copy.c
-  ./layer/div.c
-  ./layer/elu.c
-  ./layer/fill.c
-  ./layer/interpolate.c
-  ./layer/layer_norm.c
-  ./layer/linear.c
-  ./layer/matmul.c
-  ./layer/mm.c
-  ./layer/norm.c
-  ./layer/max.c
-  ./layer/maximum.c
-  ./layer/max_pool2d.c
-  ./layer/min.c
-  ./layer/minimum.c
-  ./layer/mul.c
-  ./layer/mv.c
-  ./layer/neg.c
-  ./layer/relu.c
-  ./layer/relu6.c
-  ./layer/rms_norm.c
-  ./layer/softmax.c
-  ./layer/silu.c
-  ./layer/sub.c
-  ./layer/sum.c
-  ./layer/transpose.c
+  ./functional/tensor_creation.c
+  ./functional/print.c
+  ./functional/abs.c
+  ./functional/add.c
+  ./functional/batch_norm2d.c
+  ./functional/conv2d.c
+  ./functional/clip.c
+  ./functional/copy.c
+  ./functional/div.c
+  ./functional/elu.c
+  ./functional/fill.c
+  ./functional/interpolate.c
+  ./functional/layer_norm.c
+  ./functional/linear.c
+  ./functional/matmul.c
+  ./functional/mm.c
+  ./functional/norm.c
+  ./functional/max.c
+  ./functional/maximum.c
+  ./functional/max_pool2d.c
+  ./functional/min.c
+  ./functional/minimum.c
+  ./functional/mul.c
+  ./functional/mv.c
+  ./functional/neg.c
+  ./functional/relu.c
+  ./functional/relu6.c
+  ./functional/rms_norm.c
+  ./functional/softmax.c
+  ./functional/silu.c
+  ./functional/sub.c
+  ./functional/sum.c
+  ./functional/transpose.c
 
   ${rvv_impl}
   ${gemmini_impl}

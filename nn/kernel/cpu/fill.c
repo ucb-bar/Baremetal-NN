@@ -1,4 +1,4 @@
-#include "impl/fill.h"
+#include "kernel/fill.h"
 
 
 __attribute__((weak)) void NN_fill_u8(size_t n, uint8_t *x, size_t incx, uint8_t scalar) {

@@ -1,5 +1,5 @@
 #include "riscv_vector.h"
-#include "impl/abs.h"
+#include "kernel/abs.h"
 
 #ifdef RVV
 

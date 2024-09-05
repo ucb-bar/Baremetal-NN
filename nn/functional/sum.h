@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "impl/sum.h"
+#include "kernel/sum.h"
 
 
 /**

@@ -1,5 +1,5 @@
 #include <riscv_vector.h>
-#include "impl/min.h"
+#include "kernel/min.h"
 
 #ifdef RVV
 

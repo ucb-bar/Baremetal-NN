@@ -1,5 +1,5 @@
 #include <riscv_vector.h>
-#include "impl/mul.h"
+#include "kernel/mul.h"
 
 #ifdef RVV
 

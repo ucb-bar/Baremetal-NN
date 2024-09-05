@@ -6,10 +6,10 @@
 
 #include "tensor.h"
 #include "print.h"
-#include "impl/acc.h"
-#include "impl/acc1.h"
-#include "impl/add.h"
-#include "impl/add1.h"
+#include "kernel/acc.h"
+#include "kernel/acc1.h"
+#include "kernel/add.h"
+#include "kernel/add1.h"
 
 
 /**

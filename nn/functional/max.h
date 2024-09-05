@@ -5,7 +5,7 @@
 #include <float.h>
 
 #include "tensor.h"
-#include "impl/max.h"
+#include "kernel/max.h"
 
 
 /**

@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "impl/softmax.h"
+#include "kernel/softmax.h"
 
 
 /**

@@ -1,4 +1,4 @@
-#include "impl/sqrt.h"
+#include "kernel/sqrt.h"
 
 
 __attribute__((weak)) void NN_sqrt_f16(size_t n, float16_t *y, size_t incy, const float16_t *x, size_t incx) {

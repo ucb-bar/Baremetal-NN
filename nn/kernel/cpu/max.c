@@ -1,4 +1,4 @@
-#include "impl/max.h"
+#include "kernel/max.h"
 
 
 __attribute__((weak)) void NN_max_i8(size_t n, int8_t *result, const int8_t *x, size_t incx) {

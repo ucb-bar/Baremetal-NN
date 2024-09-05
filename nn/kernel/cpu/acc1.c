@@ -1,4 +1,4 @@
-#include "impl/acc1.h"
+#include "kernel/acc1.h"
 
 
 __attribute__((weak)) void NN_acc1_i8(size_t n, int8_t *result, size_t incr, int8_t scalar) {
