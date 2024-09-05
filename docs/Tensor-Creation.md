@@ -4,7 +4,7 @@ Tensors can be initialized in various ways. A set of factory functions are avail
 
 ## Factory Functions
 
-A *factory function* is a function that produces a new tensor. There are many factory functions available, which differ in the way they initialize a new tensor before returning it. All factory functions adhere to the following general “schema”:
+A *factory function* is a function that produces a new tensor. There are many factory functions available, which differ in the way they initialize a new tensor before returning it. All factory functions adhere to the following general "schema”:
 
 ```c
 Tensor *NN_<function-name>(<ndim>, <shape>, <datatype>, <tensor-options>)

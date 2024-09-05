@@ -3,8 +3,8 @@
 
 #include <assert.h>
 
-#include "nn_float16.h"
-#include "nn_tensor.h"
+#include "float16.h"
+#include "tensor.h"
 #include "functional/nn_tensor_creation.h"
 #include "functional/nn_print.h"
 #include "functional/nn_abs.h"
