@@ -3,7 +3,7 @@
 
 #ifdef RVV
 
-void NN_dot_i8_to_i32(size_t n, int32_t *result, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {
+void NN_dot_i8_to_i32(size_t n, int32_t *r, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e8m1();
 
   vint16m1_t vec_r = __riscv_vmv_v_x_i16m1(0, vlmax);
@@ -20,10 +20,10 @@ void NN_dot_i8_to_i32(size_t n, int32_t *result, const int8_t *x, size_t incx, c
     n -= vl;
   }
   vec_r = __riscv_vredsum_vs_i16m2_i16m1(vec_r_m2, vec_r, vlmax);
-  *result = __riscv_vmv_x_s_i16m1_i16(vec_r);
+  *r = __riscv_vmv_x_s_i16m1_i16(vec_r);
 }
 
-void NN_dot_i16_to_i32(size_t n, int32_t *result, const int16_t *x, size_t incx, const int16_t *y, size_t incy) {
+void NN_dot_i16_to_i32(size_t n, int32_t *r, const int16_t *x, size_t incx, const int16_t *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e16m1();
 
   vint32m1_t vec_r = __riscv_vmv_v_x_i32m1(0, vlmax);
@@ -40,10 +40,10 @@ void NN_dot_i16_to_i32(size_t n, int32_t *result, const int16_t *x, size_t incx,
     n -= vl;
   }
   vec_r = __riscv_vredsum_vs_i32m2_i32m1(vec_r_m2, vec_r, vlmax);
-  *result = __riscv_vmv_x_s_i32m1_i32(vec_r);
+  *r = __riscv_vmv_x_s_i32m1_i32(vec_r);
 }
 
-void NN_dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const int32_t *y, size_t incy) {
+void NN_dot_i32(size_t n, int32_t *r, const int32_t *x, size_t incx, const int32_t *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e32m1();
 
   vint32m1_t vec_zero = __riscv_vmv_v_x_i32m1(0, vlmax);
@@ -60,11 +60,11 @@ void NN_dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const 
     n -= vl;
   }
   vec_r = __riscv_vredsum_vs_i32m1_i32m1(vec_r, vec_zero, vlmax);
-  *result = __riscv_vmv_x_s_i32m1_i32(vec_r);
+  *r = __riscv_vmv_x_s_i32m1_i32(vec_r);
 }
 
 #ifdef RISCV_ZVFH
-  void NN_dot_f16(size_t n, float16_t *result, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
+  void NN_dot_f16(size_t n, float16_t *r, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
     size_t vlmax = __riscv_vsetvlmax_e16m1();
 
     vfloat16m1_t vec_zero = __riscv_vfmv_v_f_f16m1(0, vlmax);
@@ -81,11 +81,11 @@ void NN_dot_i32(size_t n, int32_t *result, const int32_t *x, size_t incx, const 
       n -= vl;
     }
     vec_r = __riscv_vfredusum_vs_f16m1_f16m1(vec_r, vec_zero, vlmax);
-    *result = __riscv_vfmv_f_s_f16m1_f16(vec_r);
+    *r = __riscv_vfmv_f_s_f16m1_f16(vec_r);
   }
 #endif
 
-void NN_dot_f32(size_t n, float *result, const float *x, size_t incx, const float *y, size_t incy) {
+void NN_dot_f32(size_t n, float *r, const float *x, size_t incx, const float *y, size_t incy) {
   size_t vlmax = __riscv_vsetvlmax_e32m1();
 
   vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
@@ -102,7 +102,7 @@ void NN_dot_f32(size_t n, float *result, const float *x, size_t incx, const floa
     n -= vl;
   }
   vec_r = __riscv_vfredusum_vs_f32m1_f32m1(vec_r, vec_zero, vlmax);
-  *result = __riscv_vfmv_f_s_f32m1_f32(vec_r);
+  *r = __riscv_vfmv_f_s_f32m1_f32(vec_r);
 }
 
 

@@ -8,12 +8,12 @@
 
 
 void NN_norm_f32(size_t n,
-    float *result,
+    float *r,
     const float *x, size_t incx
     );
 
 void NN_norm_inv_f32(size_t n,
-    float *result,
+    float *r,
     const float *x, size_t incx
     );
 

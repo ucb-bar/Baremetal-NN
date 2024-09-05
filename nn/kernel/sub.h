@@ -8,39 +8,39 @@
 
 
 void NN_sub_u8(size_t n,
-    uint8_t *z, size_t incz,
-    const uint8_t *x, size_t incx,
-    const uint8_t *y, size_t incy
+    uint8_t *y, size_t incy,
+    const uint8_t *x1, size_t incx1,
+    const uint8_t *x2, size_t incx2
     );
 
 void NN_sub_i8(size_t n,
-    int8_t *z, size_t incz,
-    const int8_t *x, size_t incx,
-    const int8_t *y, size_t incy
+    int8_t *y, size_t incy,
+    const int8_t *x1, size_t incx1,
+    const int8_t *x2, size_t incx2
     );
 
 void NN_sub_i16(size_t n,
-    int16_t *z, size_t incz,
-    const int16_t *x, size_t incx,
-    const int16_t *y, size_t incy
+    int16_t *y, size_t incy,
+    const int16_t *x1, size_t incx1,
+    const int16_t *x2, size_t incx2
     );
 
 void NN_sub_i32(size_t n,
-    int32_t *z, size_t incz,
-    const int32_t *x, size_t incx,
-    const int32_t *y, size_t incy
+    int32_t *y, size_t incy,
+    const int32_t *x1, size_t incx1,
+    const int32_t *x2, size_t incx2
     );
 
 void NN_sub_f16(size_t n,
-    float16_t *z, size_t incz,
-    const float16_t *x, size_t incx,
-    const float16_t *y, size_t incy
+    float16_t *y, size_t incy,
+    const float16_t *x1, size_t incx1,
+    const float16_t *x2, size_t incx2
     );
 
 void NN_sub_f32(size_t n,
-    float *z, size_t incz,
-    const float *x, size_t incx,
-    const float *y, size_t incy
+    float *y, size_t incy,
+    const float *x1, size_t incx1,
+    const float *x2, size_t incx2
     );
 
 

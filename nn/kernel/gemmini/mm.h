@@ -10,9 +10,9 @@
 
 
 void NN_mm_f32(size_t m, size_t n,
-    float16_t *z,
-    float16_t *x,
-    float16_t *y
+    float16_t *y,
+    float16_t *x1,
+    float16_t *x2
     );
 
 

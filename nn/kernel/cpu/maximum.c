@@ -1,43 +1,43 @@
 #include "kernel/maximum.h"
 
 
-__attribute__((weak)) void NN_maximum_i8(size_t n, int8_t *z, size_t incz, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {
+__attribute__((weak)) void NN_maximum_i8(size_t n, int8_t *y, size_t incy, const int8_t *x1, size_t incx1, const int8_t *x2, size_t incx2) {
   for (size_t i = 0; i < n; i += 1) {
-    int8_t x_val = x[i * incx];
-    int8_t y_val = y[i * incy];
-    z[i * incz] = x_val > y_val ? x_val : y_val;
+    int8_t x1_val = x1[i * incx1];
+    int8_t x2_val = x2[i * incx2];
+    y[i * incy] = x1_val > x2_val ? x1_val : x2_val;
   }
 }
 
-__attribute__((weak)) void NN_maximum_i16(size_t n, int16_t *z, size_t incz, const int16_t *x, size_t incx, const int16_t *y, size_t incy) {
+__attribute__((weak)) void NN_maximum_i16(size_t n, int16_t *y, size_t incy, const int16_t *x1, size_t incx1, const int16_t *x2, size_t incx2) {
   for (size_t i = 0; i < n; i += 1) {
-    int16_t x_val = x[i * incx];
-    int16_t y_val = y[i * incy];
-    z[i * incz] = x_val > y_val ? x_val : y_val;
+    int16_t x1_val = x1[i * incx1];
+    int16_t x2_val = x2[i * incx2];
+    y[i * incy] = x1_val > x2_val ? x1_val : x2_val;
   }
 }
 
-__attribute__((weak)) void NN_maximum_i32(size_t n, int32_t *z, size_t incz, const int32_t *x, size_t incx, const int32_t *y, size_t incy) {
+__attribute__((weak)) void NN_maximum_i32(size_t n, int32_t *y, size_t incy, const int32_t *x1, size_t incx1, const int32_t *x2, size_t incx2) {
   for (size_t i = 0; i < n; i += 1) {
-    int32_t x_val = x[i * incx];
-    int32_t y_val = y[i * incy];
-    z[i * incz] = x_val > y_val ? x_val : y_val;
+    int32_t x1_val = x1[i * incx1];
+    int32_t x2_val = x2[i * incx2];
+    y[i * incy] = x1_val > x2_val ? x1_val : x2_val;
   }
 }
 
-__attribute__((weak)) void NN_maximum_f16(size_t n, float16_t *z, size_t incz, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
+__attribute__((weak)) void NN_maximum_f16(size_t n, float16_t *y, size_t incy, const float16_t *x1, size_t incx1, const float16_t *x2, size_t incx2) {
   for (size_t i = 0; i < n; i += 1) {
-    float16_t x_val = x[i * incx];
-    float16_t y_val = y[i * incy];
-    z[i * incz] = NN_half_to_float(x_val) > NN_half_to_float(y_val) ? x_val : y_val;
+    float16_t x1_val = x1[i * incx1];
+    float16_t x2_val = x2[i * incx2];
+    y[i * incy] = NN_half_to_float(x1_val) > NN_half_to_float(x2_val) ? x1_val : x2_val;
   }
 }
 
-__attribute__((weak)) void NN_maximum_f32(size_t n, float *z, size_t incz, const float *x, size_t incx, const float *y, size_t incy) {
+__attribute__((weak)) void NN_maximum_f32(size_t n, float *y, size_t incy, const float *x1, size_t incx1, const float *x2, size_t incx2) {
   for (size_t i = 0; i < n; i += 1) {
-    float x_val = x[i * incx];
-    float y_val = y[i * incy];
-    z[i * incz] = x_val > y_val ? x_val : y_val;
+    float x1_val = x1[i * incx1];
+    float x2_val = x2[i * incx2];
+    y[i * incy] = x1_val > x2_val ? x1_val : x2_val;
   }
 }
 
