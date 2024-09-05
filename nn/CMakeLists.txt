@@ -1,32 +1,34 @@
 cmake_minimum_required(VERSION 3.10)
 
 set(cpu_impl 
-  ./impl/cpu/abs.c
-  ./impl/cpu/acc.c
-  ./impl/cpu/acc1.c
-  ./impl/cpu/add.c
-  ./impl/cpu/add1.c
-  ./impl/cpu/div.c
-  ./impl/cpu/dot.c
-  ./impl/cpu/fill.c
-  ./impl/cpu/max.c
-  ./impl/cpu/maximum.c
-  ./impl/cpu/maximum1.c
-  ./impl/cpu/min.c
-  ./impl/cpu/minimum.c
-  ./impl/cpu/minimum1.c
-  ./impl/cpu/mul.c
-  ./impl/cpu/mul1.c
-  ./impl/cpu/neg.c
-  ./impl/cpu/norm.c
-  ./impl/cpu/rms_norm.c
-  ./impl/cpu/sgn.c
-  ./impl/cpu/softmax.c
-  ./impl/cpu/sqr.c
-  ./impl/cpu/sqrt.c
-  ./impl/cpu/sub.c
-  ./impl/cpu/sum.c
-  ./impl/cpu/transpose.c
+  ./kernel/cpu/abs.c
+  ./kernel/cpu/acc.c
+  ./kernel/cpu/acc1.c
+  ./kernel/cpu/add.c
+  ./kernel/cpu/add1.c
+  ./kernel/cpu/addmm.c
+  ./kernel/cpu/div.c
+  ./kernel/cpu/dot.c
+  ./kernel/cpu/fill.c
+  ./kernel/cpu/max.c
+  ./kernel/cpu/maximum.c
+  ./kernel/cpu/maximum1.c
+  ./kernel/cpu/mm.c
+  ./kernel/cpu/min.c
+  ./kernel/cpu/minimum.c
+  ./kernel/cpu/minimum1.c
+  ./kernel/cpu/mul.c
+  ./kernel/cpu/mul1.c
+  ./kernel/cpu/neg.c
+  ./kernel/cpu/norm.c
+  ./kernel/cpu/rms_norm.c
+  ./kernel/cpu/sgn.c
+  ./kernel/cpu/softmax.c
+  ./kernel/cpu/sqr.c
+  ./kernel/cpu/sqrt.c
+  ./kernel/cpu/sub.c
+  ./kernel/cpu/sum.c
+  ./kernel/cpu/transpose.c
 )
 
 
@@ -45,25 +47,26 @@ if (RVV)
   endif ()
   
   set(rvv_impl
-    ./impl/rvv/abs.c
-    ./impl/rvv/acc.c
-    ./impl/rvv/acc1.c
-    ./impl/rvv/add.c
-    ./impl/rvv/add1.c
-    ./impl/rvv/div.c
-    ./impl/rvv/dot.c
-    ./impl/rvv/max.c
-    ./impl/rvv/maximum.c
-    ./impl/rvv/maximum1.c
-    ./impl/rvv/min.c
-    ./impl/rvv/minimum.c
-    ./impl/rvv/minimum1.c
-    ./impl/rvv/mul.c
-    ./impl/rvv/mul1.c
-    ./impl/rvv/neg.c
-    ./impl/rvv/rms_norm.c
-    ./impl/rvv/sub.c
-    ./impl/rvv/transpose.c
+    ./kernel/rvv/abs.c
+    ./kernel/rvv/acc.c
+    ./kernel/rvv/acc1.c
+    ./kernel/rvv/add.c
+    ./kernel/rvv/add1.c
+    ./kernel/rvv/addmm.c
+    ./kernel/rvv/div.c
+    ./kernel/rvv/dot.c
+    ./kernel/rvv/max.c
+    ./kernel/rvv/maximum.c
+    ./kernel/rvv/maximum1.c
+    ./kernel/rvv/min.c
+    ./kernel/rvv/minimum.c
+    ./kernel/rvv/minimum1.c
+    ./kernel/rvv/mul.c
+    ./kernel/rvv/mul1.c
+    ./kernel/rvv/neg.c
+    ./kernel/rvv/rms_norm.c
+    ./kernel/rvv/sub.c
+    ./kernel/rvv/transpose.c
     )
 endif ()
 
@@ -78,39 +81,39 @@ endif ()
 
 
 add_library(nn
-  ./functional/nn_tensor_creation.c
-  ./functional/nn_print.c
-  ./functional/nn_abs.c
-  ./functional/nn_add.c
-  ./functional/nn_batch_norm2d.c
-  ./functional/nn_conv2d.c
-  ./functional/nn_clip.c
-  ./functional/nn_copy.c
-  ./functional/nn_div.c
-  ./functional/nn_elu.c
-  ./functional/nn_fill.c
-  ./functional/nn_interpolate.c
-  ./functional/nn_layer_norm.c
-  ./functional/nn_linear.c
-  ./functional/nn_matmul.c
-  ./functional/nn_mm.c
-  ./functional/nn_norm.c
-  ./functional/nn_max.c
-  ./functional/nn_maximum.c
-  ./functional/nn_max_pool2d.c
-  ./functional/nn_min.c
-  ./functional/nn_minimum.c
-  ./functional/nn_mul.c
-  ./functional/nn_mv.c
-  ./functional/nn_neg.c
-  ./functional/nn_relu.c
-  ./functional/nn_relu6.c
-  ./functional/nn_rms_norm.c
-  ./functional/nn_softmax.c
-  ./functional/nn_silu.c
-  ./functional/nn_sub.c
-  ./functional/nn_sum.c
-  ./functional/nn_transpose.c
+  ./functional/tensor_creation.c
+  ./functional/print.c
+  ./functional/abs.c
+  ./functional/add.c
+  ./functional/batch_norm2d.c
+  ./functional/conv2d.c
+  ./functional/clip.c
+  ./functional/copy.c
+  ./functional/div.c
+  ./functional/elu.c
+  ./functional/fill.c
+  ./functional/interpolate.c
+  ./functional/layer_norm.c
+  ./functional/linear.c
+  ./functional/matmul.c
+  ./functional/mm.c
+  ./functional/norm.c
+  ./functional/max.c
+  ./functional/maximum.c
+  ./functional/max_pool2d.c
+  ./functional/min.c
+  ./functional/minimum.c
+  ./functional/mul.c
+  ./functional/mv.c
+  ./functional/neg.c
+  ./functional/relu.c
+  ./functional/relu6.c
+  ./functional/rms_norm.c
+  ./functional/softmax.c
+  ./functional/silu.c
+  ./functional/sub.c
+  ./functional/sum.c
+  ./functional/transpose.c
 
   ${rvv_impl}
   ${gemmini_impl}

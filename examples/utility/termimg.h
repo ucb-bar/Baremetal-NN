@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "nn_tensor.h"
+#include "tensor.h"
 
 
 static const size_t NUM_MAPPING = 92;

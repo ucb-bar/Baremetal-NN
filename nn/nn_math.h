@@ -6,7 +6,7 @@
 #include <math.h>
 #include <string.h>
 
-#include "nn_float16.h"
+#include "float16.h"
 
 //
 // fundamental operations

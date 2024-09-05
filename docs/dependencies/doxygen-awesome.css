@@ -1026,7 +1026,7 @@ blockquote::before, blockquote::after {
 }
 
 blockquote::before {
-    content: "“";
+    content: """;
     left: -10px;
     top: 4px;
 }
