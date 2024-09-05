@@ -5,6 +5,7 @@
 
 #include "tensor.h"
 #include "kernel/dot.h"
+#include "kernel/mm.h"
 
 
 /**

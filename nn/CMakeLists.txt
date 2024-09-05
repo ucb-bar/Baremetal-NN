@@ -6,12 +6,14 @@ set(cpu_impl
   ./kernel/cpu/acc1.c
   ./kernel/cpu/add.c
   ./kernel/cpu/add1.c
+  ./kernel/cpu/addmm.c
   ./kernel/cpu/div.c
   ./kernel/cpu/dot.c
   ./kernel/cpu/fill.c
   ./kernel/cpu/max.c
   ./kernel/cpu/maximum.c
   ./kernel/cpu/maximum1.c
+  ./kernel/cpu/mm.c
   ./kernel/cpu/min.c
   ./kernel/cpu/minimum.c
   ./kernel/cpu/minimum1.c
