@@ -36,7 +36,7 @@ rm -rf ./build/
 # make sure $RISCV is set
 cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug
 cmake --build ./build/ --target all
-spike ./build/tests/tests 
+spike ./build/tests/tests.elf
 ```
 
 ### Building for RISC-V with Vector Support
@@ -51,7 +51,7 @@ rm -rf ./build/
 # make sure $RISCV is set
 cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV=ON
 cmake --build ./build/ --target all
-spike --isa=rv64gcv_zicntr_zfh --varch=vlen:512,elen:32 ./build/tests/tests
+spike --isa=rv64gcv_zicntr_zfh --varch=vlen:512,elen:32 ./build/tests/tests.elf
 ```
 
 Running with FP16 support
@@ -59,7 +59,7 @@ Running with FP16 support
 ```bash
 cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV=ON -D ZVFH=ON
 cmake --build ./build/ --target all
-spike --isa=rv64gcv_zicntr_zfh_zvfh --varch=vlen:512,elen:32 ./build/tests/tests
+spike --isa=rv64gcv_zicntr_zfh_zvfh --varch=vlen:512,elen:32 ./build/tests/tests.elf
 ```
 
 ### Building for RISC-V with Gemmini
@@ -73,7 +73,7 @@ rm -rf ./build/
 ```bash
 cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D GEMMINI=ON
 cmake --build ./build/ --target all
-spike --extension=gemmini ./example
+spike --extension=gemmini --misaligned ./build/tests/tests.elf
 ```
 
 ### Cleaning build files
@@ -120,7 +120,7 @@ The low-level implementations of kernels are under `nn/impl/<device>`.
 
 For the low-level functions, the following naming convention is used:
 
-`void NN__operator_datatype(size_t n, <datatype *output_ptr, size_t increment>, <datatype *input_ptr, size_t increment>);`
+`void NN_operator_datatype(size_t n, <datatype *output_ptr, size_t increment>, <datatype *input_ptr, size_t increment>);`
 
 `operator`: the name of the operator, such as `add`, `max`.
 
@@ -130,4 +130,9 @@ For the low-level functions, the following naming convention is used:
 
 `increment`: the number of element to increment in order to access the next element in the buffer, **in number of elements**, not bytes. (e.g. for `f32` type, increment of 1 will access next element starting from the next 4th byte, and hence the next contiguous fp32 number.)
 
+# Stats
+
+## Star History
+
+![](https://api.star-history.com/svg?repos=ucb-bar/Baremetal-NN&type=Date&theme=dark)
 

@@ -14,7 +14,7 @@
 
 
 
-// inline static void NN__mad_F32(const int n, float *y, const float *x, const float v) {
+// inline static void NN_mad_F32(const int n, float *y, const float *x, const float v) {
 // #if defined(GGML_SIMD)
 //     const int np = (n & ~(GGML_F32_STEP - 1));
 
@@ -45,7 +45,7 @@
 // #endif
 // }
 
-// inline static void NN__mad_f16(const int n, float16_t *y, const float16_t *x, const float v) {
+// inline static void NN_mad_f16(const int n, float16_t *y, const float16_t *x, const float v) {
 // #if defined(GGML_SIMD)
 //     const int np = (n & ~(GGML_F16_STEP - 1));
 
@@ -77,7 +77,7 @@
 // }
 
 // // xs and vs are byte strides of x and v
-// inline static void NN__mad_F32_unroll(const int n, const int xs, const int vs, float *restrict y, const float *restrict xv, const float *restrict vv) {
+// inline static void NN_mad_F32_unroll(const int n, const int xs, const int vs, float *restrict y, const float *restrict xv, const float *restrict vv) {
 
 //     const float *restrict x[GGML_VEC_MAD_UNROLL];
 //     const float *restrict v[GGML_VEC_MAD_UNROLL];
@@ -128,15 +128,15 @@
 // #endif
 // }
 
-// inline static void NN__step_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? 1.f : 0.f; }
-// inline static void NN__tanh_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = tanhf(x[i]);  }
-// inline static void NN__elu_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? x[i] : expf(x[i])-1; }
-// inline static void NN__relu_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? x[i] : 0.f; }
-// inline static void NN__leaky_relu_F32 (const int n, float *y, const float *x, const float ns) { for (int i = 0; i < n; i += 1) y[i] = ((x[i] > 0.f) ? x[i] : 0.f) + ns * ((x[i] < 0.0f) ? x[i] : 0.f); }
-// inline static void NN__sigmoid_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = 1.f / (1.f + expf(-x[i])); }
+// inline static void NN_step_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? 1.f : 0.f; }
+// inline static void NN_tanh_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = tanhf(x[i]);  }
+// inline static void NN_elu_F32  (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? x[i] : expf(x[i])-1; }
+// inline static void NN_relu_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = (x[i] > 0.f) ? x[i] : 0.f; }
+// inline static void NN_leaky_relu_F32 (const int n, float *y, const float *x, const float ns) { for (int i = 0; i < n; i += 1) y[i] = ((x[i] > 0.f) ? x[i] : 0.f) + ns * ((x[i] < 0.0f) ? x[i] : 0.f); }
+// inline static void NN_sigmoid_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = 1.f / (1.f + expf(-x[i])); }
 // // TODO: optimize performance
-// inline static void NN__hardswish_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = x[i] * fminf(1.0f, fmaxf(0.0f, (x[i] + 3.0f) / 6.0f)); }
-// inline static void NN__hardsigmoid_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = fminf(1.0f, fmaxf(0.0f, (x[i] + 3.0f) / 6.0f)); }
+// inline static void NN_hardswish_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = x[i] * fminf(1.0f, fmaxf(0.0f, (x[i] + 3.0f) / 6.0f)); }
+// inline static void NN_hardsigmoid_F32 (const int n, float *y, const float *x) { for (int i = 0; i < n; i += 1) y[i] = fminf(1.0f, fmaxf(0.0f, (x[i] + 3.0f) / 6.0f)); }
 
 // static const float GELU_COEF_A     = 0.044715f;
 // static const float GELU_QUICK_COEF = -1.702f;
@@ -146,7 +146,7 @@
 //     return 0.5f*x*(1.0f + tanhf(SQRT_2_OVER_PI*x*(1.0f + GELU_COEF_A*x*x)));
 // }
 
-// inline static void NN__gelu_f16(const int n, float16_t * y, const float16_t * x) {
+// inline static void NN_gelu_f16(const int n, float16_t * y, const float16_t * x) {
 //     const uint16_t * i16 = (const uint16_t *) x;
 //     for (int i = 0; i < n; i += 1) {
 //         y[i] = ggml_table_gelu_f16[i16[i]];
@@ -154,7 +154,7 @@
 // }
 
 // #ifdef GGML_GELU_FP16
-// inline static void NN__gelu_F32(const int n, float *y, const float *x) {
+// inline static void NN_gelu_F32(const int n, float *y, const float *x) {
 //     uint16_t t;
 //     for (int i = 0; i < n; i += 1) {
 //         if (x[i] <= -10.0f) {
@@ -169,7 +169,7 @@
 //     }
 // }
 // #else
-// inline static void NN__gelu_F32(const int n, float *y, const float *x) {
+// inline static void NN_gelu_F32(const int n, float *y, const float *x) {
 //     for (int i = 0; i < n; i += 1) {
 //         y[i] = ggml_gelu_F32(x[i]);
 //     }
@@ -180,7 +180,7 @@
 //     return x*(1.0f/(1.0f+expf(GELU_QUICK_COEF*x)));
 // }
 
-// //inline static void NN__gelu_quick_f16(const int n, float16_t * y, const float16_t * x) {
+// //inline static void NN_gelu_quick_f16(const int n, float16_t * y, const float16_t * x) {
 // //    const uint16_t * i16 = (const uint16_t *) x;
 // //    for (int i = 0; i < n; i += 1) {
 // //        y[i] = ggml_table_gelu_quick_f16[i16[i]];
@@ -188,7 +188,7 @@
 // //}
 
 // #ifdef GGML_GELU_QUICK_FP16
-// inline static void NN__gelu_quick_F32(const int n, float *y, const float *x) {
+// inline static void NN_gelu_quick_F32(const int n, float *y, const float *x) {
 //     uint16_t t;
 //     for (int i = 0; i < n; i += 1) {
 //         float16_t fp16 = GGML_FP32_TO_FP16(x[i]);
@@ -197,7 +197,7 @@
 //     }
 // }
 // #else
-// inline static void NN__gelu_quick_F32(const int n, float *y, const float *x) {
+// inline static void NN_gelu_quick_F32(const int n, float *y, const float *x) {
 //     for (int i = 0; i < n; i += 1) {
 //         y[i] = ggml_gelu_quick_F32(x[i]);
 //     }
@@ -407,7 +407,7 @@
 
 // #endif // __ARM_NEON / __AVX2__ / __SSE2__
 
-// static void NN__silu_F32(const int n, float *y, const float *x) {
+// static void NN_silu_F32(const int n, float *y, const float *x) {
 //     int i = 0;
 // #if defined(__AVX512F__) && defined(__AVX512DQ__)
 //     for (; i + 15 < n; i += 16) {
@@ -437,12 +437,12 @@
 //     return dy*s*(1.0f + x*(1.0f - s));
 // }
 
-// inline static void NN__silu_backward_F32(const int n, float *dx, const float *x, const float *dy) {
+// inline static void NN_silu_backward_F32(const int n, float *dx, const float *x, const float *dy) {
 //     for (int i = 0; i < n; i += 1) {
 //         dx[i] = ggml_silu_backward_F32(x[i], dy[i]);
 //     }
 // }
-// inline static void NN__argmax_F32(const int n, int * s, const float *x) {
+// inline static void NN_argmax_F32(const int n, int * s, const float *x) {
 //     float max = -INFINITY;
 //     int idx = 0;
 //     for (int i = 0; i < n; i += 1) {

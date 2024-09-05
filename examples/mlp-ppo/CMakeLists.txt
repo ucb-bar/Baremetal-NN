@@ -1,23 +1,25 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 
-set(PROJECT_NAME     "ppo")
+project(mlp-ppo LANGUAGES C)
 
-set(PROJECT_INCLUDES
-    inc
-)
+add_executable(mlp-ppo main.c)
 
-set(PROJECT_SOURCES
-    main.c
-)
-
-project(${PROJECT_NAME})
+target_include_directories(mlp-ppo PUBLIC ./)
+target_include_directories(mlp-ppo PUBLIC ../utility)
 
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
+target_compile_features(mlp-ppo INTERFACE c_std_11)
 
-add_subdirectory(../../nn ./build/nn)
-target_link_libraries(${PROJECT_NAME} PUBLIC nn)
+if (X86)
+  message(STATUS "mlp-ppo: Building for x86")
+  target_link_libraries(mlp-ppo PUBLIC target-x86)
+elseif (RISCV)
+  message(STATUS "mlp-ppo: Building for RISC-V")
+  target_link_libraries(mlp-ppo PUBLIC target-riscv)
+  set_target_properties(mlp-ppo PROPERTIES SUFFIX ".elf")
+endif ()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC m)
+target_compile_options(mlp-ppo PRIVATE -O3 -Wall -Wextra)
 
+target_link_libraries(mlp-ppo PUBLIC nn)
+target_link_libraries(mlp-ppo PUBLIC m)

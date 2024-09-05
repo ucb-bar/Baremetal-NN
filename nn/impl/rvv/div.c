@@ -3,7 +3,7 @@
 
 #ifdef RVV
 
-void NN__div_i8(size_t n, int8_t *z, size_t incz, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {
+void NN_div_i8(size_t n, int8_t *z, size_t incz, const int8_t *x, size_t incx, const int8_t *y, size_t incy) {
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e8m1(n);
     vint8m1_t vec_x = __riscv_vlse8_v_i8m1(x, sizeof(int8_t) * incx, vl);
@@ -17,7 +17,7 @@ void NN__div_i8(size_t n, int8_t *z, size_t incz, const int8_t *x, size_t incx, 
   }
 }
 
-void NN__div_i16(size_t n, int16_t *z, size_t incz, const int16_t *x, size_t incx, const int16_t *y, size_t incy) {
+void NN_div_i16(size_t n, int16_t *z, size_t incz, const int16_t *x, size_t incx, const int16_t *y, size_t incy) {
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e16m1(n);
     vint16m1_t vec_x = __riscv_vlse16_v_i16m1(x, sizeof(int16_t) * incx, vl);
@@ -31,7 +31,7 @@ void NN__div_i16(size_t n, int16_t *z, size_t incz, const int16_t *x, size_t inc
   }
 }
 
-void NN__div_i32(size_t n, int32_t *z, size_t incz, const int32_t *x, size_t incx, const int32_t *y, size_t incy) {
+void NN_div_i32(size_t n, int32_t *z, size_t incz, const int32_t *x, size_t incx, const int32_t *y, size_t incy) {
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);
     vint32m1_t vec_x = __riscv_vlse32_v_i32m1(x, sizeof(int32_t) * incx, vl);
@@ -46,7 +46,7 @@ void NN__div_i32(size_t n, int32_t *z, size_t incz, const int32_t *x, size_t inc
 }
 
 #ifdef RISCV_ZVFH
-  void NN__div_f16(size_t n, float16_t *z, size_t incz, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
+  void NN_div_f16(size_t n, float16_t *z, size_t incz, const float16_t *x, size_t incx, const float16_t *y, size_t incy) {
     while (n > 0) {
       size_t vl = __riscv_vsetvl_e16m1(n);
       vfloat16m1_t vec_x = __riscv_vlse16_v_f16m1(x, sizeof(float16_t) * incx, vl);
@@ -61,7 +61,7 @@ void NN__div_i32(size_t n, int32_t *z, size_t incz, const int32_t *x, size_t inc
   }
 #endif
 
-void NN__div_f32(size_t n, float *z, size_t incz, const float *x, size_t incx, const float *y, size_t incy) {
+void NN_div_f32(size_t n, float *z, size_t incz, const float *x, size_t incx, const float *y, size_t incy) {
   while (n > 0) {
     size_t vl = __riscv_vsetvl_e32m1(n);
     vfloat32m1_t vec_x = __riscv_vlse32_v_f32m1(x, sizeof(float) * incx, vl);

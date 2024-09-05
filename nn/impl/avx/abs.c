@@ -5,7 +5,7 @@
 
 #ifdef AVX
 
-// void NN__abs_f32(size_t n, float *result, float *x, size_t incx) {
+// void NN_abs_f32(size_t n, float *result, float *x, size_t incx) {
 //   // Mask to clear the sign bit
 //   __m256 mask = _mm256_castsi256_ps(_mm256_set1_epi32(0x7FFFFFFF));
 

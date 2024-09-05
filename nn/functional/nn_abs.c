@@ -9,19 +9,19 @@ void NN_abs(Tensor *out, const Tensor *in) {
   
   switch (out->dtype) {
     case DTYPE_I8:
-      NN__abs_i8(out->size, (int8_t *)out->data, 1, (int8_t *)in->data, 1);
+      NN_abs_i8(out->size, (int8_t *)out->data, 1, (int8_t *)in->data, 1);
       return;
     case DTYPE_I16:
-      NN__abs_i16(out->size, (int16_t *)out->data, 1, (int16_t *)in->data, 1);
+      NN_abs_i16(out->size, (int16_t *)out->data, 1, (int16_t *)in->data, 1);
       return;
     case DTYPE_I32:
-      NN__abs_i32(out->size, (int32_t *)out->data, 1, (int32_t *)in->data, 1);
+      NN_abs_i32(out->size, (int32_t *)out->data, 1, (int32_t *)in->data, 1);
       return;
     case DTYPE_F16:
-      NN__abs_f16(out->size, (float16_t *)out->data, 1, (float16_t *)in->data, 1);
+      NN_abs_f16(out->size, (float16_t *)out->data, 1, (float16_t *)in->data, 1);
       return;
     case DTYPE_F32:
-      NN__abs_f32(out->size, (float *)out->data, 1, (float *)in->data, 1);
+      NN_abs_f32(out->size, (float *)out->data, 1, (float *)in->data, 1);
       return;
 
     default:

@@ -9,8 +9,8 @@ void NN_clip(Tensor *y, const Tensor *x, float min, float max) {
 
   switch (y->dtype) {
     case DTYPE_F32:
-      NN__maximum1_f32(y->size, (float *)y->data, 1, (float *)x->data, 1, min);
-      NN__minimum1_f32(y->size, (float *)y->data, 1, (float *)y->data, 1, max);
+      NN_maximum1_f32(y->size, (float *)y->data, 1, (float *)x->data, 1, min);
+      NN_minimum1_f32(y->size, (float *)y->data, 1, (float *)y->data, 1, max);
       return;
 
     default:

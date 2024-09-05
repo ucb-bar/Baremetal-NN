@@ -12,7 +12,7 @@ void NN_add(Tensor *out, const Tensor *a, const Tensor *b) {
             && b->shape[1] == a->shape[1]
             && b->shape[2] == a->shape[2]
             && b->shape[3] == a->shape[3]) {
-          NN__add_f16(out->size, (float16_t *)out->data, 1, (float16_t *)a->data, 1, (float16_t *)b->data, 1);
+          NN_add_f16(out->size, (float16_t *)out->data, 1, (float16_t *)a->data, 1, (float16_t *)b->data, 1);
           return;
         }
         for (size_t i = 0; i < out->shape[0]; i += 1) {
@@ -44,7 +44,7 @@ void NN_add(Tensor *out, const Tensor *a, const Tensor *b) {
             && b->shape[1] == a->shape[1]
             && b->shape[2] == a->shape[2]
             && b->shape[3] == a->shape[3]) {
-          NN__add_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, (float *)b->data, 1);
+          NN_add_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, (float *)b->data, 1);
           return;
         }
         for (size_t i = 0; i < out->shape[0]; i += 1) {
@@ -103,7 +103,7 @@ void NN_add1(Tensor *out, const Tensor *a, float b) {
 
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__add1_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, b);
+      NN_add1_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, b);
       return;
 
     default:
@@ -120,10 +120,10 @@ void NN_add_inplace(Tensor *b, const Tensor *a) {
 
   switch (b->dtype) {
     case DTYPE_F32:
-      NN__acc_f32(b->size, (float *)b->data, 1, (float *)a->data, 1);
+      NN_acc_f32(b->size, (float *)b->data, 1, (float *)a->data, 1);
       return;
     case DTYPE_I8:
-      NN__acc_i8(b->size, (int8_t *)b->data, 1, (int8_t *)a->data, 1);
+      NN_acc_i8(b->size, (int8_t *)b->data, 1, (int8_t *)a->data, 1);
       return;
     default:
       break;
@@ -137,7 +137,7 @@ void NN_add_inplace(Tensor *b, const Tensor *a) {
 void NN_add1_inplace(Tensor *b, float scalar) {
   switch (b->dtype) {
     case DTYPE_F32:
-      NN__acc1_f32(b->size, (float *)b->data, 1, scalar);
+      NN_acc1_f32(b->size, (float *)b->data, 1, scalar);
       return;
     default:
       break;

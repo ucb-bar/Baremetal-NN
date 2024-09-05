@@ -12,7 +12,7 @@ void NN_minimum(Tensor *out, const Tensor *a, const Tensor *b) {
 
   switch (out->dtype) {
     case DTYPE_F32:
-      NN__minimum_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, (float *)b->data, 1);
+      NN_minimum_f32(out->size, (float *)out->data, 1, (float *)a->data, 1, (float *)b->data, 1);
       return;
 
     default:

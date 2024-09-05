@@ -16,6 +16,7 @@ if (X86)
 elseif (RISCV)
   message(STATUS "fast-depth: Building for RISC-V")
   target_link_libraries(fast-depth PUBLIC target-riscv)
+  set_target_properties(fast-depth PROPERTIES SUFFIX ".elf")
 endif ()
 
 target_compile_options(fast-depth PRIVATE -O3 -Wall -Wextra)

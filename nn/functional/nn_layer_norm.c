@@ -18,27 +18,27 @@ void NN_layer_norm(
     float *in_ptr = (float *)in->data + i * n;
     
     float mean = 0;
-    NN__sum_f32(n, &mean, in_ptr, 1);
+    NN_sum_f32(n, &mean, in_ptr, 1);
     mean /= n;
 
     float variance = 0;
     // use y as temporary buffer
     // y = x - E[x]
-    NN__add1_f32(n, out_ptr, 1, in_ptr, 1, -mean);
+    NN_add1_f32(n, out_ptr, 1, in_ptr, 1, -mean);
     // y = y * y
-    NN__sqr_f32(n, out_ptr, 1, out_ptr, 1);
+    NN_sqr_f32(n, out_ptr, 1, out_ptr, 1);
 
-    NN__sum_f32(n, &variance, out_ptr, 1);
+    NN_sum_f32(n, &variance, out_ptr, 1);
     variance /= n;
 
     // y = x - E[x]
-    NN__add1_f32(n, out_ptr, 1, in_ptr, 1, -mean);
+    NN_add1_f32(n, out_ptr, 1, in_ptr, 1, -mean);
 
     // y = y / sqrt(Var[x] + eps)
-    NN__mul1_f32(n, out_ptr, 1, out_ptr, 1, 1.f / sqrtf(variance + eps));
+    NN_mul1_f32(n, out_ptr, 1, out_ptr, 1, 1.f / sqrtf(variance + eps));
 
     // y = y * weight + bias
-    NN__mul_f32(n, out_ptr, 1, (float *)weight->data, 1, out_ptr, 1);
-    NN__add_f32(n, out_ptr, 1, (float *)bias->data, 1, out_ptr, 1);
+    NN_mul_f32(n, out_ptr, 1, (float *)weight->data, 1, out_ptr, 1);
+    NN_add_f32(n, out_ptr, 1, (float *)bias->data, 1, out_ptr, 1);
   }
 }

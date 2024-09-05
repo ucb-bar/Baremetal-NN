@@ -1,7 +1,7 @@
 #include "impl/rms_norm.h"
 
 
-__attribute__((weak)) void NN__rms_norm_f32(size_t n, float* y, size_t incy, const float* x, size_t incx, const float* w, size_t incw, float eps) {
+__attribute__((weak)) void NN_rms_norm_f32(size_t n, float* y, size_t incy, const float* x, size_t incx, const float* w, size_t incw, float eps) {
   // calculate sum of squares
   float ss = 0.0f;
   for (size_t i = 0; i < n; i += 1) {
@@ -12,7 +12,7 @@ __attribute__((weak)) void NN__rms_norm_f32(size_t n, float* y, size_t incy, con
 
   // normalize and scale
   // y = (x / ss) * w
-  NN__mul1_f32(n, y, incy, x, incx, 1.0f / sqrtf(ss));
-  NN__mul_f32(n, y, incy, y, incy, w, incw);
+  NN_mul1_f32(n, y, incy, x, incx, 1.0f / sqrtf(ss));
+  NN_mul_f32(n, y, incy, y, incy, w, incw);
 }
 

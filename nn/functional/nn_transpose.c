@@ -18,7 +18,7 @@ void NN_transpose(Tensor *out, const Tensor *a) {
   assert(out->shape[1] == a->shape[0]);
 
   if (a->dtype == DTYPE_F32) {
-    NN__transpose_f32(a->shape[0], a->shape[1], (float *)out->data, (float *)a->data);
+    NN_transpose_f32(a->shape[0], a->shape[1], (float *)out->data, (float *)a->data);
     return;
   }
 

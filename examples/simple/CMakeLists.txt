@@ -1,22 +1,24 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 
-set(PROJECT_NAME     "simple")
+project(simple LANGUAGES C)
 
-set(PROJECT_INCLUDES
-    inc
-)
+add_executable(simple main.c)
 
-set(PROJECT_SOURCES
-    main.c
-)
-
-project(${PROJECT_NAME})
+target_include_directories(simple PUBLIC ./)
 
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
+target_compile_features(simple INTERFACE c_std_11)
 
-add_subdirectory(../../nn ./build/nn)
-target_link_libraries(${PROJECT_NAME} PUBLIC nn)
+if (X86)
+  message(STATUS "simple: Building for x86")
+  target_link_libraries(simple PUBLIC target-x86)
+elseif (RISCV)
+  message(STATUS "simple: Building for RISC-V")
+  target_link_libraries(simple PUBLIC target-riscv)
+  set_target_properties(simple PROPERTIES SUFFIX ".elf")
+endif ()
 
+target_compile_options(simple PRIVATE -O3 -Wall -Wextra)
 
+target_link_libraries(simple PUBLIC nn)
+target_link_libraries(simple PUBLIC m)

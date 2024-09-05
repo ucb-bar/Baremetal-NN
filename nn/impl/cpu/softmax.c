@@ -1,7 +1,7 @@
 #include "impl/softmax.h"
 
 
-__attribute__((weak)) void NN__softmax_f16(size_t n, float16_t *y, size_t incy, const float16_t *x, size_t incx) {
+__attribute__((weak)) void NN_softmax_f16(size_t n, float16_t *y, size_t incy, const float16_t *x, size_t incx) {
   // exp and sum
   float sum = 0.0f;
   for (size_t i = 0; i < n; i += 1) {
@@ -14,7 +14,7 @@ __attribute__((weak)) void NN__softmax_f16(size_t n, float16_t *y, size_t incy, 
   }
 }
 
-__attribute__((weak)) void NN__softmax_f32(size_t n, float *y, size_t incy, const float *x, size_t incx) {
+__attribute__((weak)) void NN_softmax_f32(size_t n, float *y, size_t incy, const float *x, size_t incx) {
   // exp and sum
   float sum = 0.0f;
   for (size_t i = 0; i < n; i += 1) {

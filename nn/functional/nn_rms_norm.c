@@ -10,7 +10,7 @@ void NN_rms_norm(Tensor *y, const Tensor *x, const Tensor *w, float eps) {
 
   switch (x->dtype) {
     case DTYPE_F32:
-      NN__rms_norm_f32(y->shape[0],
+      NN_rms_norm_f32(y->shape[0],
         (float *)y->data, 1,
         (float *)x->data, 1,
         (float *)w->data, 1,

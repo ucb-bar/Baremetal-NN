@@ -1,7 +1,7 @@
 #include "mm.h"
 
 
-void NN__mm_f32(size_t m, size_t n, float16_t *z, float16_t *x, float16_t *y) {
+void NN_mm_f32(size_t m, size_t n, float16_t *z, float16_t *x, float16_t *y) {
   size_t dim_I = m;
   size_t dim_J = n;
   size_t dim_K = n;

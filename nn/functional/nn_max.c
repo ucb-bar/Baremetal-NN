@@ -7,7 +7,7 @@ void NN_max(Tensor *scalar, const Tensor *tensor) {
 
   switch (tensor->dtype) {
     case DTYPE_F32:
-      NN__max_f32(tensor->size, (float *)scalar->data, (float *)tensor->data, 1);
+      NN_max_f32(tensor->size, (float *)scalar->data, (float *)tensor->data, 1);
       break;
     
     default:
