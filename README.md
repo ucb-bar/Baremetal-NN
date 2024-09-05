@@ -36,7 +36,7 @@ rm -rf ./build/
 # make sure $RISCV is set
 cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug
 cmake --build ./build/ --target all
-spike ./build/tests/tests 
+spike ./build/tests/tests.elf
 ```
 
 ### Building for RISC-V with Vector Support
