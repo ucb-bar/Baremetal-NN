@@ -13,38 +13,59 @@
 #include "nn.h"
 #include "model.h"
 
+#include "udp.h"
 
-// static void enable_vector_operations() {
-//     unsigned long mstatus;
-//     asm volatile("csrr %0, mstatus" : "=r"(mstatus));
-//     mstatus |= 0x00000600 | 0x00006000 | 0x00018000;
-//     asm volatile("csrw mstatus, %0"::"r"(mstatus));
-// }
+
+
+#define ENV_IP            "10.0.0.1"
+#define ENV_PORT          8010
+#define POLICY_IP         "0.0.0.0"
+#define POLICY_PORT       8011
+
 
 int main() {
 
-  // enable_vector_operations();
-  
   Model *model = malloc(sizeof(Model));
+
 
   size_t cycles;
   
   printf("initalizing model...\n");
   init(model);
 
-  printf("setting input data...\n");
-  NN_fill(&model->input_1, 0.0);
+
+  PolicyComm comm;
+
+  initialize_policy(
+    &comm,
+    POLICY_IP, POLICY_PORT,
+    ENV_IP, ENV_PORT,
+    123, 37
+  );
+
+  float obs[256];
+  float acs[37];
+
+  for (int i=0; i<37; i+=1) {
+    acs[i] = 0;
+  }
+
+  printf("waiting for  obs...\n");
+  while (1) {
   
-  // cycles = READ_CSR("mcycle");
-  forward(model);
-  // cycles = READ_CSR("mcycle") - cycles;
+    receive_obs(&comm, model->input_1.data);
 
-  printf("cycles: %lu\n", cycles);
+    // cycles = READ_CSR("mcycle");
+    forward(model);
+    // cycles = READ_CSR("mcycle") - cycles;
 
-  // output tensor([[ 0.0258, -0.0050,  0.0902, -0.0022, -0.0924, -0.0574,  0.0328,  0.0386, -0.0277,  0.0788,  0.0603, -0.0085]])
+    printf("cycles: %lu\n", cycles);
 
-  printf("output:\n");
-  NN_printf(&model->_6);
+    // printf("output:\n");
+    // NN_printf(&model->_6);
+
+    send_acs(&comm, model->_6.data);
+  }
+
   
-  return 0;
 }
