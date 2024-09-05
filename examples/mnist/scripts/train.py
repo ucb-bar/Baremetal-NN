@@ -9,7 +9,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-from model import MLP
+from model import MNIST_MLP, MNIST_CNN
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -28,16 +28,17 @@ def loadDataset(directory="./data", batch_size:int = 4):
 
     return trainloader, testloader
 
-trainloader, testloaderbatch_size = loadDataset()
+trainloader, testloader = loadDataset()
 
 
-model = MLP(device="cuda:0")
+model = MNIST_MLP(device=device)
+# model = MNIST_CNN(device=device)
+
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
 for epoch in range(2):  # loop over the dataset multiple times
-
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # get the inputs; data is a list of [inputs, labels]
@@ -46,8 +47,8 @@ for epoch in range(2):  # loop over the dataset multiple times
         # zero the parameter gradients
         optimizer.zero_grad()
 
-        inputs = inputs.to("cuda:0")
-        labels = labels.to("cuda:0")
+        inputs = inputs.to(device)
+        labels = labels.to(device)
 
         # forward + backward + optimize
         outputs = model.forward(inputs)
@@ -63,4 +64,11 @@ for epoch in range(2):  # loop over the dataset multiple times
 
 print("Finished Training")
 
+from barstools import TorchConverter
+
+example_input, label = next(iter(testloader))
+TorchConverter(model).convert(example_input, ".")
+
 torch.save(model, "model.pth")
+
+
