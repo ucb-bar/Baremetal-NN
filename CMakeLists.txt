@@ -4,9 +4,10 @@
 # usage: 
 #   Edit "VARIABLES"-section to suit project requirements.
 #   Build instructions:
-#     cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV=ON
+#     cmake . -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake
 #     cmake --build ./build/ --target all
 #     cmake --build ./build/ --target clean
+#     cmake --install ./build/
 ########################################################################################################################
 cmake_minimum_required(VERSION 3.10)
 
@@ -25,7 +26,6 @@ option(RISCV                "Build for RISC-V"                  OFF     )
 option(AVX                  "Use AVX implementation"            OFF     )
 option(RVV                  "Use RISCV vector extension"        OFF     )
 option(ZVFH                 "Use RISCV half-precision floating-point vector extension" OFF)
-
 
 add_compile_options(-O1 -Wall -Wextra)
 
@@ -82,11 +82,150 @@ target_link_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 
-add_subdirectory(nn)
+set(cpu_impl 
+  ./src/ops/cpu/abs.c
+  ./src/ops/cpu/acc.c
+  ./src/ops/cpu/acc1.c
+  ./src/ops/cpu/add.c
+  ./src/ops/cpu/add1.c
+  ./src/ops/cpu/addmm.c
+  ./src/ops/cpu/div.c
+  ./src/ops/cpu/dot.c
+  ./src/ops/cpu/fill.c
+  ./src/ops/cpu/max.c
+  ./src/ops/cpu/maximum.c
+  ./src/ops/cpu/maximum1.c
+  ./src/ops/cpu/mm.c
+  ./src/ops/cpu/min.c
+  ./src/ops/cpu/minimum.c
+  ./src/ops/cpu/minimum1.c
+  ./src/ops/cpu/mul.c
+  ./src/ops/cpu/mul1.c
+  ./src/ops/cpu/neg.c
+  ./src/ops/cpu/norm.c
+  ./src/ops/cpu/rms_norm.c
+  ./src/ops/cpu/sgn.c
+  ./src/ops/cpu/softmax.c
+  ./src/ops/cpu/sqr.c
+  ./src/ops/cpu/sqrt.c
+  ./src/ops/cpu/sub.c
+  ./src/ops/cpu/sum.c
+  ./src/ops/cpu/transpose.c
+)
+
+
+if (AVX)
+  message(STATUS "Using AVX implementation")
+  add_compile_definitions(AVX)
+endif ()
+
+if (RVV)
+  message(STATUS "Using RVV implementation")
+  add_compile_definitions(RVV)
+  
+  if (RISCV_ZVFH)
+    message(STATUS "Using Zvfh extension")
+    add_compile_definitions(RISCV_ZVFH)
+  endif ()
+  
+  set(rvv_impl
+    ./src/ops/rvv/abs.c
+    ./src/ops/rvv/acc.c
+    ./src/ops/rvv/acc1.c
+    ./src/ops/rvv/add.c
+    ./src/ops/rvv/add1.c
+    ./src/ops/rvv/addmm.c
+    ./src/ops/rvv/div.c
+    ./src/ops/rvv/dot.c
+    ./src/ops/rvv/max.c
+    ./src/ops/rvv/maximum.c
+    ./src/ops/rvv/maximum1.c
+    ./src/ops/rvv/min.c
+    ./src/ops/rvv/minimum.c
+    ./src/ops/rvv/minimum1.c
+    ./src/ops/rvv/mul.c
+    ./src/ops/rvv/mul1.c
+    ./src/ops/rvv/neg.c
+    ./src/ops/rvv/rms_norm.c
+    ./src/ops/rvv/sub.c
+    ./src/ops/rvv/transpose.c
+    )
+endif ()
+
+if (GEMMINI)
+  message(STATUS "Using Gemmini implementation")
+  add_compile_definitions(GEMMINI)
+
+  set(gemmini_impl
+      impl/gemmini/mm.c
+      )
+endif ()
+
+
+add_library(nn
+  ./src/functional/tensor_creation.c
+  ./src/functional/print.c
+  ./src/functional/abs.c
+  ./src/functional/add.c
+  ./src/functional/batch_norm2d.c
+  ./src/functional/conv2d.c
+  ./src/functional/clip.c
+  ./src/functional/copy.c
+  ./src/functional/div.c
+  ./src/functional/elu.c
+  ./src/functional/fill.c
+  ./src/functional/interpolate.c
+  ./src/functional/layer_norm.c
+  ./src/functional/linear.c
+  ./src/functional/matmul.c
+  ./src/functional/mm.c
+  ./src/functional/norm.c
+  ./src/functional/max.c
+  ./src/functional/maximum.c
+  ./src/functional/max_pool2d.c
+  ./src/functional/min.c
+  ./src/functional/minimum.c
+  ./src/functional/mul.c
+  ./src/functional/mv.c
+  ./src/functional/neg.c
+  ./src/functional/relu.c
+  ./src/functional/relu6.c
+  ./src/functional/rms_norm.c
+  ./src/functional/softmax.c
+  ./src/functional/silu.c
+  ./src/functional/sub.c
+  ./src/functional/sum.c
+  ./src/functional/transpose.c
+
+  ${rvv_impl}
+  ${gemmini_impl}
+  ${cpu_impl}
+)
+
+target_include_directories(nn PUBLIC 
+  ./nn
+  ./nn/functional
+  ./nn/ops)
+
+if (X86)
+  message(STATUS "nn: Building for x86")
+  target_link_libraries(nn target-x86)
+    
+elseif (RISCV)
+  message(STATUS "nn: Building for RISC-V")
+  target_link_libraries(nn target-riscv)
+endif ()
+
+
+target_link_libraries(nn m)
+
+
+
+
 add_subdirectory(tests)
 add_subdirectory(examples)
 
-SET_PROPERTY(TARGET XNNPACK PROPERTY PUBLIC_HEADER include/nn.h)
+SET_PROPERTY(TARGET nn PROPERTY PUBLIC_HEADER include/nn.h)
 
 set(CMAKE_INSTALL_PREFIX "$ENV{RISCV}/riscv64-unknown-elf")
 

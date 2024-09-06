@@ -6,7 +6,7 @@
 
 #include "tensor.h"
 #include "print.h"
-#include "kernel/sub.h"
+#include "ops/sub.h"
 
 
 /**
