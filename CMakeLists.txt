@@ -86,3 +86,11 @@ add_subdirectory(nn)
 add_subdirectory(tests)
 add_subdirectory(examples)
 
+SET_PROPERTY(TARGET XNNPACK PROPERTY PUBLIC_HEADER include/nn.h)
+
+set(CMAKE_INSTALL_PREFIX "$ENV{RISCV}/riscv64-unknown-elf")
+
+install(TARGETS nn 
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include/nn
+)
