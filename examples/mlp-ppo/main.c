@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * 
- * A simple example demonstrating C = A * B + D
+ * Running MLP neural network robot control policy on the target compute device
  */
 
 #include <stdio.h>
