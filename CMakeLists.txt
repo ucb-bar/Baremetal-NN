@@ -11,7 +11,7 @@
 ########################################################################################################################
 cmake_minimum_required(VERSION 3.10)
 
-project(nn LANGUAGES C)
+project(nn LANGUAGES C ASM)
 
 # Options
 option(BUILD_SHARED_LIBS    "Build using shared libraries"      OFF     )
@@ -26,6 +26,8 @@ option(RISCV                "Build for RISC-V"                  OFF     )
 option(AVX                  "Use AVX implementation"            OFF     )
 option(RVV                  "Use RISCV vector extension"        OFF     )
 option(ZVFH                 "Use RISCV half-precision floating-point vector extension" OFF)
+
+option(RVV_ASM              "Use RISCV vector extension in assembly implementation" OFF)
 
 add_compile_options(-O1 -Wall -Wextra)
 
@@ -46,7 +48,7 @@ target_compile_definitions(target-riscv INTERFACE RISCV)
 
 set(WRAP_SPECS_FILE     "htif_wrap.specs")
 set(SPECS_FILE          "htif_nano.specs")
-set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
+# set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 
 set(MARCH               "rv64gc")
 set(MABI                "lp64d")
@@ -55,18 +57,22 @@ set(MCMODEL             "medany")
 # generate march flags
 if (RVV)
   list(APPEND MARCH "v")
-  list(APPEND MARCH "_zicntr")
+  # list(APPEND MARCH "_zicntr")
   
   if (ZVFH)
     list(APPEND MARCH "_zfh")
     list(APPEND MARCH "_zvfh")
   endif()
 endif()
+if (RVV_ASM)
+  list(APPEND MARCH "v")
+endif()
 
 list(JOIN MARCH "" MARCH)
 
 if (NOT DEFINED LINKER_SCRIPT)
   set(LINKER_SCRIPT     ${CMAKE_SOURCE_DIR}/toolchain/htif.ld)
+  # set(LINKER_SCRIPT     ${CMAKE_SOURCE_DIR}/toolchain/k230.ld)
 endif()
 
 target_compile_options(target-riscv INTERFACE -fno-common -fno-builtin-printf)
