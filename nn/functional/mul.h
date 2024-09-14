@@ -5,8 +5,8 @@
 #include <float.h>
 
 #include "tensor.h"
-#include "kernel/mul.h"
-#include "kernel/mul1.h"
+#include "ops/mul.h"
+#include "ops/mul1.h"
 
 
 /**

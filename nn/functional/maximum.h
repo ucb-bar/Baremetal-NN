@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "kernel/maximum.h"
+#include "ops/maximum.h"
 
 
 /**

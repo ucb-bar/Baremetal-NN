@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "kernel/minimum.h"
+#include "ops/minimum.h"
 
 
 /**

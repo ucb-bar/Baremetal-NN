@@ -5,7 +5,7 @@
 #include <float.h>
 
 #include "tensor.h"
-#include "kernel/div.h"
+#include "ops/div.h"
 
 
 /**

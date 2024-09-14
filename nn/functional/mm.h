@@ -4,8 +4,8 @@
 #include <assert.h>
 
 #include "tensor.h"
-#include "kernel/dot.h"
-#include "kernel/mm.h"
+#include "ops/dot.h"
+#include "ops/mm.h"
 
 
 /**

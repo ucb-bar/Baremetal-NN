@@ -5,7 +5,7 @@
 #include <float.h>
 
 #include "tensor.h"
-#include "kernel/min.h"
+#include "ops/min.h"
 
 
 /**
