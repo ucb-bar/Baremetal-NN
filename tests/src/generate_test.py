@@ -43,7 +43,7 @@ def functional_rms_norm(x, w, eps):
 
 test_pattern = [
     # ("abs",         lambda a: torch.abs(a),             [("a", rand((7, 7))),                                           ]),
-    ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 7)))               ]),
+    ("NN_add2d_f32",   lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 7)))               ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((1, 7)))               ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 1)))               ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((7, )))                ]),
@@ -65,8 +65,8 @@ test_pattern = [
     # ("sub",         lambda a, b: a - b,                 [("a", rand((7, 7))),         ("b", rand((7, 7)))               ]),
     # ("sum",         lambda a: torch.sum(a),             [("a", rand((7, 7))),                                           ]),
     
-    ("linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b), 
-        [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((1, 5)))                                                  ]),
+    ("NN_linear_f32",     lambda x, w, b: torch.nn.functional.linear(x, w, b), 
+        [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((5, )))                                                  ]),
     # ("linear",      lambda x, w, b: torch.nn.functional.linear(x, w, b),
     #     [("x", rand((7, ))), ("w", rand((5, 7))), ("b", rand((5, )))                                                   ]),
     # ("relu",        lambda x: torch.nn.functional.relu(x),
@@ -140,9 +140,9 @@ int main() {
 
 def type_to_str(dtype: torch.dtype):
     if dtype == torch.float16:
-        return "DTYPE_F16"
+        return "F16"
     elif dtype == torch.float32:
-        return "DTYPE_F32"
+        return "F32"
 
 
 
@@ -155,7 +155,10 @@ def format_tensor(name: str, tensor: torch.Tensor):
     human_readable = str(data_np).replace("\n", " ")[:80]
     tensor_str = env.from_string("""
     // {{ human_readable }}
-    Tensor *{{ name }} = NN_tensor({{ dim }}, (size_t[]){ {{ shape }} }, {{ dtype }}, (uint8_t[]){ {{ data }} });""").render(
+    Tensor{{ dim }}D_{{ dtype }} {{ name }} = {
+      .shape = { {{ shape }} },
+      .data = (float *)((uint8_t[]){ {{ data }} })
+    };""").render(
         human_readable=human_readable, name=name, dim=dim, shape=shape, dtype=dtype, data=data
     )
     return tensor_str
@@ -181,7 +184,7 @@ def generate_test_pattern(op, function, inputs):
             tensor_str = format_tensor(name, value)
             
             tensor_constructors.append(tensor_str)
-            tensor_destructors.append("    NN_delete_tensor({});\n".format(name))
+            tensor_destructors.append("    // NN_delete_tensor({});\n".format(name))
 
         elif type(value) == float:
             tensor_str = env.from_string("float {{ name }} = {{ value }};").render(name=name, value=value)
@@ -193,16 +196,23 @@ def generate_test_pattern(op, function, inputs):
     dim = len(result.shape)
     shape = ", ".join([str(s) for s in result.shape])
     dtype = type_to_str(result.dtype)
-    
-    result_tensors = golden_str + env.from_string("""
-    Tensor *actual = NN_zeros({{ dim }}, (size_t[]){ {{ shape }} }, {{ dtype }});""").render(
-        dim=dim, shape=shape, dtype=dtype
+    size = shape.replace(", ", "*")
+
+    actual_str = env.from_string("""
+    // {{ human_readable }}
+    Tensor{{ dim }}D_{{ dtype }} actual = {
+      .shape = { {{ shape }} },
+      .data = (float *)malloc(sizeof(float) * {{ size }})
+    };""").render(
+        dim=dim, shape=shape, size=size, dtype=dtype
     )
 
-    inputs = ", ".join([name for name, value in inputs if name != "actual"])
+    result_tensors = golden_str + actual_str
+
+    inputs = ", ".join(["&"+name for name, value in inputs if name != "actual"])
     inputs = ", " + inputs if inputs else inputs
 
-    func_str = env.from_string("""    NN_{{ op }}(actual{{ inputs }});\n""").render(
+    func_str = env.from_string("""    {{ op }}(&actual{{ inputs }});\n""").render(
         op=op, inputs=inputs
     )
     
@@ -220,12 +230,12 @@ def generate_test_pattern(op, function, inputs):
     cycles = read_cycles();
 {{ func_str }}                          
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\\n", compare_tensor(golden, actual, {{ precision }}) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\\n", NN_equals2d_f32(&golden, &actual, {{ precision }}) ? "PASS" : "FAIL", cycles);
 
 {% for tensor_str in tensor_destructors %}{{ tensor_str }}{% endfor %}
-    NN_delete_tensor(golden);
-    NN_free_tensor_data(actual);
-    NN_delete_tensor(actual);
+    // NN_delete_tensor(golden);
+    // NN_free_tensor_data(actual);
+    // NN_delete_tensor(actual);
   }
 """)
     
