@@ -2,40 +2,12 @@
 #define __NN_H
 
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <math.h>
 
 #include "float16.h"
-#include "tensor.h"
-#include "functional/tensor_creation.h"
-#include "functional/print.h"
-#include "functional/abs.h"
-#include "functional/add.h"
-#include "functional/batch_norm2d.h"
-#include "functional/clip.h"
-#include "functional/conv2d.h"
-#include "functional/copy.h"
-#include "functional/div.h"
-#include "functional/elu.h"
-#include "functional/fill.h"
-#include "functional/interpolate.h"
-#include "functional/layer_norm.h"
-#include "functional/linear.h"
-#include "functional/matmul.h"
-#include "functional/norm.h"
-#include "functional/max.h"
-#include "functional/mm.h"
-#include "functional/maximum.h"
-#include "functional/min.h"
-#include "functional/minimum.h"
-#include "functional/mul.h"
-#include "functional/mv.h"
-#include "functional/neg.h"
-#include "functional/relu.h"
-#include "functional/relu6.h"
-#include "functional/rms_norm.h"
-#include "functional/softmax.h"
-#include "functional/silu.h"
-#include "functional/sub.h"
-#include "functional/sum.h"
 
 
 // http://elm-chan.org/junk/32bit/binclude.html
@@ -54,13 +26,89 @@
 
 
 
-void NN_assert(int condition, char *message) {
+typedef struct {
+  size_t shape[1];
+  float16_t *data;
+} Tensor1D_F16;
+
+typedef struct {
+  size_t shape[1];
+  float *data;
+} Tensor1D_F32;
+
+typedef struct {
+  size_t shape[2];
+  float16_t *data;
+} Tensor2D_F16;
+
+typedef struct {
+  size_t shape[2];
+  float *data;
+} Tensor2D_F32;
+
+
+
+static inline void NN_assert(int condition, char *message) {
   if (!condition) {
     printf("Assertion failed: ");
     printf("%s\n", message);
     exit(1);
   }
 }
+
+
+static inline uint8_t float_equal(float golden, float actual, float rel_err) {
+  return (fabs(actual - golden) < rel_err) || (fabs((actual - golden) / actual) < rel_err);
+}
+
+
+
+void NN_print_u8(uint8_t v);
+
+void NN_print_i8(int8_t v);
+
+void NN_print_u16(uint16_t v);
+
+void NN_print_i16(int16_t v);
+
+void NN_print_u32(uint32_t v);
+
+void NN_print_i32(int32_t v);
+
+void NN_print_f16(float16_t v, int16_t num_digits);
+
+void NN_print_f32(float v, int16_t num_digits);
+
+void NN_print_shape(size_t ndim, const size_t *shape);
+
+void NN_print_tensor1d_f16(const Tensor1D_F16 *tensor);
+
+void NN_print_tensor1d_f32(const Tensor1D_F32 *tensor);
+
+void NN_print_tensor2d_f16(const Tensor2D_F16 *tensor);
+
+void NN_print_tensor2d_f32(const Tensor2D_F32 *tensor);
+
+// void NN_print_tensor3d_f16(const Tensor3D_F16 *tensor);
+
+// void NN_print_tensor3d_f32(const Tensor3D_F32 *tensor);
+
+// void NN_print_tensor4d_f16(const Tensor4D_F16 *tensor);
+
+// void NN_print_tensor4d_f32(const Tensor4D_F32 *tensor);
+
+
+uint8_t NN_equals1d_f32(const Tensor1D_F32 *a, const Tensor1D_F32 *b, float rel_err);
+
+uint8_t NN_equals2d_f32(const Tensor2D_F32 *a, const Tensor2D_F32 *b, float rel_err);
+
+
+void NN_add1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x2);
+void NN_add2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2);
+
+
+void NN_linear_f16(size_t batch_size, size_t in_features, size_t out_features, float16_t *out, const float16_t *input, const float16_t *weight, const float16_t *bias);
+void NN_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias);
 
 
 

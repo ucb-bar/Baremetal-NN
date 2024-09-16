@@ -1,5 +1,5 @@
-#ifndef __NN_FLOAT16
-#define __NN_FLOAT16
+#ifndef __FLOAT16
+#define __FLOAT16
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -151,4 +151,4 @@ static inline float16_t NN_float_to_half(float f) {
   #endif
 }
 
-#endif // __NN_FLOAT16
+#endif // __FLOAT16

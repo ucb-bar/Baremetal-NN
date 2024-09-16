@@ -29,7 +29,7 @@ option(ZVFH                 "Use RISCV half-precision floating-point vector exte
 
 option(RVV_ASM              "Use RISCV vector extension in assembly implementation" OFF)
 
-add_compile_options(-O1 -Wall -Wextra)
+add_compile_options(-O2 -Wall -Wextra)
 
 add_library(target-x86 INTERFACE)
 target_compile_features(target-x86 INTERFACE c_std_11)
@@ -48,7 +48,7 @@ target_compile_definitions(target-riscv INTERFACE RISCV)
 
 set(WRAP_SPECS_FILE     "htif_wrap.specs")
 set(SPECS_FILE          "htif_nano.specs")
-# set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
+set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 
 set(MARCH               "rv64gc")
 set(MABI                "lp64d")
@@ -89,34 +89,34 @@ target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 
 set(cpu_impl 
-  ./src/ops/cpu/abs.c
-  ./src/ops/cpu/acc.c
-  ./src/ops/cpu/acc1.c
-  ./src/ops/cpu/add.c
-  ./src/ops/cpu/add1.c
-  ./src/ops/cpu/addmm.c
-  ./src/ops/cpu/div.c
-  ./src/ops/cpu/dot.c
-  ./src/ops/cpu/fill.c
-  ./src/ops/cpu/max.c
-  ./src/ops/cpu/maximum.c
-  ./src/ops/cpu/maximum1.c
-  ./src/ops/cpu/mm.c
-  ./src/ops/cpu/min.c
-  ./src/ops/cpu/minimum.c
-  ./src/ops/cpu/minimum1.c
-  ./src/ops/cpu/mul.c
-  ./src/ops/cpu/mul1.c
-  ./src/ops/cpu/neg.c
-  ./src/ops/cpu/norm.c
-  ./src/ops/cpu/rms_norm.c
-  ./src/ops/cpu/sgn.c
-  ./src/ops/cpu/softmax.c
-  ./src/ops/cpu/sqr.c
-  ./src/ops/cpu/sqrt.c
-  ./src/ops/cpu/sub.c
-  ./src/ops/cpu/sum.c
-  ./src/ops/cpu/transpose.c
+  ./src/print.c
+  # ./src/ops/cpu/acc.c
+  ./src/cpu/add.c
+  # ./src/ops/cpu/add1.c
+  ./src/cpu/equals.c
+  ./src/cpu/linear.c
+  # ./src/ops/cpu/div.c
+  # ./src/ops/cpu/dot.c
+  # ./src/ops/cpu/fill.c
+  # ./src/ops/cpu/max.c
+  # ./src/ops/cpu/maximum.c
+  # ./src/ops/cpu/maximum1.c
+  # ./src/ops/cpu/mm.c
+  # ./src/ops/cpu/min.c
+  # ./src/ops/cpu/minimum.c
+  # ./src/ops/cpu/minimum1.c
+  # ./src/ops/cpu/mul.c
+  # ./src/ops/cpu/mul1.c
+  # ./src/ops/cpu/neg.c
+  # ./src/ops/cpu/norm.c
+  # ./src/ops/cpu/rms_norm.c
+  # ./src/ops/cpu/sgn.c
+  # ./src/ops/cpu/softmax.c
+  # ./src/ops/cpu/sqr.c
+  # ./src/ops/cpu/sqrt.c
+  # ./src/ops/cpu/sub.c
+  # ./src/ops/cpu/sum.c
+  # ./src/ops/cpu/transpose.c
 )
 
 
@@ -169,39 +169,39 @@ endif ()
 
 
 add_library(nn
-  ./src/functional/tensor_creation.c
-  ./src/functional/print.c
-  ./src/functional/abs.c
-  ./src/functional/add.c
-  ./src/functional/batch_norm2d.c
-  ./src/functional/conv2d.c
-  ./src/functional/clip.c
-  ./src/functional/copy.c
-  ./src/functional/div.c
-  ./src/functional/elu.c
-  ./src/functional/fill.c
-  ./src/functional/interpolate.c
-  ./src/functional/layer_norm.c
-  ./src/functional/linear.c
-  ./src/functional/matmul.c
-  ./src/functional/mm.c
-  ./src/functional/norm.c
-  ./src/functional/max.c
-  ./src/functional/maximum.c
-  ./src/functional/max_pool2d.c
-  ./src/functional/min.c
-  ./src/functional/minimum.c
-  ./src/functional/mul.c
-  ./src/functional/mv.c
-  ./src/functional/neg.c
-  ./src/functional/relu.c
-  ./src/functional/relu6.c
-  ./src/functional/rms_norm.c
-  ./src/functional/softmax.c
-  ./src/functional/silu.c
-  ./src/functional/sub.c
-  ./src/functional/sum.c
-  ./src/functional/transpose.c
+  # ./src/functional/tensor_creation.c
+  # ./src/functional/print.c
+  # ./src/functional/abs.c
+  # ./src/functional/add.c
+  # ./src/functional/batch_norm2d.c
+  # ./src/functional/conv2d.c
+  # ./src/functional/clip.c
+  # ./src/functional/copy.c
+  # ./src/functional/div.c
+  # ./src/functional/elu.c
+  # ./src/functional/fill.c
+  # ./src/functional/interpolate.c
+  # ./src/functional/layer_norm.c
+  # ./src/functional/linear.c
+  # ./src/functional/matmul.c
+  # ./src/functional/mm.c
+  # ./src/functional/norm.c
+  # ./src/functional/max.c
+  # ./src/functional/maximum.c
+  # ./src/functional/max_pool2d.c
+  # ./src/functional/min.c
+  # ./src/functional/minimum.c
+  # ./src/functional/mul.c
+  # ./src/functional/mv.c
+  # ./src/functional/neg.c
+  # ./src/functional/relu.c
+  # ./src/functional/relu6.c
+  # ./src/functional/rms_norm.c
+  # ./src/functional/softmax.c
+  # ./src/functional/silu.c
+  # ./src/functional/sub.c
+  # ./src/functional/sum.c
+  # ./src/functional/transpose.c
 
   ${rvv_impl}
   ${gemmini_impl}
@@ -210,8 +210,9 @@ add_library(nn
 
 target_include_directories(nn PUBLIC 
   ./nn
-  ./nn/functional
-  ./nn/ops)
+)
+  # ./nn/functional
+  # ./nn/ops)
 
 if (X86)
   message(STATUS "nn: Building for x86")
