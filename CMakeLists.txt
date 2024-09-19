@@ -90,9 +90,7 @@ target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 set(cpu_impl 
   ./src/print.c
-  # ./src/ops/cpu/acc.c
   ./src/cpu/add.c
-  # ./src/ops/cpu/add1.c
   ./src/cpu/equals.c
   ./src/cpu/linear.c
   ./src/cpu/elu.c
@@ -136,26 +134,10 @@ if (RVV)
   endif ()
   
   set(rvv_impl
-    ./src/ops/rvv/abs.c
-    ./src/ops/rvv/acc.c
-    ./src/ops/rvv/acc1.c
-    ./src/ops/rvv/add.c
-    ./src/ops/rvv/add1.c
-    ./src/ops/rvv/addmm.c
-    ./src/ops/rvv/div.c
-    ./src/ops/rvv/dot.c
-    ./src/ops/rvv/max.c
-    ./src/ops/rvv/maximum.c
-    ./src/ops/rvv/maximum1.c
-    ./src/ops/rvv/min.c
-    ./src/ops/rvv/minimum.c
-    ./src/ops/rvv/minimum1.c
-    ./src/ops/rvv/mul.c
-    ./src/ops/rvv/mul1.c
-    ./src/ops/rvv/neg.c
-    ./src/ops/rvv/rms_norm.c
-    ./src/ops/rvv/sub.c
-    ./src/ops/rvv/transpose.c
+    ./src/rvv/add.c
+    ./src/rvv/linear.c
+    ./src/rvv/elu.c
+    ./src/rvv/relu.c
     )
 endif ()
 

@@ -180,7 +180,7 @@ template = env.from_string(c_code)
 
 
 test_pattern = [
-    # ("abs",         lambda a: torch.abs(a),             [("a", rand((7, 7))),                                           ]),
+    generate_test_pattern("NN_add1d_f32",   lambda a, b: a + b,  [("a", rand((7, ))),          ("b", rand((7, )))             ]),
     generate_test_pattern("NN_add2d_f32",   lambda a, b: a + b,  [("a", rand((6, 7))),         ("b", rand((6, 7)))            ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((1, 7)))               ]),
     # ("add",         lambda a, b: a + b,                 [("a", rand((6, 7))),         ("b", rand((6, 1)))               ]),
