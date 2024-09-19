@@ -110,6 +110,8 @@ void NN_add2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x
 void NN_linear_f16(size_t batch_size, size_t in_features, size_t out_features, float16_t *out, const float16_t *input, const float16_t *weight, const float16_t *bias);
 void NN_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias);
 
+void NN_elu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float alpha);
+void NN_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x);
 
 
 #endif // __NN_H

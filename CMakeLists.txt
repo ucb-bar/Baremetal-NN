@@ -95,11 +95,12 @@ set(cpu_impl
   # ./src/ops/cpu/add1.c
   ./src/cpu/equals.c
   ./src/cpu/linear.c
+  ./src/cpu/elu.c
+  ./src/cpu/relu.c
   # ./src/ops/cpu/div.c
   # ./src/ops/cpu/dot.c
   # ./src/ops/cpu/fill.c
   # ./src/ops/cpu/max.c
-  # ./src/ops/cpu/maximum.c
   # ./src/ops/cpu/maximum1.c
   # ./src/ops/cpu/mm.c
   # ./src/ops/cpu/min.c
