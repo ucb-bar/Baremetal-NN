@@ -19,7 +19,7 @@ rm -rf ./build/
 ```
 
 ```bash
-cmake . -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
 cmake --build ./build/ --target tests
 ./build/tests/tests
 ```
@@ -34,7 +34,7 @@ rm -rf ./build/
 
 ```bash
 # make sure $RISCV is set
-cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake
 cmake --build ./build/ --target all
 spike ./build/tests/tests.elf
 ```
@@ -49,7 +49,7 @@ rm -rf ./build/
 
 ```bash
 # make sure $RISCV is set
-cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D RVV=ON
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RVV=ON
 cmake --build ./build/ --target all
 spike --isa=rv64gcv_zicntr_zfh --varch=vlen:512,elen:32 ./build/tests/tests.elf
 ```
@@ -57,7 +57,7 @@ spike --isa=rv64gcv_zicntr_zfh --varch=vlen:512,elen:32 ./build/tests/tests.elf
 Running with FP16 support
 
 ```bash
-cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D RVV=ON -D ZVFH=ON
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RVV=ON -D ZVFH=ON
 cmake --build ./build/ --target all
 spike --isa=rv64gcv_zicntr_zfh_zvfh --varch=vlen:512,elen:32 ./build/tests/tests.elf
 ```
@@ -71,7 +71,7 @@ rm -rf ./build/
 ```
 
 ```bash
-cmake . -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D GEMMINI=ON
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D GEMMINI=ON
 cmake --build ./build/ --target all
 spike --extension=gemmini --misaligned ./build/tests/tests.elf
 ```
@@ -85,7 +85,7 @@ rm -rf ./build/
 ```
 
 ```bash
-cmake . -D CMAKE_TOOLCHAIN_FILE=./k230-gcc.cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_BUILD_TYPE=Debug -D RVV_ASM=ON
+cmake -S ./ -B ./build/ -G "Unix Makefiles" -D CMAKE_TOOLCHAIN_FILE=./k230-gcc.cmake -D CMAKE_BUILD_TYPE=Debug -D RVV_ASM=ON
 cmake --build ./build/ --target all
 ```
 
