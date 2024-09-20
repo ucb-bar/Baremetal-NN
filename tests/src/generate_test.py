@@ -163,7 +163,7 @@ def generate_test_pattern(op, function, inputs, extra_args=None):
     cycles = read_cycles();
 {{ func_str }}                          
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\\n", NN_equals2d_f32(&golden, &actual, {{ precision }}) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\\n", NN_equals{{ dim }}d_f32(&golden, &actual, {{ precision }}) ? "PASS" : "FAIL", cycles);
 
 {% for tensor_str in tensor_destructors %}{{ tensor_str }}{% endfor %}
     // NN_delete_tensor(golden);
@@ -172,7 +172,7 @@ def generate_test_pattern(op, function, inputs, extra_args=None):
   }
 """)
     
-    return test_template.render(op=op, tensor_constructors=tensor_constructors, tensor_destructors=tensor_destructors, result_tensors=result_tensors, func_str=func_str, precision=precision)
+    return test_template.render(op=op, dim=dim, tensor_constructors=tensor_constructors, tensor_destructors=tensor_destructors, result_tensors=result_tensors, func_str=func_str, precision=precision)
 
 
 template = env.from_string(c_code)
@@ -204,7 +204,7 @@ test_pattern = [
     # ("sum",         lambda a: torch.sum(a),             [("a", rand((7, 7))),                                           ]),
     
     generate_test_pattern("NN_linear_f32",     lambda x, w, b: torch.nn.functional.linear(x, w, b), 
-        [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", rand((5, )))                                                   ]),
+        [("x", rand((6, 7))), ("w", rand((5, 7))), ("b", torch.zeros((5, ), device=device))                                                   ]),
     generate_test_pattern("NN_relu2d_f32",        lambda x: torch.nn.functional.relu(x),
         [("x", rand((7, 7)))                                                                                            ]),
     generate_test_pattern("NN_elu2d_f32",        lambda x: torch.nn.functional.elu(x),

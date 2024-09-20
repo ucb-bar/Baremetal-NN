@@ -15,7 +15,6 @@ void NN_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
   float *x_batch_data = x->data;
   float *y_batch_data = y->data;
 
-  size_t vlmax = __riscv_vsetvlmax_e32m1();
 
   for (size_t i = 0; i < batch_size; i += 1) {
     float *weight_data = weight->data;
@@ -23,27 +22,34 @@ void NN_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
     float *x_data = x_batch_data;
     float *y_data = y_batch_data;
 
-    for (size_t j = 0; j < out_features; j += 1) {
-      vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
-      vfloat32m1_t vec_sum = __riscv_vfmv_v_f_f32m1(0, vlmax);
-      
-      size_t n = in_features;
-      
-      while (n > 0) {
-        size_t vl = __riscv_vsetvl_e32m1(n);
-        vfloat32m1_t vec_x = __riscv_vlse32_v_f32m1(x_data, sizeof(float), vl);
-        vfloat32m1_t vec_y = __riscv_vlse32_v_f32m1(weight_data, sizeof(float), vl);
-        vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x, vec_y, vl);
+    #ifdef RVV_ASM
+      NN_linear_f32_asm(in_features, out_features, y_data, x_data, weight_data, bias_data);
+    #else
+      size_t vlmax = __riscv_vsetvlmax_e32m1();
+
+      for (size_t j = 0; j < out_features; j += 1) {
+        vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
+        vfloat32m1_t vec_sum = __riscv_vfmv_v_f_f32m1(0, vlmax);
         
-        x_data += vl;
-        weight_data += vl;
-        n -= vl;
+        size_t n = in_features;
+        
+        while (n > 0) {
+          size_t vl = __riscv_vsetvl_e32m1(n);
+          vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x_data, vl);
+          vfloat32m1_t vec_y = __riscv_vle32_v_f32m1(weight_data, vl);
+          vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x, vec_y, vl);
+          
+          x_data += vl;
+          weight_data += vl;
+          n -= vl;
+        }
+        vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
+        y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum) + bias_data[j];
+        
+        x_data -= in_features;
       }
-      vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
-      y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum) + bias_data[j];
       
-      x_data -= in_features;
-    }
+    #endif
 
     x_batch_data += in_features;
     y_batch_data += out_features;

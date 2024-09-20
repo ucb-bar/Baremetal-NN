@@ -29,7 +29,7 @@ option(ZVFH                 "Use RISCV half-precision floating-point vector exte
 
 option(RVV_ASM              "Use RISCV vector extension in assembly implementation" OFF)
 
-add_compile_options(-O2 -Wall -Wextra)
+add_compile_options(-O1 -Wall -Wextra)
 
 add_library(target-x86 INTERFACE)
 target_compile_features(target-x86 INTERFACE c_std_11)
@@ -50,25 +50,22 @@ set(WRAP_SPECS_FILE     "htif_wrap.specs")
 set(SPECS_FILE          "htif_nano.specs")
 set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 
-set(MARCH               "rv64gc")
-set(MABI                "lp64d")
-set(MCMODEL             "medany")
+set(ARCH               "rv64gc")
+set(ABI                "lp64d")
+set(CMODEL             "medany")
 
 # generate march flags
 if (RVV)
-  list(APPEND MARCH "v")
+  list(APPEND ARCH "v")
   # list(APPEND MARCH "_zicntr")
   
   if (ZVFH)
-    list(APPEND MARCH "_zfh")
-    list(APPEND MARCH "_zvfh")
+    list(APPEND ARCH "_zfh")
+    list(APPEND ARCH "_zvfh")
   endif()
 endif()
-if (RVV_ASM)
-  list(APPEND MARCH "v")
-endif()
 
-list(JOIN MARCH "" MARCH)
+list(JOIN ARCH "" ARCH)
 
 if (NOT DEFINED LINKER_SCRIPT)
   set(LINKER_SCRIPT     ${CMAKE_SOURCE_DIR}/toolchain/htif.ld)
@@ -76,14 +73,14 @@ if (NOT DEFINED LINKER_SCRIPT)
 endif()
 
 target_compile_options(target-riscv INTERFACE -fno-common -fno-builtin-printf)
-target_compile_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcmodel=${MCMODEL})
+target_compile_options(target-riscv INTERFACE -march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL})
 target_compile_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_compile_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 # target_compile_definitions(target-riscv INTERFACE FLT16_MAX=65504.0f)
 
 target_link_options(target-riscv INTERFACE -static)
-target_link_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcmodel=${MCMODEL})
+target_link_options(target-riscv INTERFACE -march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL})
 target_link_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
@@ -95,27 +92,6 @@ set(cpu_impl
   ./src/cpu/linear.c
   ./src/cpu/elu.c
   ./src/cpu/relu.c
-  # ./src/ops/cpu/div.c
-  # ./src/ops/cpu/dot.c
-  # ./src/ops/cpu/fill.c
-  # ./src/ops/cpu/max.c
-  # ./src/ops/cpu/maximum1.c
-  # ./src/ops/cpu/mm.c
-  # ./src/ops/cpu/min.c
-  # ./src/ops/cpu/minimum.c
-  # ./src/ops/cpu/minimum1.c
-  # ./src/ops/cpu/mul.c
-  # ./src/ops/cpu/mul1.c
-  # ./src/ops/cpu/neg.c
-  # ./src/ops/cpu/norm.c
-  # ./src/ops/cpu/rms_norm.c
-  # ./src/ops/cpu/sgn.c
-  # ./src/ops/cpu/softmax.c
-  # ./src/ops/cpu/sqr.c
-  # ./src/ops/cpu/sqrt.c
-  # ./src/ops/cpu/sub.c
-  # ./src/ops/cpu/sum.c
-  # ./src/ops/cpu/transpose.c
 )
 
 
@@ -133,11 +109,25 @@ if (RVV)
     add_compile_definitions(RISCV_ZVFH)
   endif ()
   
+  if (RVV_ASM)
+    message(STATUS "Using RVV assembly implementation")
+    add_compile_definitions(RVV_ASM)
+
+    set(rvv_asm_impl
+      ./src/rvv/add.S
+      ./src/rvv/linear.S
+      # ./src/rvv/elu.S
+      ./src/rvv/relu.S
+    )
+  endif ()
+
   set(rvv_impl
     ./src/rvv/add.c
     ./src/rvv/linear.c
     ./src/rvv/elu.c
     ./src/rvv/relu.c
+
+    ${rvv_asm_impl}
     )
 endif ()
 
