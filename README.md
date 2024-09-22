@@ -59,7 +59,7 @@ Running with FP16 support
 ```bash
 cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RISCV_V=ON -D RISCV_ZVFH=ON
 cmake --build ./build/ --target tests
-spike --isa=rv64gcv_zicntr_zfh_zvfh --misaligned ./build/tests/tests.elf
+spike --isa=rv64gcv_zicntr_zfh_zvfh ./build/tests/tests.elf
 ```
 
 Running with FP16 support with GCC<14.0
@@ -69,7 +69,7 @@ For GCC<14.0, it does not support the fp16 intrinsics, so we need to use the ass
 ```bash
 cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RISCV_V=ON -D RISCV_ZVFH=ON -D RISCV_V_ASM=ON
 cmake --build ./build/ --target tests
-spike --isa=rv64gcv_zicntr_zfh_zvfh --misaligned ./build/tests/tests.elf
+spike --isa=rv64gcv_zicntr_zfh_zvfh ./build/tests/tests.elf
 ```
 
 ### Building for RISC-V with Gemmini (Not working for now)
@@ -83,7 +83,7 @@ rm -rf ./build/
 ```bash
 cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D GEMMINI=ON
 cmake --build ./build/ --target all
-spike --extension=gemmini --misaligned ./build/tests/tests.elf
+spike --extension=gemmini ./build/tests/tests.elf
 ```
 
 ### Building for K230 board
