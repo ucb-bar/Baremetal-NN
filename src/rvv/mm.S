@@ -28,7 +28,7 @@ __nn_mm_f16_loop1:
 __nn_mm_f16_loop2:
   vfredusum.vs v24, v24, v27
   vfmv.f.s	  fa5, v24
-  fsw	        fa5, 0(a6)
+  fsh	        fa5, 0(a6)
   add	        a3, a3, t3
   addi	      a6, a6, 2
   bne	        a6, t1, __nn_mm_f16_loop0
