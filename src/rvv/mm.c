@@ -48,9 +48,9 @@ void NN_mm_f32_asm(size_t in_features, size_t out_features, float *y_data, const
             n -= vl;
           }
           #ifdef DEBUG_USE_REDOSUM
-            vec_sum = __riscv_vfredusum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
-          #else
             vec_sum = __riscv_vfredosum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
+          #else
+            vec_sum = __riscv_vfredusum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
           #endif
           y_data[j] = __riscv_vfmv_f_s_f16m1_f16(vec_sum) + bias_data[j];
           
@@ -103,9 +103,9 @@ void NN_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) 
           n -= vl;
         }
         #ifdef DEBUG_USE_REDOSUM
-          vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
-        #else
           vec_sum = __riscv_vfredosum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
+        #else
+          vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
         #endif
         y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum);
         
