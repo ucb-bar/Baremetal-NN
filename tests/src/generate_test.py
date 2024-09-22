@@ -27,18 +27,18 @@ int main() {
 """
 
     TENSOR_TEMPLATE = """
-  // {{ human_readable }}
-  Tensor{{ dim }}D_{{ dtype }} {{ name }} = {
-    .shape = { {{ shape }} },
-    .data = ({{ c_type }} *)((uint8_t[]){ {{ data }} })
-  };"""
+    // {{ human_readable }}
+    Tensor{{ dim }}D_{{ dtype }} {{ name }} = {
+      .shape = { {{ shape }} },
+      .data = ({{ c_type }} *)((uint8_t[]){ {{ data }} })
+    };"""
 
     EMPTY_TENSOR_TEMPLATE = """
-  // {{ human_readable }}
-  Tensor{{ dim }}D_{{ dtype }} actual = {
-    .shape = { {{ shape }} },
-    .data = ({{ c_type }} *)malloc(sizeof({{ c_type }}) * {{ size }})
-  };"""
+    // {{ human_readable }}
+    Tensor{{ dim }}D_{{ dtype }} actual = {
+      .shape = { {{ shape }} },
+      .data = ({{ c_type }} *)malloc(sizeof({{ c_type }}) * {{ size }})
+    };"""
 
     TEST_BLOCK_TEMPLATE = """
   {
@@ -222,11 +222,26 @@ t = TestGenerator()
 t.add_test("NN_add1d_f16",   lambda a, b: a + b,                                  [("a", t.rand16((7, ))),  ("b", t.rand16((7, )))                      ])
 t.add_test("NN_add2d_f16",   lambda a, b: a + b,                                  [("a", t.rand16((6, 7))), ("b", t.rand16((6, 7)))                     ])
 
+# mm
+t.add_test("NN_mm_f16",      lambda x, w: torch.nn.functional.linear(x, w),       [("x", t.rand16((6, 7))), ("w", t.rand16((5, 7)))                     ])
+
+# Linear
+t.add_test("NN_addmm_f16",   lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.rand16((6, 7))), ("w", t.rand16((5, 7))), ("b", t.rand16((5, ))) ])
+
+# ReLU
+t.add_test("NN_relu2d_f16",  lambda x: torch.nn.functional.relu(x),               [("x", t.rand16((7, 7)))                                                ])
+
+# ELU
+t.add_test("NN_elu2d_f16",   lambda x: torch.nn.functional.elu(x),                [("x", t.rand16((7, 7)))],    extra_args=["1.0"])
+
 
 # ==== FP32 tests ====
 # add
 t.add_test("NN_add1d_f32",   lambda a, b: a + b,                                  [("a", t.rand((7, ))),    ("b", t.rand((7, )))                        ])
 t.add_test("NN_add2d_f32",   lambda a, b: a + b,                                  [("a", t.rand((6, 7))),   ("b", t.rand((6, 7)))                       ])
+
+# mm
+t.add_test("NN_mm_f32",      lambda x, w: torch.nn.functional.linear(x, w),       [("x", t.rand((6, 7))),   ("w", t.rand((5, 7)))                       ])
 
 # Linear
 t.add_test("NN_addmm_f32",   lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.rand((6, 7))),   ("w", t.rand((5, 7))), ("b", t.rand((5, ))) ])

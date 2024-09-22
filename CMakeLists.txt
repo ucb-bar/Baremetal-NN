@@ -24,10 +24,9 @@ option(RISCV                "Build for RISC-V"                  OFF     )
 
 # accelerator options
 option(AVX                  "Use AVX implementation"            OFF     )
-option(RVV                  "Use RISCV vector extension"        OFF     )
-option(ZVFH                 "Use RISCV half-precision floating-point vector extension" OFF)
-
-option(RVV_ASM              "Use RISCV vector extension in assembly implementation" OFF)
+option(RISCV_V              "Use RISCV vector extension"        OFF     )
+option(RISCV_ZVFH           "Use RISCV half-precision floating-point vector extension" OFF)
+option(RISCV_V_ASM          "Use RISCV vector extension in assembly implementation" OFF)
 
 add_compile_options(-O1 -Wall -Wextra)
 
@@ -55,11 +54,11 @@ set(ABI                "lp64d")
 set(CMODEL             "medany")
 
 # generate march flags
-if (RVV)
+if (RISCV_V)
   list(APPEND ARCH "v")
   # list(APPEND MARCH "_zicntr")
   
-  if (ZVFH)
+  if (RISCV_ZVFH)
     list(APPEND ARCH "_zfh")
     list(APPEND ARCH "_zvfh")
   endif()
@@ -92,6 +91,7 @@ set(cpu_impl
   ./src/cpu/addmm.c
   ./src/cpu/elu.c
   ./src/cpu/relu.c
+  ./src/cpu/mm.c
 )
 
 
@@ -100,24 +100,25 @@ if (AVX)
   add_compile_definitions(AVX)
 endif ()
 
-if (RVV)
+if (RISCV_V)
   message(STATUS "Using RVV implementation")
-  add_compile_definitions(RVV)
+  add_compile_definitions(RISCV_V)
   
   if (RISCV_ZVFH)
     message(STATUS "Using Zvfh extension")
     add_compile_definitions(RISCV_ZVFH)
   endif ()
   
-  if (RVV_ASM)
-    message(STATUS "Using RVV assembly implementation")
-    add_compile_definitions(RVV_ASM)
+  if (RISCV_V_ASM)
+    message(STATUS "Using RISCV_V assembly implementation")
+    add_compile_definitions(RISCV_V_ASM)
 
     set(rvv_asm_impl
       ./src/rvv/add.S
       ./src/rvv/addmm.S
       # ./src/rvv/elu.S
       ./src/rvv/relu.S
+      ./src/rvv/mm.S
     )
   endif ()
 
@@ -126,6 +127,7 @@ if (RVV)
     ./src/rvv/addmm.c
     ./src/rvv/elu.c
     ./src/rvv/relu.c
+    ./src/rvv/mm.c
 
     ${rvv_asm_impl}
     )

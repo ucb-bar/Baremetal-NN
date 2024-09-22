@@ -25,7 +25,7 @@ void NN_print_i32(int32_t v) {
 }
 
 void NN_print_f16(float16_t v, int16_t num_digits) {
-  NN_print_f32(NN_half_to_float(v), num_digits);
+  NN_print_f32(as_f32(v), num_digits);
 }
 
 void NN_print_f32(float v, int16_t num_digits) {

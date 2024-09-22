@@ -23,7 +23,7 @@ extern size_t model_input_end[];
 
 
 int main() {
-  #ifdef RVV
+  #ifdef RISCV_V
     printf("Using RVV\n");
 
     // enable vector instructions

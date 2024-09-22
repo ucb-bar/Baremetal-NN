@@ -1,7 +1,7 @@
 #include <riscv_vector.h>
 #include "nn.h"
 
-#ifdef RVV
+#ifdef RISCV_V
 
 // void NN_elu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float alpha) {
 //   NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");

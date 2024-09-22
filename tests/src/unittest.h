@@ -11,12 +11,12 @@
   #include <x86intrin.h>
 #endif
 
-#ifdef RVV
+#ifdef RISCV_V
   #include "riscv_vector.h"
 #endif
 
 static void enable_accelerator_features() {
-  #ifdef RVV
+  #ifdef RISCV_V
     // enable vector operation
     unsigned long mstatus;
     asm volatile("csrr %0, mstatus" : "=r"(mstatus));

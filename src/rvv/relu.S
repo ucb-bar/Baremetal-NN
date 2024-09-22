@@ -1,10 +1,32 @@
+
+#ifdef RISCV_ZVFH
+  .section .text
+  .align 4
+  .globl NN_relu_f16_asm
+  NN_relu_f16_asm:
+    beqz	      a0, __relu_f16_exit
+    fmv.h.x	    fa5, zero
+  __relu_f16_loop:
+    vsetvli	    a5, a0, e16, m1, ta, ma
+    vle16.v	    v24, (a2)
+    vfmax.vf	  v24, v24, fa5
+    vse16.v	    v24, (a1)
+    slli	      a4, a5, 0x1
+    add	        a2, a2, a4
+    add	        a1, a1, a4
+    sub	        a0, a0, a5
+    bnez	      a0, __relu_f16_loop
+  __relu_f16_exit:
+    ret
+#endif
+
 .section .text
 .align 4
-.globl NN_relu2d_f32_asm
-NN_relu2d_f32_asm:
-  beqz	      a0, __relu2d_f32_exit
+.globl NN_relu_f32_asm
+NN_relu_f32_asm:
+  beqz	      a0, __relu_f32_exit
   fmv.w.x	    fa5, zero
-__relu2d_f32_loop:
+__relu_f32_loop:
   vsetvli	    a5, a0, e32, m1, ta, ma
   vle32.v	    v24, (a2)
   vfmax.vf	  v24, v24, fa5
@@ -13,6 +35,6 @@ __relu2d_f32_loop:
   add	        a2, a2, a4
   add	        a1, a1, a4
   sub	        a0, a0, a5
-  bnez	      a0, __relu2d_f32_loop
-__relu2d_f32_exit:
+  bnez	      a0, __relu_f32_loop
+__relu_f32_exit:
   ret

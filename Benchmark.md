@@ -60,7 +60,7 @@ layer_norm:             PASS  (237313 cycles)
 layer_norm:             PASS  (933313 cycles)
 ```
 
-RISCV RVV
+RISCV Vector
 ```
 abs:                    PASS  (2341 cycles)
 abs:                    PASS  (9253 cycles)
