@@ -26,7 +26,11 @@ __nn_addmm_f16_loop1:
   bnez	      a1, __nn_addmm_f16_loop1
   vsetvli	    t1, zero, e16, m1, ta, ma
 __nn_addmm_f16_loop2:
-  vfredusum.vs v24, v24, v27
+  #ifdef DEBUG_USE_REDOSUM
+    vfredosum.vs v24, v24, v27
+  #else
+    vfredusum.vs v24, v24, v27
+  #endif
   vfmv.f.s	  fa4, v24
   flh 	      fa5, 0(a7)
   fadd.h	    fa5, fa5, fa4
@@ -66,7 +70,11 @@ __nn_addmm_f32_loop1:
   bnez	      a1, __nn_addmm_f32_loop1
   vsetvli	    t1, zero, e32, m1, ta, ma
 __nn_addmm_f32_loop2:
-  vfredusum.vs v24, v24, v27
+  #ifdef DEBUG_USE_REDOSUM
+    vfredosum.vs v24, v24, v27
+  #else
+    vfredusum.vs v24, v24, v27
+  #endif
   vfmv.f.s	  fa4, v24
   flw 	      fa5, 0(a7)
   fadd.s	    fa5, fa5, fa4

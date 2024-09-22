@@ -43,7 +43,11 @@
             weight_data += vl;
             n -= vl;
           }
-          vec_sum = __riscv_vfredusum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
+          #ifdef DEBUG_USE_REDOSUM
+            vec_sum = __riscv_vfredosum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
+          #else
+            vec_sum = __riscv_vfredusum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
+          #endif
           y_data[j] = __riscv_vfmv_f_s_f16m1_f16(vec_sum) + bias_data[j];
           
           x_data -= in_features;
@@ -95,9 +99,13 @@ void NN_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *we
           weight_data += vl;
           n -= vl;
         }
-        vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
-        y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum) + bias_data[j];
         
+        #ifdef DEBUG_USE_REDOSUM
+          vec_sum = __riscv_vfredosum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
+        #else
+          vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
+        #endif
+        y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum) + bias_data[j];
         x_data -= in_features;
       }
     #endif
