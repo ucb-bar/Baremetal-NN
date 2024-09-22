@@ -89,7 +89,7 @@ set(cpu_impl
   ./src/print.c
   ./src/cpu/add.c
   ./src/cpu/equals.c
-  ./src/cpu/linear.c
+  ./src/cpu/addmm.c
   ./src/cpu/elu.c
   ./src/cpu/relu.c
 )
@@ -115,7 +115,7 @@ if (RVV)
 
     set(rvv_asm_impl
       ./src/rvv/add.S
-      ./src/rvv/linear.S
+      ./src/rvv/addmm.S
       # ./src/rvv/elu.S
       ./src/rvv/relu.S
     )
@@ -123,7 +123,7 @@ if (RVV)
 
   set(rvv_impl
     ./src/rvv/add.c
-    ./src/rvv/linear.c
+    ./src/rvv/addmm.c
     ./src/rvv/elu.c
     ./src/rvv/relu.c
 

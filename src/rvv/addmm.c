@@ -3,7 +3,7 @@
 
 #ifdef RVV
 
-void NN_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
+void NN_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
   NN_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
   NN_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
   NN_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
@@ -23,7 +23,7 @@ void NN_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
     float *y_data = y_batch_data;
 
     #ifdef RVV_ASM
-      NN_linear_f32_asm(in_features, out_features, y_data, x_data, weight_data, bias_data);
+      NN_addmm_f32_asm(in_features, out_features, y_data, x_data, weight_data, bias_data);
     #else
       size_t vlmax = __riscv_vsetvlmax_e32m1();
 

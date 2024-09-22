@@ -1,7 +1,7 @@
 #include "nn.h"
 
 
-__attribute__((weak)) void NN_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
+__attribute__((weak)) void NN_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
   NN_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
   NN_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
   NN_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
