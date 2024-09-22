@@ -1,5 +1,5 @@
 /**
- * @file rv_common.h
+ * @file riscv.h
  * @brief RISC-V Definitions
  * 
  * This header file provides common definitions and operations for RISC-V core programming.
@@ -13,38 +13,29 @@
  * The common definitions include enumerations for state values (such as RESET and SET), and status values (such as OK and ERROR).
  *
  * @note This file should be included to access RISC-V core-specific definitions and perform common operations.
- *
- * @author -T.K.-
- * @date 2023-05-20
  */
  
-#ifndef __RV_H
-#define __RV_H
+#ifndef __RISCV_H
+#define __RISCV_H
 
-#include <stdint.h>
-#include <stddef.h>
+#ifdef __riscv_xlen
+  #define RISCV_XLEN __riscv_xlen
+#else
+  #warning "__riscv_xlen not defined, defaulting to 64"
+  #define RISCV_XLEN 64
+#endif
 
-
-/* ================ Memory register attributes ================ */
-// #ifdef __cplusplus
-//   #define   __I     volatile             /** Defines "read only" permissions */
-// #else
-//   #define   __I     volatile const       /** Defines "read only" permissions */
-// #endif
-// #define     __O     volatile             /** Defines "write only" permissions */
-// #define     __IO    volatile             /** Defines "read / write" permissions */
-
-// /* following defines should be used for structure members */
-// #define     __IM     volatile const      /** Defines "read only" structure member permissions */
-// #define     __OM     volatile            /** Defines "write only" structure member permissions */
-// #define     __IOM    volatile            /** Defines "read / write" structure member permissions */
-
-
-/* ================ Bit Operation definitions ================ */
-#define SET_BITS(REG, BIT)                    ((REG) |= (BIT))
-#define CLEAR_BITS(REG, BIT)                  ((REG) &= ~(BIT))
-#define READ_BITS(REG, BIT)                   ((REG) & (BIT))
-#define WRITE_BITS(REG, CLEARMASK, SETMASK)   ((REG) = (((REG) & (~(CLEARMASK))) | (SETMASK)))
+#if RISCV_XLEN == 64
+  #define LREG ld
+  #define SREG sd
+  #define REGBYTES 8
+#elif RISCV_XLEN == 32
+  #define LREG lw
+  #define SREG sw
+  #define REGBYTES 4
+#else
+  #error "Unsupported RISCV_XLEN"
+#endif
 
 
 /* ================ RISC-V specific definitions ================ */
@@ -72,23 +63,4 @@
   __tmp; })
 
 
-/* ================ Common definitions ================ */
-typedef enum {
-  RESET = 0UL,
-  SET   = !RESET,
-
-  DISABLE = RESET,
-  ENABLE  = SET,
-  
-  LOW   = RESET,
-  HIGH  = SET,
-} State;
-
-typedef enum {
-  OK = 0U,
-  ERROR,
-  BUSY,
-  TIMEOUT
-} Status;
-
-#endif /* __RV_H */
+#endif /* __RISCV_H */

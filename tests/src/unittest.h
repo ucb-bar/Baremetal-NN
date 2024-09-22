@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <rv.h>
+#include <riscv.h>
 
 #include "nn.h"
 
