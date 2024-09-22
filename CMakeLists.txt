@@ -28,6 +28,9 @@ option(RISCV_V              "Use RISCV vector extension"        OFF     )
 option(RISCV_ZVFH           "Use RISCV half-precision floating-point vector extension" OFF)
 option(RISCV_V_ASM          "Use RISCV vector extension in assembly implementation" OFF)
 
+option(DEBUG_USE_REDOSUM        "Use redosum instead of redusum" OFF)
+
+
 add_compile_options(-O1 -Wall -Wextra)
 
 add_library(target-x86 INTERFACE)
@@ -120,6 +123,11 @@ if (RISCV_V)
       ./src/rvv/relu.S
       ./src/rvv/mm.S
     )
+  endif ()
+
+  if (DEBUG_USE_REDOSUM)
+    message(STATUS "Using redosum implementation")
+    add_compile_definitions(DEBUG_USE_REDOSUM)
   endif ()
 
   set(rvv_impl
