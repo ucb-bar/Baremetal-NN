@@ -4,6 +4,11 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
+  void NN_add_f16_asm(size_t n, float16_t *y_data, const float16_t *x1_data, const float16_t *x2_data);
+#endif
+void NN_add_f32_asm(size_t n, float *y_data, const float *x1_data, const float *x2_data);
+
+#ifdef RISCV_ZVFH
   void NN_add1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1, const Tensor1D_F16 *x2) {
     NN_assert(x1->shape[0] == x2->shape[0], "Cannot add tensors of different shapes");
     NN_assert(y->shape[0] == x1->shape[0], "Cannot add tensors of different shapes");

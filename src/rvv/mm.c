@@ -4,6 +4,11 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
+  void NN_mm_f16_asm(size_t in_features, size_t out_features, float16_t *y_data, const float16_t *x1_data, const float16_t *x2_data);
+#endif
+void NN_mm_f32_asm(size_t in_features, size_t out_features, float *y_data, const float *x1_data, const float *x2_data);
+
+#ifdef RISCV_ZVFH
   void NN_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) { 
     NN_assert(x1->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
     NN_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");

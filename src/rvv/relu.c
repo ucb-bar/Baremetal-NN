@@ -4,6 +4,11 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
+  void NN_relu_f16_asm(size_t n, float16_t *y_data, const float16_t *x_data);
+#endif
+void NN_relu_f32_asm(size_t n, float *y_data, const float *x_data);
+
+#ifdef RISCV_ZVFH
   void NN_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x) {
     NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
 

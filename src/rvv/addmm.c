@@ -4,6 +4,11 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
+  void NN_addmm_f16_asm(size_t in_features, size_t out_features, float16_t *y_data, const float16_t *x_data, const float16_t *weight_data, const float16_t *bias_data);
+#endif
+void NN_addmm_f32_asm(size_t in_features, size_t out_features, float *y_data, const float *x_data, const float *weight_data, const float *bias_data);
+
+#ifdef RISCV_ZVFH
   void NN_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *weight, const Tensor1D_F16 *bias) { 
     NN_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
     NN_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
