@@ -137,13 +137,13 @@ if (RISCV_V)
 
   set(rvv_impl
     ./src/rvv/add.c
-    # ./src/rvv/addscalar.c
+    ./src/rvv/addscalar.c
     ./src/rvv/addmm.c
     ./src/rvv/elu.c
     ./src/rvv/relu.c
     ./src/rvv/mm.c
-    # ./src/rvv/mul.c
-    # ./src/rvv/mulscalar.c
+    ./src/rvv/mul.c
+    ./src/rvv/mulscalar.c
 
     ${rvv_asm_impl}
     )
