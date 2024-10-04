@@ -5,6 +5,7 @@ __attribute__((weak)) void NN_add1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1,
   NN_assert(x1->shape[0] == x2->shape[0], "Cannot add tensors of different shapes");
   NN_assert(y->shape[0] == x1->shape[0], "Cannot add tensors of different shapes");
 
+<<<<<<< HEAD
   float16_t *y_dim0 = y->data;
   float16_t *x1_dim0 = x1->data;
   float16_t *x2_dim0 = x2->data;
@@ -13,6 +14,11 @@ __attribute__((weak)) void NN_add1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1,
     y_dim0 += y->stride[0];
     x1_dim0 += x1->stride[0];
     x2_dim0 += x2->stride[0];
+=======
+  size_t n = y->shape[0];
+  for (size_t i = 0; i < n; i += 1) {
+    y->data[i] = as_f16(as_f32(x1->data[i]) + as_f32(x2->data[i]));
+>>>>>>> f34999245bd650c48d90f3e81e691d32ac8373af
   }
 }
 

@@ -25,6 +25,13 @@
     ".section \".text\"\n")                   /* Restore section */
 
 
+typedef struct {
+  float16_t data;
+} Tensor0D_F16;
+
+typedef struct {
+  float data;
+} Tensor0D_F32;
 
 typedef struct {
   size_t shape[1];
@@ -89,6 +96,9 @@ void NN_print_tensor2d_f16(const Tensor2D_F16 *tensor);
 void NN_print_tensor2d_f32(const Tensor2D_F32 *tensor);
 
 
+uint8_t NN_equals0d_f16(const Tensor0D_F16 *a, const Tensor0D_F16 *b, float rel_err);
+
+uint8_t NN_equals0d_f32(const Tensor0D_F32 *a, const Tensor0D_F32 *b, float rel_err);
 
 uint8_t NN_equals1d_f16(const Tensor1D_F16 *a, const Tensor1D_F16 *b, float rel_err);
 
@@ -108,6 +118,13 @@ void NN_add2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x
 
 void NN_add2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2);
 
+void NN_addscalar1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x, float16_t scalar);
+
+void NN_addscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar);
+
+void NN_addscalar2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float16_t scalar);
+
+void NN_addscalar2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float scalar);
 
 
 void NN_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *weight, const Tensor1D_F16 *bias);
@@ -127,9 +144,49 @@ void NN_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x);
 void NN_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x);
 
 
+void NN_max1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x);
+
+void NN_max1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x);
+
+void NN_max2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x);
+
+void NN_max2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x);
+
+
+void NN_min1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x);
+
+void NN_min1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x);
+
+void NN_min2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x);
+
+void NN_min2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x);
+
+
 void NN_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2);
 
 void NN_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2);
+
+
+void NN_mul1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1, const Tensor1D_F16 *x2);
+
+void NN_mul1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x2);
+
+void NN_mul2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2);
+
+void NN_mul2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2);
+
+void NN_mulscalar1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x, float16_t scalar);
+
+void NN_mulscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar);
+
+void NN_mulscalar2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float16_t scalar);
+
+void NN_mulscalar2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float scalar);
+
+
+
+
+
 
 
 
