@@ -12,7 +12,7 @@ void NN_relu_f32_asm(size_t n, float *y_data, const float *x_data);
   void NN_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x) {
     NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
 
-    size_t n = x->shape[0] * x->shape[1];
+    size_t n = y->shape[0] * y->shape[1];
     float16_t *x_data = x->data;
     float16_t *y_data = y->data;
 
@@ -37,7 +37,7 @@ void NN_relu_f32_asm(size_t n, float *y_data, const float *x_data);
 void NN_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
   NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
 
-  size_t n = x->shape[0] * x->shape[1];
+  size_t n = y->shape[0] * y->shape[1];
   float *x_data = x->data;
   float *y_data = y->data;
 
