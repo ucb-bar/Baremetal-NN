@@ -90,11 +90,14 @@ target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 set(cpu_impl 
   ./src/print.c
   ./src/cpu/add.c
+  ./src/cpu/addscalar.c
   ./src/cpu/equals.c
   ./src/cpu/addmm.c
   ./src/cpu/elu.c
   ./src/cpu/relu.c
   ./src/cpu/mm.c
+  ./src/cpu/mul.c
+  ./src/cpu/mulscalar.c
 )
 
 
@@ -132,10 +135,13 @@ if (RISCV_V)
 
   set(rvv_impl
     ./src/rvv/add.c
+    # ./src/rvv/addscalar.c
     ./src/rvv/addmm.c
     ./src/rvv/elu.c
     ./src/rvv/relu.c
     ./src/rvv/mm.c
+    # ./src/rvv/mul.c
+    # ./src/rvv/mulscalar.c
 
     ${rvv_asm_impl}
     )
@@ -152,40 +158,6 @@ endif ()
 
 
 add_library(nn
-  # ./src/functional/tensor_creation.c
-  # ./src/functional/print.c
-  # ./src/functional/abs.c
-  # ./src/functional/add.c
-  # ./src/functional/batch_norm2d.c
-  # ./src/functional/conv2d.c
-  # ./src/functional/clip.c
-  # ./src/functional/copy.c
-  # ./src/functional/div.c
-  # ./src/functional/elu.c
-  # ./src/functional/fill.c
-  # ./src/functional/interpolate.c
-  # ./src/functional/layer_norm.c
-  # ./src/functional/linear.c
-  # ./src/functional/matmul.c
-  # ./src/functional/mm.c
-  # ./src/functional/norm.c
-  # ./src/functional/max.c
-  # ./src/functional/maximum.c
-  # ./src/functional/max_pool2d.c
-  # ./src/functional/min.c
-  # ./src/functional/minimum.c
-  # ./src/functional/mul.c
-  # ./src/functional/mv.c
-  # ./src/functional/neg.c
-  # ./src/functional/relu.c
-  # ./src/functional/relu6.c
-  # ./src/functional/rms_norm.c
-  # ./src/functional/softmax.c
-  # ./src/functional/silu.c
-  # ./src/functional/sub.c
-  # ./src/functional/sum.c
-  # ./src/functional/transpose.c
-
   ${rvv_impl}
   ${gemmini_impl}
   ${cpu_impl}
