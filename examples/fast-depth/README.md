@@ -41,7 +41,7 @@ Building for spike:
 
 ```bash
 cd ./example/fast-depth/build/
-cmake .. -D RISCV=ON -D RVV=ON
+cmake .. -D RISCV=ON -D RISCV_V=ON
 cmake --build .
 spike --isa=rv64gcv_zicntr --varch=vlen:512,elen:32 ./fast-depth
 ```

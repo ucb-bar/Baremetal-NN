@@ -1,5 +1,5 @@
-#ifndef __NN_FLOAT16
-#define __NN_FLOAT16
+#ifndef __FLOAT16_H
+#define __FLOAT16_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -13,6 +13,7 @@
 #ifdef FLT16_MAX
   typedef _Float16  float16_t;
 #else
+  #warning "float16_t type is not supported, using manual implementations"
   typedef union {
     uint32_t i;
     float    f;
@@ -27,7 +28,7 @@
  * @param h The half-precision floating-point number to convert.
  * @return The single-precision floating-point number.
  */
-static inline float NN_half_to_float(float16_t h) {
+static inline float as_f32(float16_t h) {
   #ifdef FLT16_MAX
     return (float)h;
   #else
@@ -93,7 +94,7 @@ static inline float NN_half_to_float(float16_t h) {
  * @param f The single-precision floating-point number to convert.
  * @return The half-precision floating-point number.
  */
-static inline float16_t NN_float_to_half(float f) {
+static inline float16_t as_f16(float f) {
   #ifdef FLT16_MAX
     return (_Float16)f;
   #else
@@ -151,4 +152,4 @@ static inline float16_t NN_float_to_half(float f) {
   #endif
 }
 
-#endif // __NN_FLOAT16
+#endif // __FLOAT16_H

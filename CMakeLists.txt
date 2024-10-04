@@ -24,10 +24,12 @@ option(RISCV                "Build for RISC-V"                  OFF     )
 
 # accelerator options
 option(AVX                  "Use AVX implementation"            OFF     )
-option(RVV                  "Use RISCV vector extension"        OFF     )
-option(ZVFH                 "Use RISCV half-precision floating-point vector extension" OFF)
+option(RISCV_V              "Use RISCV vector extension"        OFF     )
+option(RISCV_ZVFH           "Use RISCV half-precision floating-point vector extension" OFF)
+option(RISCV_V_ASM          "Use RISCV vector extension in assembly implementation" OFF)
 
-option(RVV_ASM              "Use RISCV vector extension in assembly implementation" OFF)
+option(DEBUG_USE_REDOSUM        "Use redosum instead of redusum" OFF)
+
 
 add_compile_options(-O1 -Wall -Wextra)
 
@@ -48,27 +50,24 @@ target_compile_definitions(target-riscv INTERFACE RISCV)
 
 set(WRAP_SPECS_FILE     "htif_wrap.specs")
 set(SPECS_FILE          "htif_nano.specs")
-# set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
+set(SPEC_FLAGS          -specs=${SPECS_FILE} -specs=${WRAP_SPECS_FILE})
 
-set(MARCH               "rv64gc")
-set(MABI                "lp64d")
-set(MCMODEL             "medany")
+set(ARCH               "rv64gc")
+set(ABI                "lp64d")
+set(CMODEL             "medany")
 
 # generate march flags
-if (RVV)
-  list(APPEND MARCH "v")
+if (RISCV_V)
+  list(APPEND ARCH "v")
   # list(APPEND MARCH "_zicntr")
   
-  if (ZVFH)
-    list(APPEND MARCH "_zfh")
-    list(APPEND MARCH "_zvfh")
+  if (RISCV_ZVFH)
+    list(APPEND ARCH "_zfh")
+    list(APPEND ARCH "_zvfh")
   endif()
 endif()
-if (RVV_ASM)
-  list(APPEND MARCH "v")
-endif()
 
-list(JOIN MARCH "" MARCH)
+list(JOIN ARCH "" ARCH)
 
 if (NOT DEFINED LINKER_SCRIPT)
   set(LINKER_SCRIPT     ${CMAKE_SOURCE_DIR}/toolchain/htif.ld)
@@ -76,47 +75,31 @@ if (NOT DEFINED LINKER_SCRIPT)
 endif()
 
 target_compile_options(target-riscv INTERFACE -fno-common -fno-builtin-printf)
-target_compile_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcmodel=${MCMODEL})
+target_compile_options(target-riscv INTERFACE -march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL})
 target_compile_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_compile_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 # target_compile_definitions(target-riscv INTERFACE FLT16_MAX=65504.0f)
 
 target_link_options(target-riscv INTERFACE -static)
-target_link_options(target-riscv INTERFACE -march=${MARCH} -mabi=${MABI} -mcmodel=${MCMODEL})
+target_link_options(target-riscv INTERFACE -march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL})
 target_link_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 
 set(cpu_impl 
-  ./src/ops/cpu/abs.c
-  ./src/ops/cpu/acc.c
-  ./src/ops/cpu/acc1.c
-  ./src/ops/cpu/add.c
-  ./src/ops/cpu/add1.c
-  ./src/ops/cpu/addmm.c
-  ./src/ops/cpu/div.c
-  ./src/ops/cpu/dot.c
-  ./src/ops/cpu/fill.c
-  ./src/ops/cpu/max.c
-  ./src/ops/cpu/maximum.c
-  ./src/ops/cpu/maximum1.c
-  ./src/ops/cpu/mm.c
-  ./src/ops/cpu/min.c
-  ./src/ops/cpu/minimum.c
-  ./src/ops/cpu/minimum1.c
-  ./src/ops/cpu/mul.c
-  ./src/ops/cpu/mul1.c
-  ./src/ops/cpu/neg.c
-  ./src/ops/cpu/norm.c
-  ./src/ops/cpu/rms_norm.c
-  ./src/ops/cpu/sgn.c
-  ./src/ops/cpu/softmax.c
-  ./src/ops/cpu/sqr.c
-  ./src/ops/cpu/sqrt.c
-  ./src/ops/cpu/sub.c
-  ./src/ops/cpu/sum.c
-  ./src/ops/cpu/transpose.c
+  ./src/print.c
+  ./src/cpu/add.c
+  ./src/cpu/addscalar.c
+  ./src/cpu/equals.c
+  ./src/cpu/addmm.c
+  ./src/cpu/elu.c
+  ./src/cpu/relu.c
+  ./src/cpu/max.c
+  ./src/cpu/min.c
+  ./src/cpu/mm.c
+  ./src/cpu/mul.c
+  ./src/cpu/mulscalar.c
 )
 
 
@@ -125,36 +108,45 @@ if (AVX)
   add_compile_definitions(AVX)
 endif ()
 
-if (RVV)
+if (RISCV_V)
   message(STATUS "Using RVV implementation")
-  add_compile_definitions(RVV)
+  add_compile_definitions(RISCV_V)
   
   if (RISCV_ZVFH)
     message(STATUS "Using Zvfh extension")
     add_compile_definitions(RISCV_ZVFH)
   endif ()
   
+  if (RISCV_V_ASM)
+    message(STATUS "Using RISCV_V assembly implementation")
+    add_compile_definitions(RISCV_V_ASM)
+
+    set(rvv_asm_impl
+      ./src/rvv/add.S
+      ./src/rvv/addmm.S
+      ./src/rvv/relu.S
+      ./src/rvv/mm.S
+    )
+  endif ()
+
+  if (DEBUG_USE_REDOSUM)
+    message(STATUS "Using redosum implementation")
+    add_compile_definitions(DEBUG_USE_REDOSUM)
+  endif ()
+
   set(rvv_impl
-    ./src/ops/rvv/abs.c
-    ./src/ops/rvv/acc.c
-    ./src/ops/rvv/acc1.c
-    ./src/ops/rvv/add.c
-    ./src/ops/rvv/add1.c
-    ./src/ops/rvv/addmm.c
-    ./src/ops/rvv/div.c
-    ./src/ops/rvv/dot.c
-    ./src/ops/rvv/max.c
-    ./src/ops/rvv/maximum.c
-    ./src/ops/rvv/maximum1.c
-    ./src/ops/rvv/min.c
-    ./src/ops/rvv/minimum.c
-    ./src/ops/rvv/minimum1.c
-    ./src/ops/rvv/mul.c
-    ./src/ops/rvv/mul1.c
-    ./src/ops/rvv/neg.c
-    ./src/ops/rvv/rms_norm.c
-    ./src/ops/rvv/sub.c
-    ./src/ops/rvv/transpose.c
+    ./src/rvv/add.c
+    ./src/rvv/addscalar.c
+    ./src/rvv/addmm.c
+    ./src/rvv/elu.c
+    ./src/rvv/relu.c
+    ./src/rvv/max.c
+    ./src/rvv/min.c
+    ./src/rvv/mm.c
+    ./src/rvv/mul.c
+    ./src/rvv/mulscalar.c
+
+    ${rvv_asm_impl}
     )
 endif ()
 
@@ -169,40 +161,6 @@ endif ()
 
 
 add_library(nn
-  ./src/functional/tensor_creation.c
-  ./src/functional/print.c
-  ./src/functional/abs.c
-  ./src/functional/add.c
-  ./src/functional/batch_norm2d.c
-  ./src/functional/conv2d.c
-  ./src/functional/clip.c
-  ./src/functional/copy.c
-  ./src/functional/div.c
-  ./src/functional/elu.c
-  ./src/functional/fill.c
-  ./src/functional/interpolate.c
-  ./src/functional/layer_norm.c
-  ./src/functional/linear.c
-  ./src/functional/matmul.c
-  ./src/functional/mm.c
-  ./src/functional/norm.c
-  ./src/functional/max.c
-  ./src/functional/maximum.c
-  ./src/functional/max_pool2d.c
-  ./src/functional/min.c
-  ./src/functional/minimum.c
-  ./src/functional/mul.c
-  ./src/functional/mv.c
-  ./src/functional/neg.c
-  ./src/functional/relu.c
-  ./src/functional/relu6.c
-  ./src/functional/rms_norm.c
-  ./src/functional/softmax.c
-  ./src/functional/silu.c
-  ./src/functional/sub.c
-  ./src/functional/sum.c
-  ./src/functional/transpose.c
-
   ${rvv_impl}
   ${gemmini_impl}
   ${cpu_impl}
@@ -210,8 +168,9 @@ add_library(nn
 
 target_include_directories(nn PUBLIC 
   ./nn
-  ./nn/functional
-  ./nn/ops)
+)
+  # ./nn/functional
+  # ./nn/ops)
 
 if (X86)
   message(STATUS "nn: Building for x86")
