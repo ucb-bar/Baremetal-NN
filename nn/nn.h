@@ -35,21 +35,25 @@ typedef struct {
 
 typedef struct {
   size_t shape[1];
+  size_t stride[1];
   float16_t *data;
 } Tensor1D_F16;
 
 typedef struct {
   size_t shape[1];
+  size_t stride[1];
   float *data;
 } Tensor1D_F32;
 
 typedef struct {
   size_t shape[2];
+  size_t stride[2];
   float16_t *data;
 } Tensor2D_F16;
 
 typedef struct {
   size_t shape[2];
+  size_t stride[2];
   float *data;
 } Tensor2D_F32;
 

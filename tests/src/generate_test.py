@@ -30,6 +30,7 @@ int main() {
     // {{ human_readable }}
     Tensor{{ dim }}D_{{ dtype }} {{ name }} = {
       {% if dim > 0 %}.shape = { {{ shape }} },{% endif %}
+      {% if dim > 0 %}.stride = { {{ stride }} },{% endif %}
       {% if dim > 0 %}.data = ({{ c_type }} *)((uint8_t[]){ {{ data }} }){% else %}.data = {{ data }}{% endif %}
     };"""
 
@@ -37,6 +38,7 @@ int main() {
     // {{ human_readable }}
     Tensor{{ dim }}D_{{ dtype }} actual = {
       {% if dim > 0 %}.shape = { {{ shape }} },{% endif %}
+      {% if dim > 0 %}.stride = { {{ stride }} },{% endif %}
       {% if dim > 0 %}.data = ({{ c_type }} *)malloc(sizeof({{ c_type }}) * {{ size }}){% else %}.data = 0{% endif %}
     };"""
 
@@ -116,6 +118,7 @@ int main() {
     def format_tensor(self, name: str, tensor: torch.Tensor):
         dim = len(tensor.shape)
         shape = ", ".join([str(s) for s in tensor.shape])
+        stride = ", ".join([str(s) for s in tensor.stride()])
         dtype, c_type = self.get_type_str(tensor)
         
         data_np = tensor.detach().cpu().contiguous().numpy()
@@ -130,6 +133,7 @@ int main() {
             name=name, 
             dim=dim,
             shape=shape,
+            stride=stride,
             dtype=dtype,
             data=data,
             c_type=c_type
@@ -159,6 +163,7 @@ int main() {
             if type(value) == torch.Tensor and name != "actual":
                 dim = len(value.shape)
                 shape = ", ".join([str(s) for s in value.shape])
+                stride = ", ".join([str(s) for s in value.stride()])
                 dtype, c_type = self.get_type_str(value)
                 tensor_str = self.format_tensor(name, value)
                 
@@ -177,7 +182,7 @@ int main() {
         size = shape.replace(", ", "*")
 
         actual_str = self.env.from_string(self.EMPTY_TENSOR_TEMPLATE).render(
-            dim=dim, shape=shape, size=size, dtype=dtype, c_type=c_type
+            dim=dim, shape=shape, stride=stride, size=size, dtype=dtype, c_type=c_type
         )
 
         result_tensors = golden_str + actual_str
