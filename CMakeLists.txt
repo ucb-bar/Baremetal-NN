@@ -95,6 +95,8 @@ set(cpu_impl
   ./src/cpu/addmm.c
   ./src/cpu/elu.c
   ./src/cpu/relu.c
+  ./src/cpu/max.c
+  ./src/cpu/min.c
   ./src/cpu/mm.c
   ./src/cpu/mul.c
   ./src/cpu/mulscalar.c
