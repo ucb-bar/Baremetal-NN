@@ -124,7 +124,6 @@ if (RISCV_V)
     set(rvv_asm_impl
       ./src/rvv/add.S
       ./src/rvv/addmm.S
-      # ./src/rvv/elu.S
       ./src/rvv/relu.S
       ./src/rvv/mm.S
     )
@@ -141,6 +140,8 @@ if (RISCV_V)
     ./src/rvv/addmm.c
     ./src/rvv/elu.c
     ./src/rvv/relu.c
+    ./src/rvv/max.c
+    ./src/rvv/min.c
     ./src/rvv/mm.c
     ./src/rvv/mul.c
     ./src/rvv/mulscalar.c
