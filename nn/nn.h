@@ -91,6 +91,48 @@ typedef struct {
 } Tensor2D_F32;
 
 /**
+ * Tensor3D_F16
+ * 
+ * A 3D tensor with a float16_t data type.
+ */
+typedef struct {
+  size_t shape[3];
+  float16_t *data;
+} Tensor3D_F16;
+
+/**
+ * Tensor3D_F32
+ * 
+ * A 3D tensor with a float data type.
+ */
+typedef struct {
+  size_t shape[3];
+  float *data;
+} Tensor3D_F32;
+
+/**
+ * Tensor4D_F16
+ * 
+ * A 4D tensor with a float16_t data type.
+ */
+typedef struct {
+  size_t shape[4];
+  float16_t *data;
+} Tensor4D_F16;
+
+/**
+ * Tensor4D_F32
+ * 
+ * A 4D tensor with a float data type.
+ */
+typedef struct {
+  size_t shape[4];
+  float *data;
+} Tensor4D_F32;
+
+
+
+/**
  * nn_assert
  * 
  * Asserts that a condition is true. If the condition is false, it prints an error message and exits.
@@ -371,6 +413,55 @@ uint8_t nn_equals2d_f16(const Tensor2D_F16 *a, const Tensor2D_F16 *b, float rel_
  * @return 1 if the tensors are equal within the relative error, 0 otherwise.
  */
 uint8_t nn_equals2d_f32(const Tensor2D_F32 *a, const Tensor2D_F32 *b, float rel_err);
+
+
+/**
+ * nn_equals3d_f16
+ * 
+ * Checks if two 3D tensors with type F16 are equal.
+ * 
+ * @param a The first 3D tensor.
+ * @param b The second 3D tensor.
+ * @param rel_err The relative error tolerance.
+ * @return 1 if the tensors are equal within the relative error, 0 otherwise.
+ */
+uint8_t nn_equals3d_f16(const Tensor3D_F16 *a, const Tensor3D_F16 *b, float rel_err);
+
+/**
+ * nn_equals3d_f32
+ * 
+ * Checks if two 3D tensors with type F32 are equal.
+ * 
+ * @param a The first 3D tensor.
+ * @param b The second 3D tensor.
+ * @param rel_err The relative error tolerance.
+ * @return 1 if the tensors are equal within the relative error, 0 otherwise.
+ */
+uint8_t nn_equals3d_f32(const Tensor3D_F32 *a, const Tensor3D_F32 *b, float rel_err);
+
+/**
+ * nn_equals4d_f16
+ * 
+ * Checks if two 4D tensors with type F16 are equal.
+ * 
+ * @param a The first 4D tensor.
+ * @param b The second 4D tensor.
+ * @param rel_err The relative error tolerance.
+ * @return 1 if the tensors are equal within the relative error, 0 otherwise.
+ */
+uint8_t nn_equals4d_f16(const Tensor4D_F16 *a, const Tensor4D_F16 *b, float rel_err);
+
+/**
+ * nn_equals4d_f32
+ * 
+ * Checks if two 4D tensors with type F32 are equal.
+ * 
+ * @param a The first 4D tensor.
+ * @param b The second 4D tensor.
+ * @param rel_err The relative error tolerance.
+ * @return 1 if the tensors are equal within the relative error, 0 otherwise.
+ */
+uint8_t nn_equals4d_f32(const Tensor4D_F32 *a, const Tensor4D_F32 *b, float rel_err);
 
 
 /**

@@ -300,6 +300,11 @@ if __name__ == "__main__":
     # Tanh
     t.add_test("nn_tanh2d_f32",  lambda x: torch.nn.functional.tanh(x),               [("x", t.rand((7, 7)))                                                ])
 
+    # Attention
+    t.add_test(
+        "nn_scaled_dot_product_attention_f32", 
+        lambda query, key, value: torch.nn.functional.scaled_dot_product_attention(query, key, value), 
+        [("query", t.rand((1, 2, 16, 8))), ("key", t.rand((1, 2, 16, 8))), ("value", t.rand((1, 2, 16, 8)))])
 
     t.generate(out_file)
 
