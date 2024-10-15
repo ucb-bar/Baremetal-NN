@@ -1,4 +1,3 @@
-
 #ifndef __MODEL_H
 #define __MODEL_H
 
@@ -11,56 +10,56 @@ extern size_t model_weight_start[];
 extern size_t model_weight_end[];
 
 typedef struct {
-  Tensor2D_F32 seq_0_weight;
-  Tensor1D_F32 seq_0_bias;
-  Tensor2D_F32 seq_2_weight;
-  Tensor1D_F32 seq_2_bias;
-  Tensor2D_F32 lin2_weight;
-  Tensor1D_F32 lin2_bias;
   Tensor2D_F32 input_1;
   Tensor2D_F32 seq_0;
+  Tensor2D_F32 seq_0_weight;
+  Tensor1D_F32 seq_0_bias;
   Tensor2D_F32 seq_1;
   Tensor2D_F32 seq_2;
+  Tensor2D_F32 seq_2_weight;
+  Tensor1D_F32 seq_2_bias;
   Tensor2D_F32 relu;
   Tensor2D_F32 linear;
+  Tensor2D_F32 lin2_weight;
+  Tensor1D_F32 lin2_bias;
   Tensor2D_F32 relu_1;
   Tensor2D_F32 output;
 } Model;
 
 void model_init(Model* model) {
-  model->seq_0_weight.shape[0] = 128;
-  model->seq_0_weight.shape[1] = 48;
-  model->seq_0_weight.data = (float *)(model_weight_data + 0);
-  model->seq_0_bias.shape[0] = 128;
-  model->seq_0_bias.data = (float *)(model_weight_data + 24576);
-  model->seq_2_weight.shape[0] = 5;
-  model->seq_2_weight.shape[1] = 128;
-  model->seq_2_weight.data = (float *)(model_weight_data + 25088);
-  model->seq_2_bias.shape[0] = 5;
-  model->seq_2_bias.data = (float *)(model_weight_data + 27648);
-  model->lin2_weight.shape[0] = 12;
-  model->lin2_weight.shape[1] = 5;
-  model->lin2_weight.data = (float *)(model_weight_data + 27668);
-  model->lin2_bias.shape[0] = 12;
-  model->lin2_bias.data = (float *)(model_weight_data + 27908);
   model->input_1.shape[0] = 1;
   model->input_1.shape[1] = 48;
   model->input_1.data = (float *)malloc(192);
   model->seq_0.shape[0] = 1;
   model->seq_0.shape[1] = 128;
   model->seq_0.data = (float *)malloc(512);
+  model->seq_0_weight.shape[0] = 128;
+  model->seq_0_weight.shape[1] = 48;
+  model->seq_0_weight.data = (float *)(model_weight_data + 0);
+  model->seq_0_bias.shape[0] = 128;
+  model->seq_0_bias.data = (float *)(model_weight_data + 24576);
   model->seq_1.shape[0] = 1;
   model->seq_1.shape[1] = 128;
   model->seq_1.data = (float *)malloc(512);
   model->seq_2.shape[0] = 1;
   model->seq_2.shape[1] = 5;
   model->seq_2.data = (float *)malloc(20);
+  model->seq_2_weight.shape[0] = 5;
+  model->seq_2_weight.shape[1] = 128;
+  model->seq_2_weight.data = (float *)(model_weight_data + 25088);
+  model->seq_2_bias.shape[0] = 5;
+  model->seq_2_bias.data = (float *)(model_weight_data + 27648);
   model->relu.shape[0] = 1;
   model->relu.shape[1] = 5;
   model->relu.data = (float *)malloc(20);
   model->linear.shape[0] = 1;
   model->linear.shape[1] = 12;
   model->linear.data = (float *)malloc(48);
+  model->lin2_weight.shape[0] = 12;
+  model->lin2_weight.shape[1] = 5;
+  model->lin2_weight.data = (float *)(model_weight_data + 27668);
+  model->lin2_bias.shape[0] = 12;
+  model->lin2_bias.data = (float *)(model_weight_data + 27908);
   model->relu_1.shape[0] = 1;
   model->relu_1.shape[1] = 5;
   model->relu_1.data = (float *)malloc(20);
