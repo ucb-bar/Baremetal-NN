@@ -11,9 +11,7 @@ import jinja2
 import tabulate
 
 
-
-
-class TorchConverter(torch.fx.Interpreter):
+class TracedModule(torch.fx.Interpreter):
     """
     This class converts a PyTorch model to a C model.
     """
@@ -96,8 +94,8 @@ void model_forward(Model* model) {{
         gm = torch.fx.GraphModule(model, graph)
         return graph, gm
 
-    def __init__(self, model: torch.nn.Module, output_directory: str = "./"):
-        graph, gm = TorchConverter._extract_graph_module(model)
+    def __init__(self, model: torch.nn.Module):
+        graph, gm = TracedModule._extract_graph_module(model)
         super().__init__(gm)
 
         # store the model, graph, and graph module as class attributes
@@ -105,14 +103,15 @@ void model_forward(Model* model) {{
         self.graph: torch.fx.Graph = graph
         self.gm: torch.fx.GraphModule = gm
 
-        self.output_directory = output_directory
-
         # extract node information
         self.node_info: Dict[str, Tuple[Any, Any]] = {n.name: (n.args, n.kwargs) for n in self.graph.nodes}
 
         # initialize jinja2 code generation environment
         self.env = jinja2.Environment()
 
+        self.reset()
+    
+    def reset(self):
         # arrays to hold the to-be-generated code
         self.model_struct = []
         self.model_init = []
@@ -202,7 +201,7 @@ void model_forward(Model* model) {{
             input_names (List[str]): The names of the input tensors.
         """
         
-        dtype_str = TorchConverter.get_dtype_str(out.dtype)
+        dtype_str = TracedModule.get_dtype_str(out.dtype)
         
         # get the nn function name and format it
         function_name = function_name.format(
@@ -362,16 +361,27 @@ void model_forward(Model* model) {{
 
         return out
 
-    def _generate_tensors(self):
+    def convert(self, output_directory: str = "./", model_name: str = "model"):
         """
-        Generate the tensor structs and initialize routines for the tensors in the C code.
+        Convert the model to a C model.
+
+        Args:
+            args: The input to the model.
+            kwargs: The keyword arguments to the model.
+        
+        Returns:
+            The output of the model.
         """
+        if self.example_inputs is None:
+            raise ValueError("No example inputs provided. Please call forward() at least once.")
+
+        # === Generate the tensor structs and initialize routines for the tensors in the C code. ===
         for name, tensor in self.tensors.items():
             initialized = tensor["initialized"]
             tensor = tensor["tensor"]
             
             dim = tensor.dim()
-            dtype_str = TorchConverter.get_dtype_str(tensor.dtype)
+            dtype_str = TracedModule.get_dtype_str(tensor.dtype)
             self.model_struct.append(f"Tensor{dim}D_{dtype_str} {name};")
             
             for i in range(tensor.dim()):
@@ -384,15 +394,12 @@ void model_forward(Model* model) {{
                 n_size = tensor.nelement() * tensor.element_size()
                 self.model_init.append(f"model->{name}.data = (float *)malloc({n_size});")
 
-    def _write_to_file(self):
-        """
-        Write the generated C code to the output directory.
 
-        Args:
-            output_directory (str): The directory to write the C code to.
-        """
+        print("finished tracing the model")
+
+        # === Write the generated C code to the output directory. ===
         # create the output directory if it doesn't exist
-        os.makedirs(self.output_directory, exist_ok=True)
+        os.makedirs(output_directory, exist_ok=True)
 
         INDENT = "  "
         model_struct = [f"{INDENT}{line}" for line in self.model_struct]
@@ -403,38 +410,31 @@ void model_forward(Model* model) {{
         model_init_str = "\n".join(model_init)
         model_forward_str = "\n".join(model_forward)
 
-        with open(os.path.join(self.output_directory, "model.h"), "w") as f:
-            f.write(TorchConverter.MODEL_H_TEMPLATE.format(
+        model_h_path = os.path.join(output_directory, f"{model_name}.h")
+        model_bin_path = os.path.join(output_directory, f"{model_name}.bin")
+
+        with open(model_h_path, "w") as f:
+            f.write(TracedModule.MODEL_H_TEMPLATE.format(
                 model_struct=model_struct_str,
                 model_init=model_init_str,
                 model_forward=model_forward_str
             ))
         
-        with open(os.path.join(self.output_directory, "model.bin"), "wb") as f:
+        with open(model_bin_path, "wb") as f:
             f.write(self.weight_content)
-
-    def convert(self, *args, **kwargs):
-        """
-        Convert the model to a C model.
-
-        Args:
-            args: The input to the model.
-            kwargs: The keyword arguments to the model.
         
-        Returns:
-            The output of the model.
-        """
+        print(f"wrote the model to {model_h_path} and {model_bin_path}")
+
+    def forward(self, *args):
+        self.reset()
         self.example_inputs = args
 
-        # trace the model
         output = self.run(*args)
 
-        self._generate_tensors()
-        print("finished tracing the model")
-
-        self._write_to_file()
-
         return output
+    
+    def __call__(self, *args):
+        return self.forward(*args)
 
 
 if __name__ == "__main__":
@@ -468,8 +468,12 @@ if __name__ == "__main__":
     print("input:")
     print(example_input)
 
-    TorchConverter(m).print_graph()
-    output = TorchConverter(m, "./examples/mlp").convert(example_input)
+    m = TracedModule(m)
+
+    m.print_graph()
+    output = m.forward(example_input)
     print("output:")
     print(output)
+
+    m.convert()
     

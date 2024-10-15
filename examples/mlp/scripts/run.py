@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import barstools
+from torchconverter import TracedModule
 
 
 torch.manual_seed(0)
@@ -30,13 +30,13 @@ m = Net()
 # m.load_state_dict(torch.load("model.pth", map_location=torch.device("cpu")))
 m.eval()
 
-test_input = torch.ones((48, )).unsqueeze(0)
+m = TracedModule(m)
 
-print(test_input)
+test_input = torch.ones((48, )).unsqueeze(0)
 
 with torch.no_grad():
     output = m.forward(test_input)
     print("output", output)
 
-output = barstools.TorchConverter(m).convert(test_input, output_dir=".")
-
+m.convert()
+print(output)
