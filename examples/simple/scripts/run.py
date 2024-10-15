@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+
 torch.manual_seed(0)
 
 class Simple(nn.Module):
@@ -20,8 +21,10 @@ class Simple(nn.Module):
 # Create model
 model = Simple(dim=3)
 
+model.eval()
+
 # Save model
-torch.save(model, "model.pth")
+# torch.save(model, "model.pth")
 
 # Load model
 # model = torch.load("model.pth")
@@ -39,9 +42,10 @@ w1_flat = w1.astype(np.float32).flatten()
 b1_flat = b1.astype(np.float32).flatten()
 
 with open("model.bin", "wb") as f:
-    f.write(w1_flat.tobytes())
+    # data here is ordered as bias first and then weight,
+    # following the XNNPACK convention
     f.write(b1_flat.tobytes())
-
+    f.write(w1_flat.tobytes())
 
 
 # Test model

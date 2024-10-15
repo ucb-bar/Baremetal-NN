@@ -12,7 +12,7 @@
 #include "nn.h"
 
 // load the weight data block from the model.bin file
-INCLUDE_FILE(".rodata", "../model.bin", weights);
+INCLUDE_FILE(".rodata", "./model.bin", weights);
 extern uint8_t weights_data[];
 extern size_t weights_start[];
 extern size_t weights_end[];
@@ -21,36 +21,38 @@ extern size_t weights_end[];
 
 
 // Tensors can be defined either globally or locally
-Tensor A;
-Tensor B;
-Tensor C;
-Tensor D;
+Tensor2D_F32 A;
+Tensor2D_F32 B;
+Tensor2D_F32 C;
+Tensor1D_F32 D;
 
 /**
  * Initialize the required tensors for the model
  */
-void init(Tensor *A, Tensor *B, Tensor *C, Tensor *D) {
-  nn_init_tensor(A, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)malloc(9 * sizeof(float)));
-  nn_init_tensor(B, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)(weights_data + 3 * sizeof(float)));
-  nn_init_tensor(C, 2, (size_t[]){3, 3}, DTYPE_F32, (float *)malloc(9 * sizeof(float)));
-  nn_init_tensor(D, 1, (size_t[]){3}, DTYPE_F32, (float *)(weights_data + 0 * sizeof(float)));
+void init(Tensor2D_F32 *A, Tensor2D_F32 *B, Tensor2D_F32 *C, Tensor1D_F32 *D) {
+  A->shape[0] = 3;  A->shape[1] = 3;
+  A->data = (float *)malloc(9 * sizeof(float));
+  B->shape[0] = 3;  B->shape[1] = 3;
+  B->data = (float *)(weights_data + 3 * sizeof(float));
+  C->shape[0] = 3;  C->shape[1] = 3;
+  C->data = (float *)malloc(9 * sizeof(float));
+  D->shape[0] = 3;
+  D->data = (float *)(weights_data + 0 * sizeof(float));
 }
 
 /**
  * Deinitialize the tensors used for the model
  */
-void deinit(Tensor *A, Tensor *B, Tensor *C, Tensor *D) {
-  nn_freeTensor(A);
-  nn_freeTensor(B);
-  nn_freeTensor(C);
-  nn_freeTensor(D);
+void deinit(Tensor2D_F32 *A, Tensor2D_F32 *B, Tensor2D_F32 *C, Tensor1D_F32 *D) {
+  free(A->data);
+  free(C->data);
 }
 
 /**
  * Forward pass of the model
  */
-void forward(Tensor *C, Tensor *A, Tensor *B, Tensor *D) {
-  nn_Linear_F32(C, A, B, D);
+void forward(Tensor2D_F32 *C, Tensor2D_F32 *A, Tensor2D_F32 *B, Tensor1D_F32 *D) {
+  nn_addmm_f32(C, A, B, D);
 }
 
 
@@ -59,25 +61,25 @@ int main() {
 
   // load the input data to the tensor
   float input_data[] = {
-    1., 2., 3.,
-    1., 2., 3.,
-    1., 2., 3.,
+    1.0, 2.0, 3.0,
+    1.0, 2.0, 3.0,
+    1.0, 2.0, 3.0,
   };
   memcpy(A.data, input_data, 9 * sizeof(float));
   
   forward(&C, &A, &B, &D);
 
   printf("A:\n");
-  nn_printf(&A);
+  nn_print_tensor2d_f32(&A);
 
   printf("B:\n");
-  nn_printf(&B);
+  nn_print_tensor2d_f32(&B);
   
   printf("C:\n");
-  nn_printf(&C);
+  nn_print_tensor2d_f32(&C);
   
   printf("D:\n");
-  nn_printf(&D);
+  nn_print_tensor1d_f32(&D);
   
   deinit(&A, &B, &C, &D);
 
