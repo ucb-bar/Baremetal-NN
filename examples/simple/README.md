@@ -2,13 +2,6 @@
 
 A simple example demonstrating C = A * B + D
 
-## Initial setup
-
-```bash
-mkdir ./example/simple/build/
-cd ./example/simple/build/
-cmake ..
-```
 
 ## Generating model weights
 
@@ -17,13 +10,17 @@ cd ./example/simple/
 python ./scripts/run.py
 ```
 
-The script will generate a `model.pth` file and a `model.bin` file.
+The script will generate a `model.bin` file containing the bias and weight data.
 
-## Compiling and running the program
+
+## Building
+
+At project root, run the following commands.
 
 ```bash
-cd ./example/simple/build/
-cmake --build . && ./mnist 
+# or set up towards other targets
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake
+cmake --build ./build/ --target simple
 ```
 
 
