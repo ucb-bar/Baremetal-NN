@@ -102,6 +102,7 @@ set(cpu_impl
   ./src/cpu/mul.c
   ./src/cpu/mulscalar.c
   ./src/cpu/relu.c
+  ./src/cpu/scaled_dot_product_attention.c
   ./src/cpu/tanh.c
 )
 
