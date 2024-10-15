@@ -144,6 +144,11 @@ void nn_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x);
 void nn_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x);
 
 
+void nn_tanh2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x);
+
+void nn_tanh2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x);
+
+
 void nn_max1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x);
 
 void nn_max1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x);
