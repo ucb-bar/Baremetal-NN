@@ -1,4 +1,5 @@
 import random
+import argparse
 
 import torch
 import torchtune
@@ -216,81 +217,90 @@ int main() {
         with open(out_file, "w") as f:
             f.write(result)
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-O", type=str, default="./tests/src/generated.c")
+    args = parser.parse_args()
+    out_file = args.O
+
+    scalar = 0.5
+
+    t = TestGenerator()
+
+    # ==== FP16 tests ====
+    # add
+    t.add_test("nn_add1d_f16",   lambda a, b: a + b,                                  [("a", t.rand16((7, ))),  ("b", t.rand16((7, )))                      ])
+    t.add_test("nn_add2d_f16",   lambda a, b: a + b,                                  [("a", t.rand16((6, 7))), ("b", t.rand16((6, 7)))                     ])
+    t.add_test("nn_addscalar1d_f16",  lambda a: a + scalar,                           [("a", t.rand16((7, )))],   extra_args=[f"as_f16({str(scalar)})"])
+    t.add_test("nn_addscalar2d_f16",  lambda a: a + scalar,                           [("a", t.rand16((6, 7)))],  extra_args=[f"as_f16({str(scalar)})"])
+
+    # mul
+    t.add_test("nn_mul1d_f16",   lambda a, b: a * b,                                  [("a", t.rand16((7, ))),  ("b", t.rand16((7, )))                      ])
+    t.add_test("nn_mul2d_f16",   lambda a, b: a * b,                                  [("a", t.rand16((6, 7))), ("b", t.rand16((6, 7)))                     ])
+    t.add_test("nn_mulscalar1d_f16",  lambda a: a * scalar,                           [("a", t.rand16((7, )))],   extra_args=[f"as_f16({str(scalar)})"])
+    t.add_test("nn_mulscalar2d_f16",  lambda a: a * scalar,                           [("a", t.rand16((6, 7)))],  extra_args=[f"as_f16({str(scalar)})"])
+
+    # mm
+    t.add_test("nn_mm_f16",      lambda x, w: torch.nn.functional.linear(x, w),       [("x", t.rand16((6, 7))), ("w", t.rand16((5, 7)))                     ])
+
+    # max
+    t.add_test("nn_max1d_f16",   lambda x: torch.max(x),                              [("x", t.rand16((7, )))])
+    t.add_test("nn_max2d_f16",   lambda x: torch.max(x),                              [("x", t.rand16((6, 7)))])
+
+    # min
+    t.add_test("nn_min1d_f16",   lambda x: torch.min(x),                              [("x", t.rand16((7, )))])
+    t.add_test("nn_min2d_f16",   lambda x: torch.min(x),                              [("x", t.rand16((6, 7)))])
 
 
-scalar = 0.5
+    # Linear
+    t.add_test("nn_addmm_f16",   lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.rand16((6, 7))), ("w", t.rand16((5, 7))), ("b", t.rand16((5, ))) ])
 
-t = TestGenerator()
+    # ReLU
+    t.add_test("nn_relu2d_f16",  lambda x: torch.nn.functional.relu(x),               [("x", t.rand16((7, 7)))                                                ])
 
-# ==== FP16 tests ====
-# add
-t.add_test("NN_add1d_f16",   lambda a, b: a + b,                                  [("a", t.rand16((7, ))),  ("b", t.rand16((7, )))                      ])
-t.add_test("NN_add2d_f16",   lambda a, b: a + b,                                  [("a", t.rand16((6, 7))), ("b", t.rand16((6, 7)))                     ])
-t.add_test("NN_addscalar1d_f16",  lambda a: a + scalar,                           [("a", t.rand16((7, )))],   extra_args=[f"as_f16({str(scalar)})"])
-t.add_test("NN_addscalar2d_f16",  lambda a: a + scalar,                           [("a", t.rand16((6, 7)))],  extra_args=[f"as_f16({str(scalar)})"])
+    # ELU
+    t.add_test("nn_elu2d_f16",   lambda x: torch.nn.functional.elu(x),                [("x", t.rand16((7, 7)))],    extra_args=["1.0"])
 
-# mul
-t.add_test("NN_mul1d_f16",   lambda a, b: a * b,                                  [("a", t.rand16((7, ))),  ("b", t.rand16((7, )))                      ])
-t.add_test("NN_mul2d_f16",   lambda a, b: a * b,                                  [("a", t.rand16((6, 7))), ("b", t.rand16((6, 7)))                     ])
-t.add_test("NN_mulscalar1d_f16",  lambda a: a * scalar,                           [("a", t.rand16((7, )))],   extra_args=[f"as_f16({str(scalar)})"])
-t.add_test("NN_mulscalar2d_f16",  lambda a: a * scalar,                           [("a", t.rand16((6, 7)))],  extra_args=[f"as_f16({str(scalar)})"])
+    # Tanh
+    t.add_test("nn_tanh2d_f16",  lambda x: torch.nn.functional.tanh(x),               [("x", t.rand16((7, 7)))                                                ])
 
-# mm
-t.add_test("NN_mm_f16",      lambda x, w: torch.nn.functional.linear(x, w),       [("x", t.rand16((6, 7))), ("w", t.rand16((5, 7)))                     ])
+    # ==== FP32 tests ====
+    # add
+    t.add_test("nn_add1d_f32",   lambda a, b: a + b,                                  [("a", t.rand((7, ))),    ("b", t.rand((7, )))                        ])
+    t.add_test("nn_add2d_f32",   lambda a, b: a + b,                                  [("a", t.rand((6, 7))),   ("b", t.rand((6, 7)))                       ])
+    t.add_test("nn_addscalar1d_f32",  lambda a: a + scalar,                           [("a", t.rand((7, )))],   extra_args=[str(scalar)])
+    t.add_test("nn_addscalar2d_f32",  lambda a: a + scalar,                           [("a", t.rand((6, 7)))],  extra_args=[str(scalar)])
 
-# max
-t.add_test("NN_max1d_f16",   lambda x: torch.max(x),                              [("x", t.rand16((7, )))])
-t.add_test("NN_max2d_f16",   lambda x: torch.max(x),                              [("x", t.rand16((6, 7)))])
+    # mul
+    t.add_test("nn_mul1d_f32",   lambda a, b: a * b,                                  [("a", t.rand((7, ))),    ("b", t.rand((7, )))                        ])
+    t.add_test("nn_mul2d_f32",   lambda a, b: a * b,                                  [("a", t.rand((6, 7))),   ("b", t.rand((6, 7)))                       ])
+    t.add_test("nn_mulscalar1d_f32",  lambda a: a * scalar,                           [("a", t.rand((7, )))],   extra_args=[str(scalar)])
+    t.add_test("nn_mulscalar2d_f32",  lambda a: a * scalar,                           [("a", t.rand((6, 7)))],  extra_args=[str(scalar)])
 
-# min
-t.add_test("NN_min1d_f16",   lambda x: torch.min(x),                              [("x", t.rand16((7, )))])
-t.add_test("NN_min2d_f16",   lambda x: torch.min(x),                              [("x", t.rand16((6, 7)))])
+    # mm
+    t.add_test("nn_mm_f32",      lambda x, w: torch.nn.functional.linear(x, w),       [("x", t.rand((6, 7))),   ("w", t.rand((5, 7)))                       ])
 
+    # max
+    t.add_test("nn_max1d_f32",   lambda x: torch.max(x),                              [("x", t.rand((7, )))])
+    t.add_test("nn_max2d_f32",   lambda x: torch.max(x),                              [("x", t.rand((6, 7)))])
 
-# Linear
-t.add_test("NN_addmm_f16",   lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.rand16((6, 7))), ("w", t.rand16((5, 7))), ("b", t.rand16((5, ))) ])
+    # min
+    t.add_test("nn_min1d_f32",   lambda x: torch.min(x),                              [("x", t.rand((7, )))])
+    t.add_test("nn_min2d_f32",   lambda x: torch.min(x),                              [("x", t.rand((6, 7)))])
 
-# ReLU
-t.add_test("NN_relu2d_f16",  lambda x: torch.nn.functional.relu(x),               [("x", t.rand16((7, 7)))                                                ])
+    # Linear
+    t.add_test("nn_addmm_f32",   lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.rand((6, 7))),   ("w", t.rand((5, 7))), ("b", t.rand((5, ))) ])
 
-# ELU
-t.add_test("NN_elu2d_f16",   lambda x: torch.nn.functional.elu(x),                [("x", t.rand16((7, 7)))],    extra_args=["1.0"])
+    # Relu
+    t.add_test("nn_relu2d_f32",  lambda x: torch.nn.functional.relu(x),               [("x", t.rand((7, 7)))                                                ])
 
+    # ELU
+    t.add_test("nn_elu2d_f32",   lambda x: torch.nn.functional.elu(x),                [("x", t.rand((7, 7)))],    extra_args=["1.0"])
 
-# ==== FP32 tests ====
-# add
-t.add_test("NN_add1d_f32",   lambda a, b: a + b,                                  [("a", t.rand((7, ))),    ("b", t.rand((7, )))                        ])
-t.add_test("NN_add2d_f32",   lambda a, b: a + b,                                  [("a", t.rand((6, 7))),   ("b", t.rand((6, 7)))                       ])
-t.add_test("NN_addscalar1d_f32",  lambda a: a + scalar,                           [("a", t.rand((7, )))],   extra_args=[str(scalar)])
-t.add_test("NN_addscalar2d_f32",  lambda a: a + scalar,                           [("a", t.rand((6, 7)))],  extra_args=[str(scalar)])
-
-# mul
-t.add_test("NN_mul1d_f32",   lambda a, b: a * b,                                  [("a", t.rand((7, ))),    ("b", t.rand((7, )))                        ])
-t.add_test("NN_mul2d_f32",   lambda a, b: a * b,                                  [("a", t.rand((6, 7))),   ("b", t.rand((6, 7)))                       ])
-t.add_test("NN_mulscalar1d_f32",  lambda a: a * scalar,                           [("a", t.rand((7, )))],   extra_args=[str(scalar)])
-t.add_test("NN_mulscalar2d_f32",  lambda a: a * scalar,                           [("a", t.rand((6, 7)))],  extra_args=[str(scalar)])
-
-# mm
-t.add_test("NN_mm_f32",      lambda x, w: torch.nn.functional.linear(x, w),       [("x", t.rand((6, 7))),   ("w", t.rand((5, 7)))                       ])
-
-# max
-t.add_test("NN_max1d_f32",   lambda x: torch.max(x),                              [("x", t.rand((7, )))])
-t.add_test("NN_max2d_f32",   lambda x: torch.max(x),                              [("x", t.rand((6, 7)))])
-
-# min
-t.add_test("NN_min1d_f32",   lambda x: torch.min(x),                              [("x", t.rand((7, )))])
-t.add_test("NN_min2d_f32",   lambda x: torch.min(x),                              [("x", t.rand((6, 7)))])
-
-# Linear
-t.add_test("NN_addmm_f32",   lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.rand((6, 7))),   ("w", t.rand((5, 7))), ("b", t.rand((5, ))) ])
-
-# Relu
-t.add_test("NN_relu2d_f32",  lambda x: torch.nn.functional.relu(x),               [("x", t.rand((7, 7)))                                                ])
-
-# ELU
-t.add_test("NN_elu2d_f32",   lambda x: torch.nn.functional.elu(x),                [("x", t.rand((7, 7)))],    extra_args=["1.0"])
+    # Tanh
+    t.add_test("nn_tanh2d_f32",  lambda x: torch.nn.functional.tanh(x),               [("x", t.rand((7, 7)))                                                ])
 
 
-t.generate("generated.c")
+    t.generate(out_file)
 
 
