@@ -1,100 +1,82 @@
+
 #ifndef __MODEL_H
 #define __MODEL_H
 
 #include "nn.h"
 
-
 // load the weight data block from the model.bin file
-INCLUDE_FILE(".rodata", "../model.bin", model_weight);
+INCLUDE_FILE(".rodata", "./model.bin", model_weight);
 extern uint8_t model_weight_data[];
 extern size_t model_weight_start[];
 extern size_t model_weight_end[];
 
 typedef struct {
-  Tensor input_1;
-  Tensor actor_0_weight;
-  Tensor actor_0_bias;
-  Tensor actor_0;
-  Tensor actor_1;
-  Tensor actor_2_weight;
-  Tensor actor_2_bias;
-  Tensor actor_2;
-  Tensor actor_3;
-  Tensor actor_4_weight;
-  Tensor actor_4_bias;
-  Tensor actor_4;
-  Tensor actor_5;
-  Tensor actor_6_weight;
-  Tensor actor_6_bias;
-  Tensor actor_6;
-
+  Tensor2D_F32 seq_0_weight;
+  Tensor1D_F32 seq_0_bias;
+  Tensor2D_F32 seq_2_weight;
+  Tensor1D_F32 seq_2_bias;
+  Tensor2D_F32 lin2_weight;
+  Tensor1D_F32 lin2_bias;
+  Tensor2D_F32 input_1;
+  Tensor2D_F32 seq_0;
+  Tensor2D_F32 seq_1;
+  Tensor2D_F32 seq_2;
+  Tensor2D_F32 relu;
+  Tensor2D_F32 linear;
+  Tensor2D_F32 relu_1;
+  Tensor2D_F32 output;
 } Model;
 
-
-void init(Model *model);
-
-void forward(Model *model);
-
-/**
- * Initialize the required tensors for the model
- */
-void init(Model *model) {
-  float *array_pointer = (float *)model_weight_data;
-
-  NN_init_tensor(&model->input_1, 2, (size_t[]){1, 48}, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: actor_0
-  NN_init_tensor(&model->actor_0_weight, 2, (size_t[]){512, 48}, DTYPE_F32, array_pointer);
-  array_pointer += 24576;
-  NN_init_tensor(&model->actor_0_bias, 1, (size_t[]){512}, DTYPE_F32, array_pointer);
-  array_pointer += 512;
-  NN_init_tensor(&model->actor_0, 2, (size_t[]){1, 512}, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.activation.ELU'>: actor_1
-  NN_init_tensor(&model->actor_1, 2, (size_t[]){1, 512}, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: actor_2
-  NN_init_tensor(&model->actor_2_weight, 2, (size_t[]){256, 512}, DTYPE_F32, array_pointer);
-  array_pointer += 131072;
-  NN_init_tensor(&model->actor_2_bias, 1, (size_t[]){256}, DTYPE_F32, array_pointer);
-  array_pointer += 256;
-  NN_init_tensor(&model->actor_2, 2, (size_t[]){1, 256}, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.activation.ELU'>: actor_3
-  NN_init_tensor(&model->actor_3, 2, (size_t[]){1, 256}, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: actor_4
-  NN_init_tensor(&model->actor_4_weight, 2, (size_t[]){128, 256}, DTYPE_F32, array_pointer);
-  array_pointer += 32768;
-  NN_init_tensor(&model->actor_4_bias, 1, (size_t[]){128}, DTYPE_F32, array_pointer);
-  array_pointer += 128;
-  NN_init_tensor(&model->actor_4, 2, (size_t[]){1, 128}, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.activation.ELU'>: actor_5
-  NN_init_tensor(&model->actor_5, 2, (size_t[]){1, 128}, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: actor_6
-  NN_init_tensor(&model->actor_6_weight, 2, (size_t[]){12, 128}, DTYPE_F32, array_pointer);
-  array_pointer += 1536;
-  NN_init_tensor(&model->actor_6_bias, 1, (size_t[]){12}, DTYPE_F32, array_pointer);
-  array_pointer += 12;
-  NN_init_tensor(&model->actor_6, 2, (size_t[]){1, 12}, DTYPE_F32, NULL);
-
+void model_init(Model* model) {
+  model->seq_0_weight.shape[0] = 128;
+  model->seq_0_weight.shape[1] = 48;
+  model->seq_0_weight.data = (float *)(model_weight_data + 0);
+  model->seq_0_bias.shape[0] = 128;
+  model->seq_0_bias.data = (float *)(model_weight_data + 24576);
+  model->seq_2_weight.shape[0] = 5;
+  model->seq_2_weight.shape[1] = 128;
+  model->seq_2_weight.data = (float *)(model_weight_data + 25088);
+  model->seq_2_bias.shape[0] = 5;
+  model->seq_2_bias.data = (float *)(model_weight_data + 27648);
+  model->lin2_weight.shape[0] = 12;
+  model->lin2_weight.shape[1] = 5;
+  model->lin2_weight.data = (float *)(model_weight_data + 27668);
+  model->lin2_bias.shape[0] = 12;
+  model->lin2_bias.data = (float *)(model_weight_data + 27908);
+  model->input_1.shape[0] = 1;
+  model->input_1.shape[1] = 48;
+  model->input_1.data = (float *)malloc(192);
+  model->seq_0.shape[0] = 1;
+  model->seq_0.shape[1] = 128;
+  model->seq_0.data = (float *)malloc(512);
+  model->seq_1.shape[0] = 1;
+  model->seq_1.shape[1] = 128;
+  model->seq_1.data = (float *)malloc(512);
+  model->seq_2.shape[0] = 1;
+  model->seq_2.shape[1] = 5;
+  model->seq_2.data = (float *)malloc(20);
+  model->relu.shape[0] = 1;
+  model->relu.shape[1] = 5;
+  model->relu.data = (float *)malloc(20);
+  model->linear.shape[0] = 1;
+  model->linear.shape[1] = 12;
+  model->linear.data = (float *)malloc(48);
+  model->relu_1.shape[0] = 1;
+  model->relu_1.shape[1] = 5;
+  model->relu_1.data = (float *)malloc(20);
+  model->output.shape[0] = 1;
+  model->output.shape[1] = 12;
+  model->output.data = (float *)malloc(48);
 }
 
-
-/**
- * Forward pass of the model
- */
-void forward(Model *model) {
-  NN_linear(&model->actor_0, &model->input_1, &model->actor_0_weight, &model->actor_0_bias);
-  NN_elu(&model->actor_1, &model->actor_0, 1.0);
-  NN_linear(&model->actor_2, &model->actor_1, &model->actor_2_weight, &model->actor_2_bias);
-  NN_elu(&model->actor_3, &model->actor_2, 1.0);
-  NN_linear(&model->actor_4, &model->actor_3, &model->actor_4_weight, &model->actor_4_bias);
-  NN_elu(&model->actor_5, &model->actor_4, 1.0);
-  NN_linear(&model->actor_6, &model->actor_5, &model->actor_6_weight, &model->actor_6_bias);
-
+void model_forward(Model* model) {
+  NN_addmm_f32(&model->seq_0, &model->input_1, &model->seq_0_weight, &model->seq_0_bias);
+  NN_elu2d_f32(&model->seq_1, &model->seq_0, 1.0);
+  NN_addmm_f32(&model->seq_2, &model->seq_1, &model->seq_2_weight, &model->seq_2_bias);
+  NN_relu2d_f32(&model->relu, &model->seq_2);
+  NN_addmm_f32(&model->linear, &model->relu, &model->lin2_weight, &model->lin2_bias);
+  NN_relu2d_f32(&model->relu_1, &model->relu);
+  memcpy(model->output.data, model->linear.data, 48);
 }
 
-#endif
+#endif  // __MODEL_H

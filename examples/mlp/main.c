@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rv.h"
+#include "riscv.h"
 #include "nn.h"
 #include "model.h"
 
@@ -30,13 +30,13 @@ int main() {
   size_t cycles;
   
   printf("initalizing model...\n");
-  init(model);
+  model_init(model);
 
   printf("setting input data...\n");
-  NN_fill(&model->input_1, 1.0);
+  // NN_fill(&model->input_1, 1.0);
   
   // cycles = READ_CSR("mcycle");
-  forward(model);
+  model_forward(model);
   // cycles = READ_CSR("mcycle") - cycles;
 
   printf("cycles: %lu\n", cycles);
@@ -44,7 +44,7 @@ int main() {
   // output tensor([[ 0.0258, -0.0050,  0.0902, -0.0022, -0.0924, -0.0574,  0.0328,  0.0386, -0.0277,  0.0788,  0.0603, -0.0085]])
 
   printf("output:\n");
-  NN_printf(&model->actor_6);
+  // NN_printf(&model->output);
   
   return 0;
 }
