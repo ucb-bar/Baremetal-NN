@@ -90,16 +90,18 @@ target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 set(cpu_impl 
   ./src/print.c
   ./src/cpu/add.c
-  ./src/cpu/addscalar.c
-  ./src/cpu/equals.c
   ./src/cpu/addmm.c
+  ./src/cpu/addscalar.c
+  ./src/cpu/dot.c
   ./src/cpu/elu.c
-  ./src/cpu/relu.c
+  ./src/cpu/equals.c
   ./src/cpu/max.c
   ./src/cpu/min.c
   ./src/cpu/mm.c
   ./src/cpu/mul.c
   ./src/cpu/mulscalar.c
+  ./src/cpu/relu.c
+  ./src/cpu/tanh.c
 )
 
 
