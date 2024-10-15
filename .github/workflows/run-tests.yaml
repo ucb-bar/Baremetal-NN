@@ -24,7 +24,7 @@ jobs:
         rm -rf ./build/
     - name: Configure CMake
       run: |
-        cmake . -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
+        cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
     - name: Build
       run: |
         cmake --build ./build/ --target tests
@@ -32,3 +32,36 @@ jobs:
     - name: Run binary
       run: |
         ./build/tests/tests
+  
+  build-riscv:
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Set up toolchain
+      run: |
+        wget https://github.com/ucb-bar/RISC-V-Ready-To-Run/releases/download/v2024.06.04/riscv64-unknown-toolchain.tar.xz
+        tar -xf riscv64-unknown-toolchain.tar.xz
+        wget https://github.com/ucb-bar/RISC-V-Ready-To-Run/releases/download/v2024.06.04/spike -O $GITHUB_WORKSPACE/riscv64-unknown-toolchain/bin/spike
+        chmod +x $GITHUB_WORKSPACE/riscv64-unknown-toolchain/bin/spike
+        echo "RISCV=$GITHUB_WORKSPACE/riscv64-unknown-toolchain" >> $GITHUB_ENV
+        echo "$GITHUB_WORKSPACE/riscv64-unknown-toolchain/bin" >> $GITHUB_PATH
+    - name: Clean previous builds
+      run: |
+        rm -rf ./build/
+    - name: Configure CMake
+      run: |
+        cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake
+    - name: Build
+      run: |
+        cmake --build ./build/ --target tests
+    - name: Run binary
+      run: |
+        cmake --build ./build/ --target run_tests
