@@ -245,12 +245,24 @@ void model_forward(Model* model) {{
             self.add_uninitialized_tensor(layer_name, out)
             self.add_forward_call("nn_add_{dtype}", out, layer_name, input_names)
         
+        elif function == operator.__mul__:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_forward_call("nn_mul_{dtype}", out, layer_name, input_names)
+        
         # Convolution Layers
 
         # Non-linear Activations
         elif function == torch.nn.functional.relu:
             self.add_uninitialized_tensor(layer_name, out)
             self.add_forward_call("nn_relu{dim}d_{dtype}", out, layer_name, input_names)
+        
+        elif function == torch.nn.functional.relu6:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_forward_call("nn_relu6{dim}d_{dtype}", out, layer_name, input_names)
+        
+        elif function == torch.nn.functional.tanh:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_forward_call("nn_tanh{dim}d_{dtype}", out, layer_name, input_names)
         
         # Linear Layers
         elif function == torch.nn.functional.linear:
@@ -261,6 +273,8 @@ void model_forward(Model* model) {{
             self.add_initialized_tensor(f"{input_names[2]}", bias)
             self.add_forward_call("nn_addmm_{dtype}", out, layer_name, input_names)
         
+        # Vision Functions
+
         
     def handle_call_method(self, n: torch.fx.node.Node, out: torch.Tensor):
         print("call method:", n.name, n.target)
@@ -274,15 +288,42 @@ void model_forward(Model* model) {{
         input_names = [n.name for n in self.node_info[n.name][0]]
 
         # Convolution Layers
-        # Normalization Layers
-        # Non-linear Activations
-        if type(module) == torch.nn.ReLU:
+        if type(module) == torch.nn.Conv2d:
             self.add_uninitialized_tensor(layer_name, out)
-            self.add_forward_call("nn_relu{dim}d_{dtype}", out, layer_name, input_names)
+            self.add_initialized_tensor(f"{layer_name}_weight", module.weight)
+            self.add_initialized_tensor(f"{layer_name}_bias", module.bias)
+            self.add_forward_call("nn_conv2d_{dtype}", out, layer_name, input_names, [
+                module.stride,
+                module.padding,
+                module.dilation,
+                module.groups
+            ])
+
+        # Normalization Layers
+        elif type(module) == torch.nn.BatchNorm2d:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_initialized_tensor(f"{layer_name}_weight", module.weight)
+            self.add_initialized_tensor(f"{layer_name}_bias", module.bias)
+            self.add_initialized_tensor(f"{layer_name}_running_mean", module.running_mean)
+            self.add_initialized_tensor(f"{layer_name}_running_var", module.running_var)
+            self.add_forward_call("nn_batchnorm2d_{dtype}", out, layer_name, input_names, [module.eps])
         
+        # Non-linear Activations
         elif type(module) == torch.nn.ELU:
             self.add_uninitialized_tensor(layer_name, out)
             self.add_forward_call("nn_elu{dim}d_{dtype}", out, layer_name, input_names, [module.alpha])
+        
+        elif type(module) == torch.nn.ReLU:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_forward_call("nn_relu{dim}d_{dtype}", out, layer_name, input_names)
+        
+        elif type(module) == torch.nn.ReLU6:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_forward_call("nn_relu6{dim}d_{dtype}", out, layer_name, input_names)
+        
+        elif type(module) == torch.nn.Tanh:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_forward_call("nn_tanh{dim}d_{dtype}", out, layer_name, input_names)
     
         # Linear Layers
         elif type(module) == torch.nn.Linear:
