@@ -1,20 +1,36 @@
 # Tensor Basics
 
-Tensor types are resolved dynamically, such that the API is generic, does not include multiple struct definitions, and enables multiple types within a single program. That is, there is one Tensor type. The tensor may have doubles (DTYPE_F64), float (DTYPE_F32), ints, etc. This design makes it easy to write generic code.
+> **Note**: Different from PyTorch, the attributes of the tensors are static, and are determined at compile time. Hence, tensor with different datatypes and dimensions are defined with separate struct definitions. That is, there is more than one Tensor type. 
+>
+> This way, the runtime kernel library only needs to handle the shape information of the tensors, reducing the typechecking and broadcasting overhead.
 
-The underlying fundamental operators will be statically typed, and hence the tensor-level API will dynamically determine which fundamental operator to use to do the computation.
 
 ## Attributes of a Tensor
 
 Tensor attributes describe their dimension, shape, number of elements, and datatype.
 
-```c
-Tensor *tensor = nn_rand(2, (size_t []){ 3, 4 }, DTYPE_F32);
+In Baremetal-NN, the dimension and datatype of the tensor are static. Tensor with different shapes and datatypes are defined with different struct definitions. 
 
-printf("Datatype of tensor: %s\n", nn_get_datatype_name(tensor->dtype));
-printf("Dimension of tensor: %d\n", tensor->ndim);
-printf("Shape of tensor: (%d, %d)\n", tensor->shape[0], tensor->shape[1]);
-printf("Number of elements: %d\n", tensor->size);
+```c
+Tensor1D_F32 tensor;  // this defines a 1D tensor with float datatype
+
+Tensor2D_F16 tensor;  // this defines a 2D tensor with half-precision floating-point (fp16) datatype
+```
+
+The maximum dimension supported is 4. These 4D tensors are used in 2D convolutions and attention layers.
+
+The shape of the tensor is defined by an array of integers, which is a list of the lengths of each dimension. For example, a 2x3 tensor has a shape of `(size_t []){2, 3}`.
+
+```c
+Tensor2D_F32 tensor = {
+  .shape = (size_t []){2, 3},
+  .data = NULL,
+};
+
+printf("Shape of tensor: (%d, %d)", tensor.shape[0], tensor.shape[1]);
+
+// alternatively, we can use the helper function to print the shape of the tensor
+nn_print_shape(2, tensor.shape);
 ```
 
 ## Tensor Element in Memory
@@ -29,12 +45,19 @@ If the data of the tensor is already allocated in memory, that memory can be vie
 ```c
 float data[] = { 1, 2, 3,
                  4, 5, 6 };
-Tensor *tensor = nn_tensor(2, (const size_t[]){2, 3}, DTYPE_F32, data);
+Tensor tensor = {
+  .shape = (size_t []){2, 3},
+  .data = data,
+};
 ```
-
 
 ## Zero-dimensional Tensors as Scalars
 
-A scalar is represented by a Tensor object that is zero-dimensional. These Tensors hold a single value and they can be references to a single element in a larger Tensor. They can be used anywhere a Tensor is expected. 
+A scalar is represented by a Tensor object that is zero-dimensional. The `.data` field of Tensors hold a single value, instead of a pointer to an array of values. Additionally, they do not have a `.shape` field.
 
-When creating such zero-dimensional tensor, the shape will be a NULL pointer, but the size will be set to 1 and a single element worth of memory will be allocated as the data buffer.
+```c
+Tensor0D_F32 scalar = {
+  .data = 42
+};
+```
+

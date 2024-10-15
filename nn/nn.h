@@ -120,6 +120,66 @@ static inline uint8_t float_equal(float golden, float actual, float rel_err) {
   return (fabs(actual - golden) < rel_err) || (fabs((actual - golden) / actual) < rel_err);
 }
 
+
+/**
+ * nn_tensor0d_f16
+ * 
+ * Creates a 0D tensor with type F16.
+ * 
+ * @param data The data to store in the tensor.
+ */
+Tensor0D_F16 *nn_tensor0d_f16(float16_t data);
+
+/**
+ * nn_tensor0d_f32
+ * 
+ * Creates a 0D tensor with type F32.
+ * 
+ * @param data The data to store in the tensor.
+ */
+Tensor0D_F32 *nn_tensor0d_f32(float data);
+
+/**
+ * nn_tensor1d_f16
+ * 
+ * Creates a 1D tensor with type F16.
+ * 
+ * @param shape The shape of the tensor.
+ * @param data The data to store in the tensor.
+ */
+Tensor1D_F16 *nn_tensor1d_f16(size_t shape[1], const float16_t *data);
+
+/**
+ * nn_tensor1d_f32
+ * 
+ * Creates a 1D tensor with type F32.
+ * 
+ * @param shape The shape of the tensor.
+ * @param data The data to store in the tensor.
+ */
+Tensor1D_F32 *nn_tensor1d_f32(size_t shape[1], const float *data);
+
+/**
+ * nn_tensor2d_f16
+ * 
+ * Creates a 2D tensor with type F16.
+ * 
+ * @param shape The shape of the tensor.
+ * @param data The data to store in the tensor.
+ */
+Tensor2D_F16 *nn_tensor2d_f16(size_t shape[2], const float16_t *data);
+
+/**
+ * nn_tensor2d_f32
+ * 
+ * Creates a 2D tensor with type F32.
+ * 
+ * @param shape The shape of the tensor.
+ * @param data The data to store in the tensor.
+ */
+Tensor2D_F32 *nn_tensor2d_f32(size_t shape[2], const float *data);
+
+
 /**
  * nn_print_u8
  * 
