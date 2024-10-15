@@ -1,8 +1,8 @@
 #include "nn.h"
 
 
-__attribute__((weak)) void NN_elu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float alpha) {
-  NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");
+__attribute__((weak)) void nn_elu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float alpha) {
+  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");
 
   const size_t n = y->shape[0] * y->shape[1];
   for (size_t i = 0; i < n; i += 1) {
@@ -16,8 +16,8 @@ __attribute__((weak)) void NN_elu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, 
 }
 
 
-__attribute__((weak)) void NN_elu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float alpha) {
-  NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");
+__attribute__((weak)) void nn_elu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float alpha) {
+  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");
 
   const size_t n = y->shape[0] * y->shape[1];
   for (size_t i = 0; i < n; i += 1) {

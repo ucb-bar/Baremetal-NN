@@ -70,12 +70,12 @@ void model_init(Model* model) {
 }
 
 void model_forward(Model* model) {
-  NN_addmm_f32(&model->seq_0, &model->input_1, &model->seq_0_weight, &model->seq_0_bias);
-  NN_elu2d_f32(&model->seq_1, &model->seq_0, 1.0);
-  NN_addmm_f32(&model->seq_2, &model->seq_1, &model->seq_2_weight, &model->seq_2_bias);
-  NN_relu2d_f32(&model->relu, &model->seq_2);
-  NN_addmm_f32(&model->linear, &model->relu, &model->lin2_weight, &model->lin2_bias);
-  NN_relu2d_f32(&model->relu_1, &model->relu);
+  nn_addmm_f32(&model->seq_0, &model->input_1, &model->seq_0_weight, &model->seq_0_bias);
+  nn_elu2d_f32(&model->seq_1, &model->seq_0, 1.0);
+  nn_addmm_f32(&model->seq_2, &model->seq_1, &model->seq_2_weight, &model->seq_2_bias);
+  nn_relu2d_f32(&model->relu, &model->seq_2);
+  nn_addmm_f32(&model->linear, &model->relu, &model->lin2_weight, &model->lin2_bias);
+  nn_relu2d_f32(&model->relu_1, &model->relu);
   memcpy(model->output.data, model->linear.data, 48);
 }
 

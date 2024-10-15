@@ -1,10 +1,10 @@
 #include "nn.h"
 
 
-__attribute__((weak)) void NN_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *weight, const Tensor1D_F16 *bias) { 
-  NN_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
-  NN_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
-  NN_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+__attribute__((weak)) void nn_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *weight, const Tensor1D_F16 *bias) { 
+  nn_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
 
   const size_t batch_size = x->shape[0];
   const size_t in_features = x->shape[1];
@@ -22,10 +22,10 @@ __attribute__((weak)) void NN_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, 
 }
 
 
-__attribute__((weak)) void NN_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
-  NN_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
-  NN_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
-  NN_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+__attribute__((weak)) void nn_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
+  nn_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
 
   const size_t batch_size = x->shape[0];
   const size_t in_features = x->shape[1];

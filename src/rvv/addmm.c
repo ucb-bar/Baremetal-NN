@@ -4,15 +4,15 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
-  void NN_addmm_f16_asm(size_t in_features, size_t out_features, float16_t *y_data, const float16_t *x_data, const float16_t *weight_data, const float16_t *bias_data);
+  void nn_addmm_f16_asm(size_t in_features, size_t out_features, float16_t *y_data, const float16_t *x_data, const float16_t *weight_data, const float16_t *bias_data);
 #endif
-void NN_addmm_f32_asm(size_t in_features, size_t out_features, float *y_data, const float *x_data, const float *weight_data, const float *bias_data);
+void nn_addmm_f32_asm(size_t in_features, size_t out_features, float *y_data, const float *x_data, const float *weight_data, const float *bias_data);
 
 #ifdef RISCV_ZVFH
-  void NN_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *weight, const Tensor1D_F16 *bias) { 
-    NN_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
-    NN_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
-    NN_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+  void nn_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *weight, const Tensor1D_F16 *bias) { 
+    nn_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
+    nn_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+    nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
 
     const size_t batch_size = x->shape[0];
     const size_t in_features = x->shape[1];
@@ -28,7 +28,7 @@ void NN_addmm_f32_asm(size_t in_features, size_t out_features, float *y_data, co
       float16_t *y_data = y_batch_data;
 
       #ifdef RISCV_V_ASM
-        NN_addmm_f16_asm(in_features, out_features, y_data, x_data, weight_data, bias_data);
+        nn_addmm_f16_asm(in_features, out_features, y_data, x_data, weight_data, bias_data);
       #else
         size_t vlmax = __riscv_vsetvlmax_e16m1();
 
@@ -65,10 +65,10 @@ void NN_addmm_f32_asm(size_t in_features, size_t out_features, float *y_data, co
   }
 #endif
 
-void NN_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
-  NN_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
-  NN_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
-  NN_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+void nn_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *weight, const Tensor1D_F32 *bias) { 
+  nn_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
 
   const size_t batch_size = x->shape[0];
   const size_t in_features = x->shape[1];
@@ -84,7 +84,7 @@ void NN_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *we
     float *y_data = y_batch_data;
 
     #ifdef RISCV_V_ASM
-      NN_addmm_f32_asm(in_features, out_features, y_data, x_data, weight_data, bias_data);
+      nn_addmm_f32_asm(in_features, out_features, y_data, x_data, weight_data, bias_data);
     #else
       size_t vlmax = __riscv_vsetvlmax_e32m1();
 

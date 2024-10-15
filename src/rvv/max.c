@@ -2,7 +2,7 @@
 #include "nn.h"
 
 #ifdef RISCV_ZVFH
-  void NN_max1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x) {
+  void nn_max1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x) {
     vfloat16m1_t vec_max = __riscv_vfmv_v_f_f16m1(-FLT_MAX, 1);
     size_t n = x->shape[0];
     float16_t *x_data = x->data;
@@ -18,7 +18,7 @@
   }
 #endif
 
-void NN_max1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) {
+void nn_max1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) {
   vfloat32m1_t vec_max = __riscv_vfmv_s_f_f32m1(-FLT_MAX, 1);
   size_t n = x->shape[0];
   float *x_data = x->data;
@@ -34,7 +34,7 @@ void NN_max1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) {
 }
 
 #ifdef RISCV_ZVFH
-  void NN_max2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x) {
+  void nn_max2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x) {
     vfloat16m1_t vec_max = __riscv_vfmv_v_f_f16m1(-FLT_MAX, 1);
     size_t n = x->shape[0] * x->shape[1];
     float16_t *x_data = x->data;
@@ -50,7 +50,7 @@ void NN_max1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) {
   }
 #endif
 
-void NN_max2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x) {
+void nn_max2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x) {
   vfloat32m1_t vec_max = __riscv_vfmv_s_f_f32m1(-FLT_MAX, 1);
   size_t n = x->shape[0] * x->shape[1];
   float *x_data = x->data;

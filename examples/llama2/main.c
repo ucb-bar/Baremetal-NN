@@ -96,20 +96,20 @@ typedef struct {
 void malloc_run_state(RunState *s, Config *p) {
   // we calloc instead of malloc to keep valgrind happy
   int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
-  s->key_cache = NN_zeros(3, (size_t[]){p->n_layers, p->seq_len, kv_dim}, DTYPE_F32);
-  s->value_cache = NN_zeros(3, (size_t[]){p->n_layers, p->seq_len, kv_dim}, DTYPE_F32);
-  s->att = NN_zeros(2, (size_t[]){p->n_heads, p->seq_len}, DTYPE_F32);
-  s->logits = NN_zeros(1, (size_t[]){p->vocab_size}, DTYPE_F32);
+  s->key_cache = nn_zeros(3, (size_t[]){p->n_layers, p->seq_len, kv_dim}, DTYPE_F32);
+  s->value_cache = nn_zeros(3, (size_t[]){p->n_layers, p->seq_len, kv_dim}, DTYPE_F32);
+  s->att = nn_zeros(2, (size_t[]){p->n_heads, p->seq_len}, DTYPE_F32);
+  s->logits = nn_zeros(1, (size_t[]){p->vocab_size}, DTYPE_F32);
 
-  s->x = NN_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
-  s->xb = NN_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
-  s->xb2 = NN_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
-  s->hb = NN_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
-  s->hb2 = NN_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
+  s->x = nn_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
+  s->xb = nn_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
+  s->xb2 = nn_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
+  s->hb = nn_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
+  s->hb2 = nn_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
 
-  s->q = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, NULL);
-  s->k = NN_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, NULL);
-  s->v = NN_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, NULL);
+  s->q = nn_tensor(1, (size_t[]){p->dim}, DTYPE_F32, NULL);
+  s->k = nn_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, NULL);
+  s->v = nn_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, NULL);
 }
 
 void free_run_state(RunState *s) {
@@ -199,26 +199,26 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
   float *content_row = w->token_embedding_table_ptr + token * dim;
   memcpy(s->x->data, content_row, dim*sizeof(float));
 
-  s->rms_final_weight = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_ffn_weight_ptr);
-  s->rms_final_weight = NN_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_att_weight_ptr);
-  s->wq = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wq_ptr);
-  s->wk = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wk_ptr);
-  s->wv = NN_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wv_ptr);
-  s->wo = NN_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wo_ptr);
-  s->w1 = NN_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w1_ptr);
-  s->w2 = NN_tensor(2, (size_t[]){dim, hidden_dim}, DTYPE_F32, w->w2_ptr);
-  s->w3 = NN_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w3_ptr);
+  s->rms_final_weight = nn_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_ffn_weight_ptr);
+  s->rms_final_weight = nn_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_att_weight_ptr);
+  s->wq = nn_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wq_ptr);
+  s->wk = nn_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wk_ptr);
+  s->wv = nn_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wv_ptr);
+  s->wo = nn_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wo_ptr);
+  s->w1 = nn_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w1_ptr);
+  s->w2 = nn_tensor(2, (size_t[]){dim, hidden_dim}, DTYPE_F32, w->w2_ptr);
+  s->w3 = nn_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w3_ptr);
 
-  s->rms_final_weight = NN_tensor(1, (size_t[]){p->dim}, DTYPE_F32, w->rms_final_weight_ptr);
-  s->wcls = NN_tensor(2, (size_t[]){p->vocab_size, p->dim}, DTYPE_F32, w->wcls_ptr);
+  s->rms_final_weight = nn_tensor(1, (size_t[]){p->dim}, DTYPE_F32, w->rms_final_weight_ptr);
+  s->wcls = nn_tensor(2, (size_t[]){p->vocab_size, p->dim}, DTYPE_F32, w->wcls_ptr);
 
-  Tensor *att_tensor = NN_tensor(2, (size_t[]){1, pos + 1}, DTYPE_F32, s->att->data);
+  Tensor *att_tensor = nn_tensor(2, (size_t[]){1, pos + 1}, DTYPE_F32, s->att->data);
 
   // forward all the layers
   for (size_t l = 0; l < p->n_layers; l += 1) {
     // attention rmsnorm
     s->rms_final_weight->data = w->rms_att_weight_ptr + l*dim;
-    NN_rms_norm(s->xb, s->x, s->rms_final_weight, 1e-5);
+    nn_rms_norm(s->xb, s->x, s->rms_final_weight, 1e-5);
 
     // key and value point to the kv cache
     int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
@@ -230,9 +230,9 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
     s->wk->data = w->wk_ptr + l*dim*kv_dim;
     s->wv->data = w->wv_ptr + l*dim*kv_dim;
     
-    NN_matmul(s->q, s->wq, s->xb);
-    NN_matmul(s->k, s->wk, s->xb);
-    NN_matmul(s->v, s->wv, s->xb);
+    nn_matmul(s->q, s->wq, s->xb);
+    nn_matmul(s->k, s->wk, s->xb);
+    nn_matmul(s->v, s->wv, s->xb);
   
 
     // RoPE relative positional encoding: complex-valued rotate q and k in each head
@@ -274,7 +274,7 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
 
       // softmax the scores to get attention weights, from 0..pos inclusively
       att_tensor->data = att;
-      NN_softmax(att_tensor, att_tensor, 1);
+      nn_softmax(att_tensor, att_tensor, 1);
 
       // weighted sum of the values, store back into xb
       float *xb = ((float *)s->xb->data) + h * head_size;
@@ -293,41 +293,41 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
 
     // final matmul to get the output of the attention
     s->wo->data = w->wo_ptr + l*dim*dim;
-    NN_matmul(s->xb2, s->wo, s->xb);
+    nn_matmul(s->xb2, s->wo, s->xb);
 
     // residual connection back into x
-    NN_add_inplace(s->x, s->xb2);
+    nn_add_inplace(s->x, s->xb2);
 
     // ffn rmsnorm
     s->rms_final_weight->data = w->rms_ffn_weight_ptr + l*dim;
-    NN_rms_norm(s->xb, s->x, s->rms_final_weight, 1e-5);
+    nn_rms_norm(s->xb, s->x, s->rms_final_weight, 1e-5);
 
     // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
     // first calculate self.w1(x) and self.w3(x)
     s->w1->data = w->w1_ptr + l*dim*hidden_dim;
     s->w3->data = w->w3_ptr + l*dim*hidden_dim;
-    NN_matmul(s->hb, s->w1, s->xb);
-    NN_matmul(s->hb2, s->w3, s->xb);
+    nn_matmul(s->hb, s->w1, s->xb);
+    nn_matmul(s->hb2, s->w3, s->xb);
 
     // SwiGLU non-linearity
     // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
-    NN_silu(s->hb, s->hb);
+    nn_silu(s->hb, s->hb);
     // elementwise multiply with w3(x)
-    NN_mul_inplace(s->hb, s->hb2);
+    nn_mul_inplace(s->hb, s->hb2);
     
     // final matmul to get the output of the ffn
     s->w2->data = w->w2_ptr + l*dim*hidden_dim;
-    NN_matmul(s->xb, s->w2, s->hb);
+    nn_matmul(s->xb, s->w2, s->hb);
 
     // residual connection
-    NN_add_inplace(s->x, s->xb);
+    nn_add_inplace(s->x, s->xb);
   }
 
   // final rmsnorm
-  NN_rms_norm(s->x, s->x, s->rms_final_weight, 1e-5);
+  nn_rms_norm(s->x, s->x, s->rms_final_weight, 1e-5);
 
   // classifier into logits
-  NN_matmul(s->logits, s->wcls, s->x);
+  nn_matmul(s->logits, s->wcls, s->x);
 
   return s->logits;
 }
@@ -683,10 +683,10 @@ int sample(Sampler *sampler, Tensor *logits) {
   }
   else {
     // apply the temperature to the logits
-    NN_mul1_inplace(logits, 1.0f / sampler->temperature);
+    nn_mul1_inplace(logits, 1.0f / sampler->temperature);
 
     // apply softmax to the logits to get the probabilities for next token
-    NN_softmax(logits, logits, 1);
+    nn_softmax(logits, logits, 1);
     
     // flip a (float) coin (this is our source of entropy for sampling)
     float coin = random_f32(&sampler->rng_state);

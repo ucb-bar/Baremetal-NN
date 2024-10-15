@@ -14,14 +14,14 @@ Tensor *NN_<function-name>(<ndim>, <shape>, <datatype>, <tensor-options>)
 
 The following factory functions are available at the time of this writing:
 
-#### NN_tensor()
+#### nn_tensor()
 
 Returns a tensor with uninitialized values or preallocated buffer.
 
 When passing NULL as the data buffer, the method will allocate a new chunk of uninitialized data chunk.
 
 ```c
-Tensor *tensor = NN_tensor(2, (size_t []){ 2, 2 }, DTYPE_F32, NULL);
+Tensor *tensor = nn_tensor(2, (size_t []){ 2, 2 }, DTYPE_F32, NULL);
 ```
 
 Alternatively, tensor be created directly from an existing data buffer.
@@ -29,30 +29,30 @@ Alternatively, tensor be created directly from an existing data buffer.
 ```c
 // data = [[1, 2], [3, 4]]
 float data[] = { 1, 2, 3, 4 };
-Tensor *tensor = NN_tensor(2, (size_t []){ 2, 2 }, DTYPE_F32, data);
+Tensor *tensor = nn_tensor(2, (size_t []){ 2, 2 }, DTYPE_F32, data);
 ```
 
-#### NN_zeros()
+#### nn_zeros()
 
 Returns a tensor filled with all zeros.
 
-#### NN_ones()
+#### nn_ones()
 
 Returns a tensor filled with all ones.
 
-#### NN_full()
+#### nn_full()
 
 Returns a tensor filled with a single value.
 
-#### NN_rand()
+#### nn_rand()
 
 Returns a tensor filled with values drawn from a uniform distribution on [0, 1).
 
-#### NN_randint()
+#### nn_randint()
 
 Returns a tensor with integers randomly drawn from an interval.
 
-#### NN_arange()
+#### nn_arange()
 
 Returns a tensor with a sequence of integers.
 

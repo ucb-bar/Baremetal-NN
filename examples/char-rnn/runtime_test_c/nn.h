@@ -17,7 +17,7 @@ typedef struct {
  * ====== Utility Functions ======
  */
 
-void NN_assert(int condition, char *message) {
+void nn_assert(int condition, char *message) {
   if (!condition) {
     printf("Assertion failed: ");
     printf("%s\n", message);
@@ -31,7 +31,7 @@ void NN_assert(int condition, char *message) {
  * These functions assumes that printf is available.
  */
 
-void NN_print_f32(float v, int16_t num_digits) {
+void nn_print_f32(float v, int16_t num_digits) {
   int32_t scale = 1;
   int32_t integer_part, fractional_part;
   while (num_digits != 0) {
@@ -46,14 +46,14 @@ void NN_print_f32(float v, int16_t num_digits) {
   printf("%i.%i", integer_part, fractional_part);
 }
 
-void NN_print_shape(Matrix *a) {
+void nn_print_shape(Matrix *a) {
   printf("(%d, %d)\n", a->rows, a->cols);
 }
 
-void NN_printMatrix(Matrix *a) {
+void nn_printMatrix(Matrix *a) {
   for (size_t i = 0; i < a->rows; i++) {
     for (size_t j = 0; j < a->cols; j++) {
-      NN_print_f32(a->data[i * a->cols + j], 2);
+      nn_print_f32(a->data[i * a->cols + j], 2);
       printf(" ");
     }
     printf("\n");
@@ -64,16 +64,16 @@ void NN_printMatrix(Matrix *a) {
 /*
  * ====== Math Functions ======
  */
-void NN_initMatrix(Matrix *m, size_t rows, size_t cols) {
+void nn_initMatrix(Matrix *m, size_t rows, size_t cols) {
   m->rows = rows;
   m->cols = cols;
   m->data = malloc(rows * cols * sizeof(float));
 }
 
-void NN_matmul(Matrix *out, Matrix *a, Matrix *b) {
-  NN_assert(a->cols == b->rows, "matmul: dimension mismatch");
-  NN_assert(out->rows == a->rows, "matmul: dimension mismatch");
-  NN_assert(out->cols == b->cols, "matmul: dimension mismatch");
+void nn_matmul(Matrix *out, Matrix *a, Matrix *b) {
+  nn_assert(a->cols == b->rows, "matmul: dimension mismatch");
+  nn_assert(out->rows == a->rows, "matmul: dimension mismatch");
+  nn_assert(out->cols == b->cols, "matmul: dimension mismatch");
   for (size_t i = 0; i < a->rows; i += 1) {
     for (size_t j = 0; j < b->cols; j += 1) {
       float sum = 0;
@@ -85,9 +85,9 @@ void NN_matmul(Matrix *out, Matrix *a, Matrix *b) {
   }
 }
 
-void NN_matadd(Matrix *out, Matrix *a, Matrix *b) {
-  NN_assert(a->rows == b->rows, "matadd: dimension mismatch");
-  NN_assert(a->cols == b->cols, "matadd: dimension mismatch");
+void nn_matadd(Matrix *out, Matrix *a, Matrix *b) {
+  nn_assert(a->rows == b->rows, "matadd: dimension mismatch");
+  nn_assert(a->cols == b->cols, "matadd: dimension mismatch");
   for (size_t i = 0; i < a->rows; i += 1) {
     for (size_t j = 0; j < a->cols; j += 1) {
       out->data[i * out->cols + j] = a->data[i * a->cols + j] + b->data[i * b->cols + j];
@@ -95,7 +95,7 @@ void NN_matadd(Matrix *out, Matrix *a, Matrix *b) {
   }
 }
 
-void NN_transpose(Matrix *out, Matrix *a) {
+void nn_transpose(Matrix *out, Matrix *a) {
   for (size_t i = 0; i < a->rows; i += 1) {
     for (size_t j = 0; j < a->cols; j += 1) {
       out->data[j * out->cols + i] = a->data[i * a->cols + j];
@@ -103,7 +103,7 @@ void NN_transpose(Matrix *out, Matrix *a) {
   }
 }
 
-void NN_concatenate(Matrix *out, Matrix *a, Matrix *b) {
+void nn_concatenate(Matrix *out, Matrix *a, Matrix *b) {
   for (size_t i = 0; i < a->cols; i += 1) {
     out->data[i] = a->data[i];
   }
@@ -112,7 +112,7 @@ void NN_concatenate(Matrix *out, Matrix *a, Matrix *b) {
   }
 }
 
-size_t NN_argmax(Matrix *a) {
+size_t nn_argmax(Matrix *a) {
   int max_index = 0;
   float max_value = a->data[0];
   for (size_t i = 1; i < a->cols; i += 1) {
@@ -128,12 +128,12 @@ size_t NN_argmax(Matrix *a) {
  * ====== Operators ======
  */
 
-void NN_linear(Matrix *out, Matrix *weight, Matrix *bias, Matrix *input) {
-  NN_matmul(out, input, weight);
-  NN_matadd(out, out, bias);
+void nn_linear(Matrix *out, Matrix *weight, Matrix *bias, Matrix *input) {
+  nn_matmul(out, input, weight);
+  nn_matadd(out, out, bias);
 }
 
-void NN_logSoftmax(Matrix *out, Matrix *a) {
+void nn_logSoftmax(Matrix *out, Matrix *a) {
   float sum = 0;
   for (size_t i = 0; i < a->cols; i += 1) {
     sum += exp(a->data[i]);

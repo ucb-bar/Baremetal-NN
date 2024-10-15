@@ -40,13 +40,13 @@ int main() {
   printf("\n\n");
 
   Matrix output;
-  NN_initMatrix(&output, 1, output_size);
+  nn_initMatrix(&output, 1, output_size);
   
   Matrix input;
-  NN_initMatrix(&input, 1, input_size + hidden_size);
+  nn_initMatrix(&input, 1, input_size + hidden_size);
   
   Matrix hidden;
-  NN_initMatrix(&hidden, 1, hidden_size);
+  nn_initMatrix(&hidden, 1, hidden_size);
 
   int index;
 
@@ -57,17 +57,17 @@ int main() {
     
     for (int j=1; j<strlen(str); j+=1) {
       encodeOneHot(&input, str[j]);
-      NN_linear(&hidden, &i2h_weight_transposed, &i2h_bias, &input);
+      nn_linear(&hidden, &i2h_weight_transposed, &i2h_bias, &input);
 
       forward(&output, &hidden, &input);
     }
     
     // printMatrix(&output);
-    index = NN_argmax(&output);
+    index = nn_argmax(&output);
     
     printf("\n> %s\n", str);
     printf("score: (");
-    NN_print_f32(output.data[index], 2);
+    nn_print_f32(output.data[index], 2);
     printf("), predicted: (%d, %s)\n", index, categories[index]);
   }
 

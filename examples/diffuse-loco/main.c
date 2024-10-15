@@ -33,7 +33,7 @@ int main() {
   init(model);
 
   printf("setting input data...\n");
-  NN_fill(&model->input_1, 1.0);
+  nn_fill(&model->input_1, 1.0);
   
   // cycles = READ_CSR("mcycle");
   forward(model);
@@ -44,7 +44,7 @@ int main() {
   // output tensor([[ 0.0258, -0.0050,  0.0902, -0.0022, -0.0924, -0.0574,  0.0328,  0.0386, -0.0277,  0.0788,  0.0603, -0.0085]])
 
   printf("output:\n");
-  NN_printf(&model->actor_6);
+  nn_printf(&model->actor_6);
   
   return 0;
 }

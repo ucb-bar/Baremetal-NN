@@ -9,9 +9,9 @@ The underlying fundamental operators will be statically typed, and hence the ten
 Tensor attributes describe their dimension, shape, number of elements, and datatype.
 
 ```c
-Tensor *tensor = NN_rand(2, (size_t []){ 3, 4 }, DTYPE_F32);
+Tensor *tensor = nn_rand(2, (size_t []){ 3, 4 }, DTYPE_F32);
 
-printf("Datatype of tensor: %s\n", NN_get_datatype_name(tensor->dtype));
+printf("Datatype of tensor: %s\n", nn_get_datatype_name(tensor->dtype));
 printf("Dimension of tensor: %d\n", tensor->ndim);
 printf("Shape of tensor: (%d, %d)\n", tensor->shape[0], tensor->shape[1]);
 printf("Number of elements: %d\n", tensor->size);

@@ -46,7 +46,7 @@ int main() {
   init(model);
 
   printf("setting input data...\n");
-  // NN_fill(&model->x, 0.0);
+  // nn_fill(&model->x, 0.0);
   memcpy((uint8_t *)model->x.data, (uint8_t *)model_input_data, (size_t)model_input_end - (size_t)model_input_start);
 
   // cycles = READ_CSR("mcycle");
@@ -55,9 +55,9 @@ int main() {
 
   printf("cycles: %lu\n", cycles);
 
-  Tensor *img = NN_tensor(4, (const size_t[]){1, model->decode_conv6_2.shape[1] / 8, model->decode_conv6_2.shape[2] / 4, 1}, DTYPE_F32, NULL);
+  Tensor *img = nn_tensor(4, (const size_t[]){1, model->decode_conv6_2.shape[1] / 8, model->decode_conv6_2.shape[2] / 4, 1}, DTYPE_F32, NULL);
 
-  NN_interpolate(img, &model->decode_conv6_2, (float []){0.125, 0.25});
+  nn_interpolate(img, &model->decode_conv6_2, (float []){0.125, 0.25});
 
   printf("output:\n");
   show_ASCII_image(img, 0, 0);

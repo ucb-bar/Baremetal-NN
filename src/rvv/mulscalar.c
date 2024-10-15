@@ -4,8 +4,8 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
-  void NN_mulscalar1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x, float16_t scalar) {
-    NN_assert(x->shape[0] == y->shape[0], "Cannot add tensors of different shapes");
+  void nn_mulscalar1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x, float16_t scalar) {
+    nn_assert(x->shape[0] == y->shape[0], "Cannot add tensors of different shapes");
 
     size_t n = y->shape[0];
     float16_t *x_data = x->data;
@@ -23,8 +23,8 @@
   }
 #endif
 
-void NN_mulscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar) {
-  NN_assert(x->shape[0] == y->shape[0], "Cannot add tensors of different shapes");
+void nn_mulscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar) {
+  nn_assert(x->shape[0] == y->shape[0], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0];
   float *x_data = x->data;
@@ -42,8 +42,8 @@ void NN_mulscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar) {
 }
 
 #ifdef RISCV_ZVFH
-  void NN_mulscalar2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float16_t scalar) {
-    NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot add tensors of different shapes");
+  void nn_mulscalar2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float16_t scalar) {
+    nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot add tensors of different shapes");
 
     size_t n = y->shape[0] * y->shape[1];
     float16_t *x_data = x->data;
@@ -61,8 +61,8 @@ void NN_mulscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar) {
   }
 #endif
 
-void NN_mulscalar2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float scalar) {
-  NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot add tensors of different shapes");
+void nn_mulscalar2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float scalar) {
+  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0] * y->shape[1];
   float *x_data = x->data;

@@ -4,20 +4,20 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
-  void NN_relu_f16_asm(size_t n, float16_t *y_data, const float16_t *x_data);
+  void nn_relu_f16_asm(size_t n, float16_t *y_data, const float16_t *x_data);
 #endif
-void NN_relu_f32_asm(size_t n, float *y_data, const float *x_data);
+void nn_relu_f32_asm(size_t n, float *y_data, const float *x_data);
 
 #ifdef RISCV_ZVFH
-  void NN_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x) {
-    NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
+  void nn_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x) {
+    nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
 
     size_t n = y->shape[0] * y->shape[1];
     float16_t *x_data = x->data;
     float16_t *y_data = y->data;
 
     #ifdef RISCV_V_ASM
-      NN_relu_f16_asm(n, y_data, x_data);
+      nn_relu_f16_asm(n, y_data, x_data);
     #else
       float16_t zero = 0.0f;
 
@@ -34,15 +34,15 @@ void NN_relu_f32_asm(size_t n, float *y_data, const float *x_data);
   }
 #endif
 
-void NN_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
-  NN_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
+void nn_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
+  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
 
   size_t n = y->shape[0] * y->shape[1];
   float *x_data = x->data;
   float *y_data = y->data;
 
   #ifdef RISCV_V_ASM
-    NN_relu_f32_asm(n, y_data, x_data);
+    nn_relu_f32_asm(n, y_data, x_data);
   #else
     float zero = 0.0f;
 
