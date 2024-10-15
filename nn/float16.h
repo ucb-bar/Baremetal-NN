@@ -1,3 +1,14 @@
+/**
+ * @file float16.h
+ * @brief Half-Precision Floating-Point (fp16) Definitions
+ * 
+ * This header file provides a unified interface for half-precision floating-point numbers.
+ * It includes support for half-precision floating-point numbers on systems that do not natively support them.
+ * 
+ * The half-precision floating-point number is represented using a 16-bit unsigned integer.
+ * The conversion functions between half-precision and single-precision floating-point numbers are provided.
+ */
+
 #ifndef __FLOAT16_H
 #define __FLOAT16_H
 
