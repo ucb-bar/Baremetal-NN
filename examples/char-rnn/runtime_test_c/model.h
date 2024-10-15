@@ -35,11 +35,11 @@ static void forward(Matrix *output, Matrix *hidden, Matrix *input) {
   // Input
   Matrix *input_out = input;
   // Linear
-  NN_linear(hidden, &i2h_weight_transposed, &i2h_bias, input_out);
+  nn_linear(hidden, &i2h_weight_transposed, &i2h_bias, input_out);
   // Linear
-  NN_linear(output, &h2o_weight_transposed, &h2o_bias, hidden);
+  nn_linear(output, &h2o_weight_transposed, &h2o_bias, hidden);
   // Log Softmax
-  NN_logSoftmax(output, output);
+  nn_logSoftmax(output, output);
 }
 
 #endif  // __MODEL_H

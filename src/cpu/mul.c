@@ -1,9 +1,9 @@
 #include "nn.h"
 
 
-__attribute__((weak)) void NN_mul1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1, const Tensor1D_F16 *x2) {
-  NN_assert(x1->shape[0] == x2->shape[0], "Cannot add tensors of different shapes");
-  NN_assert(y->shape[0] == x1->shape[0], "Cannot add tensors of different shapes");
+__attribute__((weak)) void nn_mul1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1, const Tensor1D_F16 *x2) {
+  nn_assert(x1->shape[0] == x2->shape[0], "Cannot add tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0];
   for (size_t i = 0; i < n; i += 1) {
@@ -11,9 +11,9 @@ __attribute__((weak)) void NN_mul1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1,
   }
 }
 
-__attribute__((weak)) void NN_mul1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x2) {
-  NN_assert(x1->shape[0] == x2->shape[0], "Cannot add tensors of different shapes");
-  NN_assert(y->shape[0] == x1->shape[0], "Cannot add tensors of different shapes");
+__attribute__((weak)) void nn_mul1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x2) {
+  nn_assert(x1->shape[0] == x2->shape[0], "Cannot add tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0];
   for (size_t i = 0; i < n; i += 1) {
@@ -21,9 +21,9 @@ __attribute__((weak)) void NN_mul1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1,
   }
 }
 
-__attribute__((weak)) void NN_mul2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) {
-  NN_assert(x1->shape[0] == x2->shape[0] && x1->shape[1] == x2->shape[1], "Cannot add tensors of different shapes");
-  NN_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x1->shape[1], "Cannot add tensors of different shapes");
+__attribute__((weak)) void nn_mul2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) {
+  nn_assert(x1->shape[0] == x2->shape[0] && x1->shape[1] == x2->shape[1], "Cannot add tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x1->shape[1], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0] * y->shape[1];
   for (size_t i = 0; i < n; i += 1) {
@@ -31,9 +31,9 @@ __attribute__((weak)) void NN_mul2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1,
   }
 }
 
-__attribute__((weak)) void NN_mul2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) {
-  NN_assert(x1->shape[0] == x2->shape[0] && x1->shape[1] == x2->shape[1], "Cannot add tensors of different shapes");
-  NN_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x1->shape[1], "Cannot add tensors of different shapes");
+__attribute__((weak)) void nn_mul2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) {
+  nn_assert(x1->shape[0] == x2->shape[0] && x1->shape[1] == x2->shape[1], "Cannot add tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x1->shape[1], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0] * y->shape[1];
   for (size_t i = 0; i < n; i += 1) {

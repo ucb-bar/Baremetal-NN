@@ -18,7 +18,7 @@ int main() {
   forward(&model);
 
   printf("Output:\n");
-  NN_printf(&model.fc3);
+  nn_printf(&model.fc3);
 
   return 0;
 }

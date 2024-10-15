@@ -40,12 +40,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_add1d_f16(&actual, &a, &b);
+    nn_add1d_f16(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -75,12 +75,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_add2d_f16(&actual, &a, &b);
+    nn_add2d_f16(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -105,12 +105,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_addscalar1d_f16(&actual, &a, as_f16(0.5));
+    nn_addscalar1d_f16(&actual, &a, as_f16(0.5));
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -135,12 +135,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_addscalar2d_f16(&actual, &a, as_f16(0.5));
+    nn_addscalar2d_f16(&actual, &a, as_f16(0.5));
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -170,12 +170,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mul1d_f16(&actual, &a, &b);
+    nn_mul1d_f16(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -205,12 +205,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mul2d_f16(&actual, &a, &b);
+    nn_mul2d_f16(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -235,12 +235,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mulscalar1d_f16(&actual, &a, as_f16(0.5));
+    nn_mulscalar1d_f16(&actual, &a, as_f16(0.5));
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -265,12 +265,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mulscalar2d_f16(&actual, &a, as_f16(0.5));
+    nn_mulscalar2d_f16(&actual, &a, as_f16(0.5));
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -300,12 +300,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mm_f16(&actual, &x, &w);
+    nn_mm_f16(&actual, &x, &w);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -330,12 +330,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_max1d_f16(&actual, &x);
+    nn_max1d_f16(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -360,12 +360,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_max2d_f16(&actual, &x);
+    nn_max2d_f16(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -390,12 +390,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_min1d_f16(&actual, &x);
+    nn_min1d_f16(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -420,12 +420,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_min2d_f16(&actual, &x);
+    nn_min2d_f16(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -460,12 +460,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_addmm_f16(&actual, &x, &w, &b);
+    nn_addmm_f16(&actual, &x, &w, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -490,12 +490,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_relu2d_f16(&actual, &x);
+    nn_relu2d_f16(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -520,12 +520,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_elu2d_f16(&actual, &x, 1.0);
+    nn_elu2d_f16(&actual, &x, 1.0);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f16(&golden, &actual, 1e-2) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -555,12 +555,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_add1d_f32(&actual, &a, &b);
+    nn_add1d_f32(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -590,12 +590,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_add2d_f32(&actual, &a, &b);
+    nn_add2d_f32(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -620,12 +620,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_addscalar1d_f32(&actual, &a, 0.5);
+    nn_addscalar1d_f32(&actual, &a, 0.5);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -650,12 +650,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_addscalar2d_f32(&actual, &a, 0.5);
+    nn_addscalar2d_f32(&actual, &a, 0.5);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -685,12 +685,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mul1d_f32(&actual, &a, &b);
+    nn_mul1d_f32(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -720,12 +720,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mul2d_f32(&actual, &a, &b);
+    nn_mul2d_f32(&actual, &a, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -750,12 +750,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mulscalar1d_f32(&actual, &a, 0.5);
+    nn_mulscalar1d_f32(&actual, &a, 0.5);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -780,12 +780,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mulscalar2d_f32(&actual, &a, 0.5);
+    nn_mulscalar2d_f32(&actual, &a, 0.5);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -815,12 +815,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_mm_f32(&actual, &x, &w);
+    nn_mm_f32(&actual, &x, &w);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -845,12 +845,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_max1d_f32(&actual, &x);
+    nn_max1d_f32(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -875,12 +875,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_max2d_f32(&actual, &x);
+    nn_max2d_f32(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -905,12 +905,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_min1d_f32(&actual, &x);
+    nn_min1d_f32(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -935,12 +935,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_min2d_f32(&actual, &x);
+    nn_min2d_f32(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals0d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -975,12 +975,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_addmm_f32(&actual, &x, &w, &b);
+    nn_addmm_f32(&actual, &x, &w, &b);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -1005,12 +1005,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_relu2d_f32(&actual, &x);
+    nn_relu2d_f32(&actual, &x);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
   {
@@ -1035,12 +1035,12 @@ int main() {
     };
 
     cycles = read_cycles();
-    NN_elu2d_f32(&actual, &x, 1.0);
+    nn_elu2d_f32(&actual, &x, 1.0);
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\n", NN_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\n", nn_equals2d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
 
     
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }
 
 }

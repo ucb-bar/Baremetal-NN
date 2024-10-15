@@ -143,7 +143,7 @@ The low-level implementations of kernels are under `nn/impl/<device>`.
 
 For the low-level functions, the following naming convention is used:
 
-`void NN_operator_datatype(size_t n, <datatype *output_ptr, size_t increment>, <datatype *input_ptr, size_t increment>);`
+`void nn_operator_datatype(size_t n, <datatype *output_ptr, size_t increment>, <datatype *input_ptr, size_t increment>);`
 
 `operator`: the name of the operator, such as `add`, `max`.
 

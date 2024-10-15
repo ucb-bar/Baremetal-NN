@@ -50,10 +50,10 @@ int main() {
     cycles = read_cycles();
     {{ func_str }}
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\\n", NN_equals{{ dim }}d_{{ dtype.lower() }}(&golden, &actual, {{ precision }}) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\\n", nn_equals{{ dim }}d_{{ dtype.lower() }}(&golden, &actual, {{ precision }}) ? "PASS" : "FAIL", cycles);
 
     {% for tensor_str in tensor_destructors %}{{ tensor_str }}{% endfor %}
-      // NN_free_tensor_data(actual);
+      // nn_free_tensor_data(actual);
   }"""
 
     @staticmethod

@@ -2,8 +2,8 @@
 #ifdef RISCV_ZVFH
   .section .text
   .align 4
-  .globl NN_relu_f16_asm
-  NN_relu_f16_asm:
+  .globl nn_relu_f16_asm
+  nn_relu_f16_asm:
     beqz	      a0, __relu_f16_exit
     fmv.h.x	    fa5, zero
   __relu_f16_loop:
@@ -22,7 +22,7 @@
 
 .section .text
 .align 4
-.globl NN_relu_f32_asm
+.globl nn_relu_f32_asm
 NN_relu_f32_asm:
   beqz	      a0, __relu_f32_exit
   fmv.w.x	    fa5, zero

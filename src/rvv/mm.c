@@ -4,14 +4,14 @@
 #ifdef RISCV_V
 
 #ifdef RISCV_ZVFH
-  void NN_mm_f16_asm(size_t in_features, size_t out_features, float16_t *y_data, const float16_t *x1_data, const float16_t *x2_data);
+  void nn_mm_f16_asm(size_t in_features, size_t out_features, float16_t *y_data, const float16_t *x1_data, const float16_t *x2_data);
 #endif
-void NN_mm_f32_asm(size_t in_features, size_t out_features, float *y_data, const float *x1_data, const float *x2_data);
+void nn_mm_f32_asm(size_t in_features, size_t out_features, float *y_data, const float *x1_data, const float *x2_data);
 
 #ifdef RISCV_ZVFH
-  void NN_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) { 
-    NN_assert(x1->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
-    NN_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
+  void nn_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) { 
+    nn_assert(x1->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
+    nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
 
     const size_t batch_size = x1->shape[0];
     const size_t in_features = x1->shape[1];
@@ -27,7 +27,7 @@ void NN_mm_f32_asm(size_t in_features, size_t out_features, float *y_data, const
       float16_t *y_data = y_batch_data;
 
       #ifdef RISCV_V_ASM
-        NN_mm_f16_asm(in_features, out_features, y_data, x1_data, x2_data);
+        nn_mm_f16_asm(in_features, out_features, y_data, x1_data, x2_data);
       #else
         size_t vlmax = __riscv_vsetvlmax_e16m1();
 
@@ -64,9 +64,9 @@ void NN_mm_f32_asm(size_t in_features, size_t out_features, float *y_data, const
   }
 #endif
 
-void NN_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) { 
-  NN_assert(x1->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
-  NN_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
+void nn_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) { 
+  nn_assert(x1->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
 
   const size_t batch_size = x1->shape[0];
   const size_t in_features = x1->shape[1];
@@ -82,7 +82,7 @@ void NN_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) 
     float *y_data = y_batch_data;
 
     #ifdef RISCV_V_ASM
-      NN_mm_f32_asm(in_features, out_features, y_data, x1_data, x2_data);
+      nn_mm_f32_asm(in_features, out_features, y_data, x1_data, x2_data);
     #else
       size_t vlmax = __riscv_vsetvlmax_e32m1();
 

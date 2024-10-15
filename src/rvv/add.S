@@ -1,6 +1,6 @@
 .section .text
 .align 4
-.globl NN_add_f16_asm
+.globl nn_add_f16_asm
 NN_add_f16_asm:
   beqz        a0, __add_f16_exit
 __add_f16_loop:
@@ -20,7 +20,7 @@ __add_f16_exit:
 
 .section .text
 .align 4
-.globl NN_add_f32_asm
+.globl nn_add_f32_asm
 NN_add_f32_asm:
   beqz        a0, __add_f32_exit
 __add_f32_loop:

@@ -33,18 +33,20 @@ int main() {
   model_init(model);
 
   printf("setting input data...\n");
-  // NN_fill(&model->input_1, 1.0);
+  for (int i = 0; i < 48; i += 1) {
+    model->input_1.data[i] = 1.0;
+  }
   
-  // cycles = READ_CSR("mcycle");
+  cycles = READ_CSR("mcycle");
   model_forward(model);
-  // cycles = READ_CSR("mcycle") - cycles;
+  cycles = READ_CSR("mcycle") - cycles;
 
   printf("cycles: %lu\n", cycles);
 
   // output tensor([[ 0.0258, -0.0050,  0.0902, -0.0022, -0.0924, -0.0574,  0.0328,  0.0386, -0.0277,  0.0788,  0.0603, -0.0085]])
 
   printf("output:\n");
-  // NN_printf(&model->output);
+  nn_print_tensor2d_f32(&model->output);
   
   return 0;
 }

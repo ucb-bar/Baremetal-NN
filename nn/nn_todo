@@ -2,13 +2,13 @@
 /*
  * ====== Math Functions ======
  */
-void NN_initMatrix(Matrix *m, size_t rows, size_t cols) {
+void nn_initMatrix(Matrix *m, size_t rows, size_t cols) {
   m->rows = rows;
   m->cols = cols;
   m->data = malloc(rows * cols * sizeof(float));
 }
 
-void NN_concatenate(Matrix *out, Matrix *a, Matrix *b) {
+void nn_concatenate(Matrix *out, Matrix *a, Matrix *b) {
   for (size_t i = 0; i < a->cols; i += 1) {
     out->data[i] = a->data[i];
   }
@@ -17,7 +17,7 @@ void NN_concatenate(Matrix *out, Matrix *a, Matrix *b) {
   }
 }
 
-size_t NN_argmax(Matrix *a) {
+size_t nn_argmax(Matrix *a) {
   int max_index = 0;
   float max_value = a->data[0];
   for (size_t i = 1; i < a->cols; i += 1) {
@@ -33,7 +33,7 @@ size_t NN_argmax(Matrix *a) {
  * ====== Operators ======
  */
 
-void NN_logSoftmax(Matrix *out, Matrix *a) {
+void nn_logSoftmax(Matrix *out, Matrix *a) {
   float sum = 0;
   for (size_t i = 0; i < a->cols; i += 1) {
     sum += exp(a->data[i]);

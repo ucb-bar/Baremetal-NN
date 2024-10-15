@@ -60,15 +60,15 @@ Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int ma
 
   int sad_iop = 0;
 
-  Tensor *disparity_img = NN_zeros(4, (const size_t[]){1, s_h, s_w, 1}, DTYPE_U8);
+  Tensor *disparity_img = nn_zeros(4, (const size_t[]){1, s_h, s_w, 1}, DTYPE_U8);
   
-  Tensor *left_block = NN_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U8, (uint8_t *)left->data);
-  Tensor *right_block = NN_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U8, (uint8_t *)right->data);
-  Tensor *left_block_signed = NN_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U32, NULL);
-  Tensor *right_block_signed = NN_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U32, NULL);
-  Tensor *diff = NN_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U8, NULL);
-  Tensor *diff_wide = NN_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_I32, NULL);
-  Tensor *out = NN_tensor(1, (const size_t[]){1}, DTYPE_I32, NULL);
+  Tensor *left_block = nn_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U8, (uint8_t *)left->data);
+  Tensor *right_block = nn_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U8, (uint8_t *)right->data);
+  Tensor *left_block_signed = nn_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U32, NULL);
+  Tensor *right_block_signed = nn_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U32, NULL);
+  Tensor *diff = nn_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_U8, NULL);
+  Tensor *diff_wide = nn_tensor(2, (const size_t[]){1, 2*half_block_size}, DTYPE_I32, NULL);
+  Tensor *out = nn_tensor(1, (const size_t[]){1}, DTYPE_I32, NULL);
   
   // compute disparity
   // outer loop iterating over blocks
@@ -100,15 +100,15 @@ Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int ma
             left_block->data = ((uint8_t *)left->data) + row*width + col;
             right_block->data = ((uint8_t *)right->data) + row*width + col + offset;
             
-            NN_sub(diff, left_block, right_block);
+            nn_sub(diff, left_block, right_block);
 
             diff->dtype = DTYPE_I8;
-            NN_copy(diff_wide, diff);
+            nn_copy(diff_wide, diff);
             diff->dtype = DTYPE_U8;
 
-            NN_abs_inplace(diff_wide);
+            nn_abs_inplace(diff_wide);
 
-            NN_sum(out, diff_wide);
+            nn_sum(out, diff_wide);
             SAD += ((int32_t *)out->data)[0];
         }
         // reduction step
@@ -121,16 +121,16 @@ Tensor* compute_dispartiy(Tensor *left, Tensor *right, int min_disparity, int ma
     }
   }
 
-  NN_free_tensor_data(left_block_signed);
-  NN_free_tensor_data(right_block_signed);
-  NN_free_tensor_data(diff);
-  NN_free_tensor_data(out);
-  NN_delete_tensor(left_block_signed);
-  NN_delete_tensor(right_block_signed);
-  NN_delete_tensor(diff);
-  NN_delete_tensor(out);
-  NN_delete_tensor(left_block);
-  NN_delete_tensor(right_block);
+  nn_free_tensor_data(left_block_signed);
+  nn_free_tensor_data(right_block_signed);
+  nn_free_tensor_data(diff);
+  nn_free_tensor_data(out);
+  nn_delete_tensor(left_block_signed);
+  nn_delete_tensor(right_block_signed);
+  nn_delete_tensor(diff);
+  nn_delete_tensor(out);
+  nn_delete_tensor(left_block);
+  nn_delete_tensor(right_block);
 
   printf("SAD IOPs: %d\n", sad_iop);
 
@@ -141,8 +141,8 @@ int main() {
 
   file_size = (size_t)left_end - (size_t)left_start;
 
-  Tensor *left_image = NN_tensor(4, (const size_t[]){1, IMG_HEIGHT, IMG_WIDTH, 1}, DTYPE_U8, left_data);
-  Tensor *right_image = NN_tensor(4, (const size_t[]){1, IMG_HEIGHT, IMG_WIDTH, 1}, DTYPE_U8, right_data);
+  Tensor *left_image = nn_tensor(4, (const size_t[]){1, IMG_HEIGHT, IMG_WIDTH, 1}, DTYPE_U8, left_data);
+  Tensor *right_image = nn_tensor(4, (const size_t[]){1, IMG_HEIGHT, IMG_WIDTH, 1}, DTYPE_U8, right_data);
 
   size_t cycles = READ_CSR("cycle");
   Tensor *disparity_img = compute_dispartiy(left_image, right_image, 0, 32, 4);
@@ -153,11 +153,11 @@ int main() {
   // Save the disparity image
 
   printf("Result:\n");
-  NN_print_shape(disparity_img);
+  nn_print_shape(disparity_img);
   printf("\n");
 
-  Tensor *disparity_img_small = NN_zeros(4, (const size_t[]){1, disparity_img->shape[1] / 4, disparity_img->shape[2] / 2, 1}, DTYPE_U8);
-  NN_interpolate(disparity_img_small, disparity_img, (float []){0.25, 0.5});
+  Tensor *disparity_img_small = nn_zeros(4, (const size_t[]){1, disparity_img->shape[1] / 4, disparity_img->shape[2] / 2, 1}, DTYPE_U8);
+  nn_interpolate(disparity_img_small, disparity_img, (float []){0.25, 0.5});
 
   show_ASCII_image(disparity_img_small, 0, 32);
 

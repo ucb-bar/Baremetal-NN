@@ -1,6 +1,6 @@
 .section .text
 .align 4
-.globl NN_addmm_f16_asm
+.globl nn_addmm_f16_asm
 NN_addmm_f16_asm:
   vsetvli	    t3, zero, e16, m1, ta, ma
   beqz	      a1, __nn_addmm_f16_exit
@@ -44,7 +44,7 @@ __nn_addmm_f16_exit:
 
 .section .text
 .align 4
-.globl NN_addmm_f32_asm
+.globl nn_addmm_f32_asm
 NN_addmm_f32_asm:
   vsetvli	    t3, zero, e32, m1, ta, ma
   beqz	      a1, __nn_addmm_f32_exit
