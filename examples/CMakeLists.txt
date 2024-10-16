@@ -1,4 +1,4 @@
-add_subdirectory(mlp-cartpole)
+add_subdirectory(mlp-flappy)
 add_subdirectory(fast-depth)
 add_subdirectory(llama2)
 add_subdirectory(mnist)

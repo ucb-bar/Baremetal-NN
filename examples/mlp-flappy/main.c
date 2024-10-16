@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rv.h"
+#include "riscv.h"
 #include "nn.h"
 #include "model.h"
 
@@ -30,21 +30,23 @@ int main() {
   size_t cycles;
   
   printf("initalizing model...\n");
-  init(model);
+  model_init(model);
 
   printf("setting input data...\n");
-  nn_fill(&model->input_1, 1.0);
+  for (int i = 0; i < 83; i += 1) {
+    model->obs.data[i] = 1.0;
+  }
   
-  // cycles = READ_CSR("mcycle");
-  forward(model);
-  // cycles = READ_CSR("mcycle") - cycles;
+  cycles = READ_CSR("mcycle");
+  model_forward(model);
+  cycles = READ_CSR("mcycle") - cycles;
 
   printf("cycles: %lu\n", cycles);
 
-  // output tensor([[ 0.0258, -0.0050,  0.0902, -0.0022, -0.0924, -0.0574,  0.0328,  0.0386, -0.0277,  0.0788,  0.0603, -0.0085]])
+  // output: [[ 0.1256, -0.0136, -0.2046,  0.1883, -0.1451]]
 
   printf("output:\n");
-  nn_printf(&model->actor_6);
+  nn_print_tensor2d_f32(&model->output);
   
   return 0;
 }

@@ -13,7 +13,7 @@
 // Transformer model
 
 #include "nn.h"
-#include "rv.h"
+#include "riscv.h"
 
 
 // load the weight data block from the model.bin file
@@ -60,30 +60,30 @@ typedef struct {
 } TransformerWeights;
 
 typedef struct {
-  Tensor *rms_final_weight;
-  Tensor *wq;
-  Tensor *wk;
-  Tensor *wv;
-  Tensor *wo;
-  Tensor *w1;
-  Tensor *w2;
-  Tensor *w3;
-  Tensor *wcls;
+  Tensor1D_F32 *rms_final_weight;
+  Tensor2D_F32 *wq;
+  Tensor2D_F32 *wk;
+  Tensor2D_F32 *wv;
+  Tensor2D_F32 *wo;
+  Tensor2D_F32 *w1;
+  Tensor2D_F32 *w2;
+  Tensor2D_F32 *w3;
+  Tensor2D_F32 *wcls;
 
   // current wave of activations
-  Tensor *x;     // activation at current time stamp (dim,)
-  Tensor *xb;    // same, but inside a residual branch (dim,)
-  Tensor *xb2;   // an additional buffer just for convenience (dim,)
-  Tensor *hb;    // buffer for hidden dimension in the ffn (hidden_dim,)
-  Tensor *hb2;   // buffer for hidden dimension in the ffn (hidden_dim,)
-  Tensor *q;     // query (dim,)
-  Tensor *k;     // key (dim,)
-  Tensor *v;     // value (dim,)
-  Tensor *att; // buffer for scores/attention values (n_heads, seq_len)
-  Tensor *logits; // output logits
+  Tensor1D_F32 *x;     // activation at current time stamp (dim,)
+  Tensor1D_F32 *xb;    // same, but inside a residual branch (dim,)
+  Tensor1D_F32 *xb2;   // an additional buffer just for convenience (dim,)
+  Tensor1D_F32 *hb;    // buffer for hidden dimension in the ffn (hidden_dim,)
+  Tensor1D_F32 *hb2;   // buffer for hidden dimension in the ffn (hidden_dim,)
+  Tensor1D_F32 *q;     // query (dim,)
+  Tensor1D_F32 *k;     // key (dim,)
+  Tensor1D_F32 *v;     // value (dim,)
+  Tensor2D_F32 *att; // buffer for scores/attention values (n_heads, seq_len)
+  Tensor1D_F32 *logits; // output logits
   // kv cache
-  Tensor *key_cache;   // (layer, seq_len, dim)
-  Tensor *value_cache; // (layer, seq_len, dim)
+  Tensor3D_F32 *key_cache;   // (layer, seq_len, dim)
+  Tensor3D_F32 *value_cache; // (layer, seq_len, dim)
 } RunState;
 
 typedef struct {
