@@ -10,7 +10,7 @@ torch.manual_seed(0)
 class ValueNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.value = nn.Sequential(
+        self.policy_net = nn.Sequential(
             nn.Linear(83, 512, bias=True),
             nn.ReLU(),
             nn.Linear(512, 256, bias=True),
@@ -18,35 +18,29 @@ class ValueNet(nn.Module):
         )
 
     def forward(self, obs):
-        hidden = self.value.forward(obs)
+        hidden = self.policy_net.forward(obs)
         return hidden
 
-
-class ActionNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.action = nn.Linear(256, 5, bias=True)
-
-    def forward(self, hidden):
-        acs = self.action.forward(hidden)
-        return acs
 
 
 class MergedNet(nn.Module):
     def __init__(self):
         super().__init__()
-        self.value = ValueNet()
-        self.action = ActionNet()
+        self.mlp_extractor = ValueNet()
+        self.action_net = nn.Linear(256, 5, bias=True)
 
     def forward(self, obs):
-        hidden = self.value.forward(obs)
-        acs = self.action.forward(hidden)
+        hidden = self.mlp_extractor.forward(obs)
+        acs = self.action_net.forward(hidden)
         return acs
 
-# Tracing the module
-m = MergedNet()
 
-# m.load_state_dict(torch.load("model.pth", map_location=torch.device("cpu")))
+
+state_dict = torch.load("policy.pt")
+
+m = MergedNet()
+m.load_state_dict(state_dict, strict=False)
+
 m.eval()
 
 m = TracedModule(m)
