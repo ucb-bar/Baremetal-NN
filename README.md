@@ -156,9 +156,24 @@ For the low-level functions, the following naming convention is used:
 
 `increment`: the number of element to increment in order to access the next element in the buffer, **in number of elements**, not bytes. (e.g. for `f32` type, increment of 1 will access next element starting from the next 4th byte, and hence the next contiguous fp32 number.)
 
+
 # Stats
 
 ## Star History
 
 ![](https://api.star-history.com/svg?repos=ucb-bar/Baremetal-NN&type=Date&theme=dark)
 
+
+# Acknowledgement
+
+If you find this code useful, we would appreciate if you would cite it with the following:
+
+```
+@software{baremetal-nn,
+  author = {Yufeng Chi},
+  title = {{Baremetal-NN: A tool for running PyTorch models in resource-constrained embedded environments.}},
+  url = {https://github.com/ucb-bar/Baremetal-NN},
+  year = {2024},
+  version = {0.2.0}
+}
+```
