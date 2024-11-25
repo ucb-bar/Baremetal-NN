@@ -102,6 +102,9 @@ set(cpu_impl
   ./src/cpu/mul.c
   ./src/cpu/mulscalar.c
   ./src/cpu/relu.c
+  ./src/cpu/rms_norm.c
+  ./src/cpu/silu.c
+  ./src/cpu/softmax.c
   ./src/cpu/tanh.c
 )
 

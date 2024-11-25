@@ -91,6 +91,46 @@ typedef struct {
 } Tensor2D_F32;
 
 /**
+ * Tensor3D_F16
+ * 
+ * A 3D tensor with a float16_t data type.
+ */
+typedef struct {
+  size_t shape[3];
+  float16_t *data;
+} Tensor3D_F16;
+
+/**
+ * Tensor3D_F32
+ * 
+ * A 3D tensor with a float data type.
+ */
+typedef struct {
+  size_t shape[3];
+  float *data;
+} Tensor3D_F32;
+
+/**
+ * Tensor4D_F16
+ * 
+ * A 4D tensor with a float16_t data type.
+ */
+typedef struct {
+  size_t shape[4];
+  float16_t *data;
+} Tensor4D_F16;
+
+/**
+ * Tensor4D_F32
+ * 
+ * A 4D tensor with a float data type.
+ */
+typedef struct {
+  size_t shape[4];
+  float *data;
+} Tensor4D_F32;
+
+/**
  * nn_assert
  * 
  * Asserts that a condition is true. If the condition is false, it prints an error message and exits.

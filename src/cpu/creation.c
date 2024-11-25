@@ -56,6 +56,20 @@ __attribute__((weak)) Tensor2D_F32 *nn_tensor2d_f32(size_t shape[2], const float
   }
 }
 
+__attribute__((weak)) Tensor3D_F16 *nn_tensor3d_f16(size_t shape[3], const float16_t *data) {
+  Tensor3D_F16 *tensor = (Tensor3D_F16 *)malloc(sizeof(Tensor3D_F16));
+  tensor->shape[0] = shape[0];
+  tensor->shape[1] = shape[1];
+  tensor->shape[2] = shape[2];
+}
+
+__attribute__((weak)) Tensor3D_F32 *nn_tensor3d_f32(size_t shape[3], const float *data) {
+  Tensor3D_F32 *tensor = (Tensor3D_F32 *)malloc(sizeof(Tensor3D_F32));
+  tensor->shape[0] = shape[0];
+  tensor->shape[1] = shape[1];
+  tensor->shape[2] = shape[2];
+}
+
 __attribute__((weak)) Tensor0D_F16 *nn_zeros0d_f16() {
   Tensor0D_F16 *tensor = nn_tensor0d_f16(0);
   return tensor;
@@ -96,6 +110,24 @@ __attribute__((weak)) Tensor2D_F16 *nn_zeros2d_f16(size_t shape[2]) {
 __attribute__((weak)) Tensor2D_F32 *nn_zeros2d_f32(size_t shape[2]) {
   Tensor2D_F32 *tensor = nn_tensor2d_f32(shape, NULL);
   size_t n = shape[0] * shape[1];
+  for (size_t i = 0; i < n; i += 1) {
+    tensor->data[i] = 0;
+  }
+  return tensor;
+}
+
+__attribute__((weak)) Tensor3D_F16 *nn_zeros3d_f16(size_t shape[3]) {
+  Tensor3D_F16 *tensor = nn_tensor3d_f16(shape, NULL);
+  size_t n = shape[0] * shape[1] * shape[2];
+  for (size_t i = 0; i < n; i += 1) {
+    tensor->data[i] = 0;
+  }
+  return tensor;
+}
+
+__attribute__((weak)) Tensor3D_F32 *nn_zeros3d_f32(size_t shape[3]) {
+  Tensor3D_F32 *tensor = nn_tensor3d_f32(shape, NULL);
+  size_t n = shape[0] * shape[1] * shape[2];
   for (size_t i = 0; i < n; i += 1) {
     tensor->data[i] = 0;
   }
@@ -239,3 +271,4 @@ __attribute__((weak)) Tensor2D_F32 *nn_rand2d_f32(size_t shape[2]) {
   }
   return tensor;
 }
+

@@ -96,20 +96,20 @@ typedef struct {
 void malloc_run_state(RunState *s, Config *p) {
   // we calloc instead of malloc to keep valgrind happy
   int kv_dim = (p->dim * p->n_kv_heads) / p->n_heads;
-  s->key_cache = nn_zeros(3, (size_t[]){p->n_layers, p->seq_len, kv_dim}, DTYPE_F32);
-  s->value_cache = nn_zeros(3, (size_t[]){p->n_layers, p->seq_len, kv_dim}, DTYPE_F32);
-  s->att = nn_zeros(2, (size_t[]){p->n_heads, p->seq_len}, DTYPE_F32);
-  s->logits = nn_zeros(1, (size_t[]){p->vocab_size}, DTYPE_F32);
+  s->key_cache = nn_zeros3d_f32((size_t[]){p->n_layers, p->seq_len, kv_dim});
+  s->value_cache = nn_zeros3d_f32((size_t[]){p->n_layers, p->seq_len, kv_dim});
+  s->att = nn_zeros2d_f32((size_t[]){p->n_heads, p->seq_len});
+  s->logits = nn_zeros1d_f32((size_t[]){p->vocab_size});
 
-  s->x = nn_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
-  s->xb = nn_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
-  s->xb2 = nn_zeros(1, (size_t[]){p->dim}, DTYPE_F32);
-  s->hb = nn_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
-  s->hb2 = nn_zeros(1, (size_t[]){p->hidden_dim}, DTYPE_F32);
+  s->x = nn_zeros1d_f32((size_t[]){p->dim});
+  s->xb = nn_zeros1d_f32((size_t[]){p->dim});
+  s->xb2 = nn_zeros1d_f32((size_t[]){p->dim});
+  s->hb = nn_zeros1d_f32((size_t[]){p->hidden_dim});
+  s->hb2 = nn_zeros1d_f32((size_t[]){p->hidden_dim});
 
-  s->q = nn_tensor(1, (size_t[]){p->dim}, DTYPE_F32, NULL);
-  s->k = nn_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, NULL);
-  s->v = nn_tensor(1, (size_t[]){kv_dim}, DTYPE_F32, NULL);
+  s->q = nn_tensor1d_f32((size_t[]){p->dim}, NULL);
+  s->k = nn_tensor1d_f32((size_t[]){kv_dim}, NULL);
+  s->v = nn_tensor1d_f32((size_t[]){kv_dim}, NULL);
 }
 
 void free_run_state(RunState *s) {
@@ -183,7 +183,7 @@ void free_transformer(Transformer *t) {
 
 
 
-Tensor *forward(Transformer *transformer, int token, int pos) {
+Tensor1D_F32 *forward(Transformer *transformer, int token, int pos) {
   // a few convenience variables
   Config *p = &transformer->config;
   TransformerWeights *w = &transformer->weights;
@@ -199,26 +199,26 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
   float *content_row = w->token_embedding_table_ptr + token * dim;
   memcpy(s->x->data, content_row, dim*sizeof(float));
 
-  s->rms_final_weight = nn_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_ffn_weight_ptr);
-  s->rms_final_weight = nn_tensor(1, (size_t[]){dim}, DTYPE_F32, w->rms_att_weight_ptr);
-  s->wq = nn_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wq_ptr);
-  s->wk = nn_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wk_ptr);
-  s->wv = nn_tensor(2, (size_t[]){kv_dim, dim}, DTYPE_F32, w->wv_ptr);
-  s->wo = nn_tensor(2, (size_t[]){dim, dim}, DTYPE_F32, w->wo_ptr);
-  s->w1 = nn_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w1_ptr);
-  s->w2 = nn_tensor(2, (size_t[]){dim, hidden_dim}, DTYPE_F32, w->w2_ptr);
-  s->w3 = nn_tensor(2, (size_t[]){hidden_dim, dim}, DTYPE_F32, w->w3_ptr);
+  s->rms_final_weight = nn_tensor1d_f32((size_t[]){dim}, w->rms_ffn_weight_ptr);
+  s->rms_final_weight = nn_tensor1d_f32((size_t[]){dim}, w->rms_att_weight_ptr);
+  s->wq = nn_tensor2d_f32((size_t[]){dim, dim}, w->wq_ptr);
+  s->wk = nn_tensor2d_f32((size_t[]){kv_dim, dim}, w->wk_ptr);
+  s->wv = nn_tensor2d_f32((size_t[]){kv_dim, dim}, w->wv_ptr);
+  s->wo = nn_tensor2d_f32((size_t[]){dim, dim}, w->wo_ptr);
+  s->w1 = nn_tensor2d_f32((size_t[]){hidden_dim, dim}, w->w1_ptr);
+  s->w2 = nn_tensor2d_f32((size_t[]){dim, hidden_dim}, w->w2_ptr);
+  s->w3 = nn_tensor2d_f32((size_t[]){hidden_dim, dim}, w->w3_ptr);
 
-  s->rms_final_weight = nn_tensor(1, (size_t[]){p->dim}, DTYPE_F32, w->rms_final_weight_ptr);
-  s->wcls = nn_tensor(2, (size_t[]){p->vocab_size, p->dim}, DTYPE_F32, w->wcls_ptr);
+  s->rms_final_weight = nn_tensor1d_f32((size_t[]){p->dim}, w->rms_final_weight_ptr);
+  s->wcls = nn_tensor2d_f32((size_t[]){p->vocab_size, p->dim}, w->wcls_ptr);
 
-  Tensor *att_tensor = nn_tensor(2, (size_t[]){1, pos + 1}, DTYPE_F32, s->att->data);
+  Tensor2D_F32 *att_tensor = nn_tensor2d_f32((size_t[]){1, pos + 1}, s->att->data);
 
   // forward all the layers
   for (size_t l = 0; l < p->n_layers; l += 1) {
     // attention rmsnorm
     s->rms_final_weight->data = w->rms_att_weight_ptr + l*dim;
-    nn_rms_norm(s->xb, s->x, s->rms_final_weight, 1e-5);
+    nn_rms_norm1d_f32(s->xb, s->x, s->rms_final_weight, 1e-5);
 
     // key and value point to the kv cache
     int loff = l * p->seq_len * kv_dim; // kv cache layer offset for convenience
@@ -230,9 +230,9 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
     s->wk->data = w->wk_ptr + l*dim*kv_dim;
     s->wv->data = w->wv_ptr + l*dim*kv_dim;
     
-    nn_matmul(s->q, s->wq, s->xb);
-    nn_matmul(s->k, s->wk, s->xb);
-    nn_matmul(s->v, s->wv, s->xb);
+    nn_mm_f32(s->q, s->wq, s->xb);
+    nn_mm_f32(s->k, s->wk, s->xb);
+    nn_mm_f32(s->v, s->wv, s->xb);
   
 
     // RoPE relative positional encoding: complex-valued rotate q and k in each head
@@ -274,7 +274,7 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
 
       // softmax the scores to get attention weights, from 0..pos inclusively
       att_tensor->data = att;
-      nn_softmax(att_tensor, att_tensor, 1);
+      nn_softmax1d_f32(att_tensor, att_tensor, 1);
 
       // weighted sum of the values, store back into xb
       float *xb = ((float *)s->xb->data) + h * head_size;
@@ -293,41 +293,41 @@ Tensor *forward(Transformer *transformer, int token, int pos) {
 
     // final matmul to get the output of the attention
     s->wo->data = w->wo_ptr + l*dim*dim;
-    nn_matmul(s->xb2, s->wo, s->xb);
+    nn_mm_f32(s->xb2, s->wo, s->xb);
 
     // residual connection back into x
-    nn_add_inplace(s->x, s->xb2);
+    nn_add1d_f32(s->x, s->x, s->xb2);
 
     // ffn rmsnorm
     s->rms_final_weight->data = w->rms_ffn_weight_ptr + l*dim;
-    nn_rms_norm(s->xb, s->x, s->rms_final_weight, 1e-5);
+    nn_rms_norm1d_f32(s->xb, s->x, s->rms_final_weight, 1e-5);
 
     // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
     // first calculate self.w1(x) and self.w3(x)
     s->w1->data = w->w1_ptr + l*dim*hidden_dim;
     s->w3->data = w->w3_ptr + l*dim*hidden_dim;
-    nn_matmul(s->hb, s->w1, s->xb);
-    nn_matmul(s->hb2, s->w3, s->xb);
+    nn_mm_f32(s->hb, s->w1, s->xb);
+    nn_mm_f32(s->hb2, s->w3, s->xb);
 
     // SwiGLU non-linearity
     // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
-    nn_silu(s->hb, s->hb);
+    nn_silu1d_f32(s->hb, s->hb);
     // elementwise multiply with w3(x)
-    nn_mul_inplace(s->hb, s->hb2);
+    nn_mul1d_f32(s->hb, s->hb, s->hb2);
     
     // final matmul to get the output of the ffn
     s->w2->data = w->w2_ptr + l*dim*hidden_dim;
-    nn_matmul(s->xb, s->w2, s->hb);
+    nn_mm_f32(s->xb, s->w2, s->hb);
 
     // residual connection
-    nn_add_inplace(s->x, s->xb);
+    nn_add1d_f32(s->x, s->x, s->xb);
   }
 
   // final rmsnorm
-  nn_rms_norm(s->x, s->x, s->rms_final_weight, 1e-5);
+  nn_rms_norm1d_f32(s->x, s->x, s->rms_final_weight, 1e-5);
 
   // classifier into logits
-  nn_matmul(s->logits, s->wcls, s->x);
+  nn_mm_f32(s->logits, s->wcls, s->x);
 
   return s->logits;
 }
@@ -571,7 +571,7 @@ typedef struct {
   unsigned long long rng_state;
 } Sampler;
 
-size_t sample_argmax(Tensor *probabilities) {
+size_t sample_argmax(Tensor1D_F32 *probabilities) {
   // return the index that has the highest probability
   size_t n = probabilities->shape[0];
   size_t max_i = 0;
@@ -585,7 +585,7 @@ size_t sample_argmax(Tensor *probabilities) {
   return max_i;
 }
 
-size_t sample_mult(Tensor *probabilities, float coin) {
+size_t sample_mult(Tensor1D_F32 *probabilities, float coin) {
   // sample index from probabilities (they must sum to 1!)
   // coin is a random number in [0, 1), usually from random_f32()
   size_t n = probabilities->shape[0];
@@ -607,7 +607,7 @@ int compare(const void *a, const void *b) {
   return 0;
 }
 
-size_t sample_topp(Tensor *probabilities, float topp, ProbIndex *probindex, float coin) {
+size_t sample_topp(Tensor1D_F32 *probabilities, float topp, ProbIndex *probindex, float coin) {
   // top-p sampling (or "nucleus sampling") samples from the smallest set of
   // tokens that exceed probability topp. This way we never sample tokens that
   // have very low probabilities and are less likely to go "off the rails".
@@ -651,30 +651,30 @@ size_t sample_topp(Tensor *probabilities, float topp, ProbIndex *probindex, floa
 }
 
 void init_sampler(Sampler *sampler, int vocab_size, float temperature, float topp, unsigned long long rng_seed) {
-sampler->vocab_size = vocab_size;
-sampler->temperature = temperature;
-sampler->topp = topp;
-sampler->rng_state = rng_seed;
-// buffer only used with nucleus sampling; may not need but it's ~small
-sampler->probindex = malloc(sampler->vocab_size * sizeof(ProbIndex));
+  sampler->vocab_size = vocab_size;
+  sampler->temperature = temperature;
+  sampler->topp = topp;
+  sampler->rng_state = rng_seed;
+  // buffer only used with nucleus sampling; may not need but it's ~small
+  sampler->probindex = malloc(sampler->vocab_size * sizeof(ProbIndex));
 }
 
 void free_sampler(Sampler *sampler) {
-free(sampler->probindex);
+  free(sampler->probindex);
 }
 
 unsigned int random_u32(unsigned long long *state) {
-// xorshift rng: https://en.wikipedia.org/wiki/Xorshift#xorshift.2A
-*state ^= *state >> 12;
-*state ^= *state << 25;
-*state ^= *state >> 27;
-return (*state * 0x2545F4914F6CDD1Dull) >> 32;
+  // xorshift rng: https://en.wikipedia.org/wiki/Xorshift#xorshift.2A
+  *state ^= *state >> 12;
+  *state ^= *state << 25;
+  *state ^= *state >> 27;
+  return (*state * 0x2545F4914F6CDD1Dull) >> 32;
 }
 float random_f32(unsigned long long *state) { // random float32 in [0,1)
   return (random_u32(state) >> 8) / 16777216.0f;
 }
 
-int sample(Sampler *sampler, Tensor *logits) {
+int sample(Sampler *sampler, Tensor1D_F32 *logits) {
   // sample the token given the logits and some hyperparameters
   int next;
   if (sampler->temperature == 0.0f) {
@@ -683,10 +683,10 @@ int sample(Sampler *sampler, Tensor *logits) {
   }
   else {
     // apply the temperature to the logits
-    nn_mul1_inplace(logits, 1.0f / sampler->temperature);
+    nn_mulscalar1d_f32(logits, logits, 1.0f / sampler->temperature);
 
     // apply softmax to the logits to get the probabilities for next token
-    nn_softmax(logits, logits, 1);
+    nn_softmax1d_f32(logits, logits, 1);
     
     // flip a (float) coin (this is our source of entropy for sampling)
     float coin = random_f32(&sampler->rng_state);
@@ -739,7 +739,7 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
   while (pos < steps) {
     // forward the transformer to get logits for the next token
     size_t cycles = READ_CSR("mcycle");
-    Tensor *logits = forward(transformer, token, pos);
+    Tensor1D_F32 *logits = forward(transformer, token, pos);
     cycles = READ_CSR("mcycle") - cycles;
     printf("forward taking %ld cycles\n", cycles);
 
@@ -747,7 +747,8 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     if (pos < num_prompt_tokens - 1) {
       // if we are still processing the input prompt, force the next prompt token
       next = prompt_tokens[pos + 1];
-    } else {
+    }
+    else {
       // otherwise sample the next token from the logits
       next = sample(sampler, logits);
     }
@@ -866,7 +867,7 @@ void chat(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler,
       if (token == 2) { user_turn = 1; }
 
       // forward the transformer to get logits for the next token
-      Tensor *logits = forward(transformer, token, pos);
+      Tensor1D_F32 *logits = forward(transformer, token, pos);
       next = sample(sampler, logits);
       pos += 1;
 
