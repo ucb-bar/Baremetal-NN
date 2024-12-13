@@ -8,7 +8,6 @@ __attribute__((weak)) void nn_min1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x) 
     float val = as_f32(x->data[i]);
     y->data = val < y->data ? val : y->data;
   }
-  return y->data;
 }
 
 __attribute__((weak)) void nn_min1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) {
@@ -18,7 +17,6 @@ __attribute__((weak)) void nn_min1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) 
     float val = x->data[i];
     y->data = val < y->data ? val : y->data;
   }
-  return y->data;
 }
 
 __attribute__((weak)) void nn_min2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x) {
@@ -28,7 +26,6 @@ __attribute__((weak)) void nn_min2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x) 
     float val = as_f32(x->data[i]);
     y->data = val < y->data ? val : y->data;
   }
-  return y->data;
 }
 
 __attribute__((weak)) void nn_min2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x) {
@@ -38,5 +35,4 @@ __attribute__((weak)) void nn_min2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x) 
     float val = x->data[i];
     y->data = val < y->data ? val : y->data;
   }
-  return y->data;
 }
