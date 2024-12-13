@@ -1103,4 +1103,34 @@ int main() {
       // nn_free_tensor_data(actual);
   }
 
+  {
+    printf("nn_softmax1d_f32:       ");
+    
+    // [ 1.463511   -2.0732946   2.5087662  -0.44954896  0.43284953 -3.458044  -4.46862
+    Tensor1D_F32 x = {
+      .shape = { 7 },
+      .data = (float *)((uint8_t[]){ 0x54,0x54,0xbb,0x3f,0xdc,0xb0,0x4,0xc0,0xa0,0x8f,0x20,0x40,0x48,0x2b,0xe6,0xbe,0x74,0x9e,0xdd,0x3e,0x98,0x50,0x5d,0xc0,0x0,0xff,0x8e,0xc0 })
+    };
+
+    
+    // [2.2791658e-01 6.6337758e-03 6.4822310e-01 3.3646863e-02 8.1313998e-02  1.661008
+    Tensor1D_F32 golden = {
+      .shape = { 7 },
+      .data = (float *)((uint8_t[]){ 0xf7,0x62,0x69,0x3e,0x25,0x60,0xd9,0x3b,0xf3,0xf1,0x25,0x3f,0x4b,0xd1,0x9,0x3d,0xf4,0x87,0xa6,0x3d,0x2f,0xb6,0xd9,0x3a,0x32,0x7f,0x1e,0x3a })
+    };
+    // 
+    Tensor1D_F32 actual = {
+      .shape = { 7 },
+      .data = (float *)malloc(sizeof(float) * 7)
+    };
+
+    cycles = read_cycles();
+    nn_softmax1d_f32(&actual, &x);
+    cycles = read_cycles() - cycles;
+    printf("%s  (%lu cycles)\n", nn_equals1d_f32(&golden, &actual, 1e-4) ? "PASS" : "FAIL", cycles);
+
+    
+      // nn_free_tensor_data(actual);
+  }
+
 }

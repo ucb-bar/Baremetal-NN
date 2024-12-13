@@ -300,6 +300,9 @@ if __name__ == "__main__":
     # Tanh
     t.add_test("nn_tanh2d_f32",  lambda x: torch.nn.functional.tanh(x),               [("x", t.rand((7, 7)))                                                ])
 
+    # Softmax
+    t.add_test("nn_softmax1d_f32",  lambda x: torch.nn.functional.softmax(x),         [("x", t.rand((7, )))])
+
 
     t.generate(out_file)
 

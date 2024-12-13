@@ -322,6 +322,10 @@ void model_forward(Model* model) {{
         elif type(module) == torch.nn.Tanh:
             self.add_uninitialized_tensor(layer_name, out)
             self.add_forward_call("nn_tanh{dim}d_{dtype}", out, layer_name, input_names)
+
+        elif type(module) == torch.nn.Softmax:
+            self.add_uninitialized_tensor(layer_name, out)
+            self.add_forward_call("nn_softmax{dim}d_{dtype}", out, layer_name, input_names)
     
         # Linear Layers
         elif type(module) == torch.nn.Linear:
