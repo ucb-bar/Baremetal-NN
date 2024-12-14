@@ -302,6 +302,8 @@ if __name__ == "__main__":
 
     # Softmax
     t.add_test("nn_softmax1d_f32",  lambda x: torch.nn.functional.softmax(x),         [("x", t.rand((7, )))])
+    t.add_test("nn_softmax2d_f32",  lambda x: torch.nn.functional.softmax(x),         [("x", t.rand((7, 5)))], extra_args=["0"])
+    t.add_test("nn_softmax2d_f32",  lambda x: torch.nn.functional.softmax(x),         [("x", t.rand((1, 5)))], extra_args=["1"])
 
 
     t.generate(out_file)
