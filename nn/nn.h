@@ -12,12 +12,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <math.h>
 
 #include "float16.h"
 
 
 // http://elm-chan.org/junk/32bit/binclude.html
+#ifdef __APPLE__
+#define INCLUDE_FILE(section, filename, symbol) asm (\
+    ".align 4\n"                             /* Word alignment */\
+    ".globl _"#symbol"_start\n"              /* Export the object start address */\
+    ".globl _"#symbol"_data\n"               /* Export the object address */\
+    "_"#symbol"_start:\n"                    /* Define the object start address label */\
+    "_"#symbol"_data:\n"                     /* Define the object label */\
+    ".incbin \""filename"\"\n"               /* Import the file */\
+    ".globl _"#symbol"_end\n"                /* Export the object end address */\
+    "_"#symbol"_end:\n"                      /* Define the object end address label */\
+    ".align 4\n")                            /* Word alignment */
+#else
 #define INCLUDE_FILE(section, filename, symbol) asm (\
     ".section "#section"\n"                   /* Change section */\
     ".balign 4\n"                             /* Word alignment */\
@@ -30,7 +43,7 @@
     #symbol"_end:\n"                          /* Define the object end address label */\
     ".balign 4\n"                             /* Word alignment */\
     ".section \".text\"\n")                   /* Restore section */
-
+#endif
 
 /**
  * Tensor0D_F16
