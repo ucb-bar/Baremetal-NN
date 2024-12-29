@@ -52,7 +52,7 @@ rm -rf ./build/
 
 ```bash
 # make sure $RISCV is set
-cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RISCV_V=ON
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D CONFIG_BACKEND_RISCV_V=ON
 cmake --build ./build/ --target tests
 spike --isa=rv64gcv_zicntr_zfh ./build/tests/tests.elf
 ```
@@ -60,7 +60,7 @@ spike --isa=rv64gcv_zicntr_zfh ./build/tests/tests.elf
 Running with FP16 support
 
 ```bash
-cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RISCV_V=ON -D RISCV_ZVFH=ON
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D CONFIG_BACKEND_RISCV_V=ON -D CONFIG_BACKEND_RISCV_ZVFH=ON
 cmake --build ./build/ --target tests
 spike --isa=rv64gcv_zicntr_zfh_zvfh ./build/tests/tests.elf
 ```
@@ -70,7 +70,7 @@ Running with FP16 support with GCC<14.0
 For GCC<14.0, it does not support the fp16 intrinsics, so we need to use the assembly implementation.
 
 ```bash
-cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D RISCV_V=ON -D RISCV_ZVFH=ON -D RISCV_V_ASM=ON
+cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D CONFIG_BACKEND_RISCV_V=ON -D RISCV_ZVFH=ON -D RISCV_V_ASM=ON
 cmake --build ./build/ --target tests
 spike --isa=rv64gcv_zicntr_zfh_zvfh ./build/tests/tests.elf
 ```
@@ -113,6 +113,17 @@ cmake --build ./build/ --target clean
 ```
 rm -rf ./build/
 ```
+
+
+## Supported config flags
+
+CONFIG_BACKEND_RISCV_V: use RISC-V Vector backend.
+
+CONFIG_BACKEND_RISCV_ZVFH: use RISC-V Vector Floating-Point Hardware for the FP16 operations.
+
+CONFIG_DEBUG_RISCV_V_USE_REDOSUM: use REDOSUM for the reduction operation in RVV. By default, it uses REDUSUM.
+
+
 
 
 ## Convert the model
