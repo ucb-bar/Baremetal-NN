@@ -24,8 +24,8 @@ option(RISCV                "Build for RISC-V"                  OFF     )
 
 # accelerator options
 option(AVX                  "Use AVX implementation"            OFF     )
-option(RISCV_V              "Use RISCV vector extension"        OFF     )
-option(RISCV_ZVFH           "Use RISCV half-precision floating-point vector extension" OFF)
+option(CONFIG_BACKEND_RISCV_V              "Use RISCV vector extension"        OFF     )
+option(CONFIG_BACKEND_RISCV_ZVFH           "Use RISCV half-precision floating-point vector extension" OFF)
 option(RISCV_V_ASM          "Use RISCV vector extension in assembly implementation" OFF)
 
 option(DEBUG_USE_REDOSUM        "Use redosum instead of redusum" OFF)
@@ -57,11 +57,11 @@ set(ABI                "lp64d")
 set(CMODEL             "medany")
 
 # generate march flags
-if (RISCV_V)
+if (CONFIG_BACKEND_RISCV_V)
   list(APPEND ARCH "v")
   # list(APPEND MARCH "_zicntr")
   
-  if (RISCV_ZVFH)
+  if (CONFIG_BACKEND_RISCV_ZVFH)
     list(APPEND ARCH "_zfh")
     list(APPEND ARCH "_zvfh")
   endif()
@@ -93,13 +93,13 @@ if (AVX)
   add_compile_definitions(AVX)
 endif ()
 
-if (RISCV_V)
+if (CONFIG_BACKEND_RISCV_V)
   message(STATUS "Using RVV implementation")
-  add_compile_definitions(RISCV_V)
+  add_compile_definitions(CONFIG_BACKEND_RISCV_V)
   
-  if (RISCV_ZVFH)
+  if (CONFIG_BACKEND_RISCV_ZVFH)
     message(STATUS "Using Zvfh extension")
-    add_compile_definitions(RISCV_ZVFH)
+    add_compile_definitions(CONFIG_BACKEND_RISCV_ZVFH)
   endif ()
   
   if (RISCV_V_ASM)
@@ -114,25 +114,11 @@ if (RISCV_V)
     )
   endif ()
 
-  if (DEBUG_USE_REDOSUM)
+  if (CONFIG_DEBUG_USE_REDOSUM)
     message(STATUS "Using redosum implementation")
-    add_compile_definitions(DEBUG_USE_REDOSUM)
+    add_compile_definitions(CONFIG_DEBUG_USE_REDOSUM)
   endif ()
 
-  set(rvv_impl
-    ./src/rvv/add.c
-    ./src/rvv/addscalar.c
-    ./src/rvv/addmm.c
-    ./src/rvv/elu.c
-    ./src/rvv/relu.c
-    ./src/rvv/max.c
-    ./src/rvv/min.c
-    ./src/rvv/mm.c
-    ./src/rvv/mul.c
-    ./src/rvv/mulscalar.c
-
-    ${rvv_asm_impl}
-    )
 endif ()
 
 if (GEMMINI)
@@ -154,11 +140,11 @@ target_include_directories(nn INTERFACE ./nn)
 
 if (X86)
   message(STATUS "nn: Building for x86")
-  target_link_libraries(nn target-x86)
+  target_link_libraries(nn INTERFACE target-x86)
     
 elseif (RISCV)
   message(STATUS "nn: Building for RISC-V")
-  target_link_libraries(nn target-riscv)
+  target_link_libraries(nn INTERFACE target-riscv)
 endif ()
 
 

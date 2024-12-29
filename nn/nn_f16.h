@@ -733,9 +733,9 @@ void nn_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) 
         
         while (n > 0) {
           size_t vl = __riscv_vsetvl_e16m1(n);
-          vfloat16m1_t vec_x = __riscv_vle16_v_f16m1(x_data, vl);
-          vfloat16m1_t vec_y = __riscv_vle16_v_f16m1(weight_data, vl);
-          vec_sum = __riscv_vfmacc_vv_f16m1(vec_sum, vec_x, vec_y, vl);
+          vfloat16m1_t vec_x1 = __riscv_vle16_v_f16m1(x1_data, vl);
+          vfloat16m1_t vec_x2 = __riscv_vle16_v_f16m1(x2_data, vl);
+          vec_sum = __riscv_vfmacc_vv_f16m1(vec_sum, vec_x1, vec_x2, vl);
           
           x1_data += vl;
           x2_data += vl;
@@ -746,7 +746,7 @@ void nn_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) 
         #else
           vec_sum = __riscv_vfredusum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
         #endif
-        y_data[j] = __riscv_vfmv_f_s_f16m1_f16(vec_sum) + bias_data[j];
+        y_data[j] = __riscv_vfmv_f_s_f16m1_f16(vec_sum);
         
         x1_data -= in_features;
       }
@@ -855,17 +855,17 @@ void nn_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x) {
   nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
 
   size_t n = y->shape[0] * y->shape[1];
-  float *x_data = x->data;
-  float *y_data = y->data;
+  float16_t *x_data = x->data;
+  float16_t *y_data = y->data;
 
   #ifdef CONFIG_BACKEND_RISCV_ZVFH
-    float zero = 0.0f;
+    float16_t zero = 0.0f;
 
     while (n > 0) {
-      size_t vl = __riscv_vsetvl_e32m1(n);
-      vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x_data, vl);
-      vfloat32m1_t vec_y = __riscv_vfmax_vf_f32m1(vec_x, zero, vl);
-      __riscv_vse32_v_f32m1(y_data, vec_y, vl);
+      size_t vl = __riscv_vsetvl_e16m1(n);
+      vfloat16m1_t vec_x = __riscv_vle16_v_f16m1(x_data, vl);
+      vfloat16m1_t vec_y = __riscv_vfmax_vf_f16m1(vec_x, zero, vl);
+      __riscv_vse16_v_f16m1(y_data, vec_y, vl);
       x_data += vl;
       y_data += vl;
       n -= vl;

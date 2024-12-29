@@ -80,6 +80,51 @@ void nn_print_shape(size_t ndim, const size_t *shape) {
 }
 
 
+/**
+ * nn_print_f32
+ * 
+ * Prints a float.
+ * 
+ * @param v The float to print.
+ * @param num_digits The number of decimal digits to print.
+ */
+void nn_print_f32(float v, int16_t num_digits) {
+  if (isinf(v)) {
+    if (signbit(v)) {
+      printf("-inf");
+    } else {
+      printf("inf");
+    }
+    return;
+  }
+  
+  if (v < 0) {
+    printf("-");  // Print the minus sign for negative numbers
+    v = -v;        // Make the number positive for processing
+  }
+
+  // Calculate the integer part of the number
+  long int_part = (long)v;
+  float fractional_part = v - int_part;
+
+  // Print the integer part
+  printf("%ld", int_part);
+
+  if (num_digits > 0) {
+    printf("."); // Print the decimal point
+  }
+
+  // Handle the fractional part
+  while (num_digits > 0) {
+    num_digits -= 1;
+    fractional_part *= 10;
+    int digit = (int)(fractional_part);
+    printf("%d", digit);
+    fractional_part -= digit;
+  }
+}
+
+
 #include "nn_f16.h"
 
 #include "nn_f32.h"
