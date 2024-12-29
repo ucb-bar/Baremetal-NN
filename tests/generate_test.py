@@ -51,7 +51,7 @@ int main() {
     cycles = read_cycles();
     {{ func_str }}
     cycles = read_cycles() - cycles;
-    printf("%s  (%lu cycles)\\n", nn_equals{{ dim }}d_{{ dtype.lower() }}(&golden, &actual, {{ precision }}) ? "PASS" : "FAIL", cycles);
+    printf("%s  (%lu cycles)\\n", nn_equals{{ dim }}d_{{ dtype.lower() }}(&golden, &actual{% if precision %}, {{ precision }}{% endif %}) ? "PASS" : "FAIL", cycles);
 
     {% for tensor_str in tensor_destructors %}{{ tensor_str }}{% endfor %}
       // nn_free_tensor_data(actual);
@@ -63,6 +63,8 @@ int main() {
             return "F16", "float16_t"
         elif tensor.dtype == torch.float32:
             return "F32", "float"
+        elif tensor.dtype == torch.int32:
+            return "I32", "int32_t"
 
     def __init__(self, seed=0):
 
@@ -104,6 +106,8 @@ int main() {
     def rand16(self, shape):
         return self.rand(shape, dtype=torch.float16)
     
+    def randi32(self, shape):
+        return torch.randint(-127, 127, shape, dtype=torch.int32, device=self.device)
 
     def functional_rms_norm(self, x, w, eps):
         with torch.no_grad():
@@ -190,9 +194,11 @@ int main() {
             op=op, inputs=inputs, extra_args=extra_args
         )
         
-        precision = "1e-4"
+        precision = None
         if result.dtype == torch.float16:
             precision = "1e-2"
+        elif result.dtype == torch.float32:
+            precision = "1e-4"
 
         test_block_template = self.env.from_string(self.TEST_BLOCK_TEMPLATE)
         
@@ -301,9 +307,16 @@ if __name__ == "__main__":
     t.add_test("nn_tanh2d_f32",  lambda x: torch.nn.functional.tanh(x),               [("x", t.rand((7, 7)))                                                ])
 
     # Softmax
-    t.add_test("nn_softmax1d_f32",  lambda x: torch.nn.functional.softmax(x),         [("x", t.rand((7, )))])
-    t.add_test("nn_softmax2d_f32",  lambda x: torch.nn.functional.softmax(x),         [("x", t.rand((7, 5)))], extra_args=["0"])
-    t.add_test("nn_softmax2d_f32",  lambda x: torch.nn.functional.softmax(x),         [("x", t.rand((1, 5)))], extra_args=["1"])
+    t.add_test("nn_softmax1d_f32",  lambda x: torch.nn.functional.softmax(x, dim=0),  [("x", t.rand((7, )))])
+    t.add_test("nn_softmax2d_f32",  lambda x: torch.nn.functional.softmax(x, dim=0),  [("x", t.rand((7, 5)))], extra_args=["0"])
+    t.add_test("nn_softmax2d_f32",  lambda x: torch.nn.functional.softmax(x, dim=1),  [("x", t.rand((1, 5)))], extra_args=["1"])
+
+
+    # === I32 tests ===
+    t.add_test("nn_add1d_i32",   lambda a, b: a + b,                                  [("a", t.randi32((7, ))),  ("b", t.randi32((7, )))                          ])
+    t.add_test("nn_add2d_i32",   lambda a, b: a + b,                                  [("a", t.randi32((6, 7))), ("b", t.randi32((6, 7)))                       ])
+
+    t.add_test("nn_addmm_i32",   lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.randi32((6, 7))),   ("w", t.randi32((5, 7))), ("b", t.randi32((5, ))) ])
 
 
     t.generate(out_file)
