@@ -124,10 +124,15 @@ void nn_print_f32(float v, int16_t num_digits) {
   }
 }
 
-
-#include "nn_f16.h"
-
 #include "nn_f32.h"
+
+#ifdef CONFIG_DTYPE_ENABLE_F16
+  #include "nn_f16.h"
+#endif
+
+#ifdef CONFIG_DTYPE_ENABLE_I32
+  #include "nn_i32.h"
+#endif
 
 
 #endif // __NN_H

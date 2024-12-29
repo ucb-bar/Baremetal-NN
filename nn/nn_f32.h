@@ -8,6 +8,8 @@
 #ifndef __NN_F32_H
 #define __NN_F32_H
 
+#include <float.h>
+
 #ifdef CONFIG_BACKEND_RISCV_V
   #include "riscv_vector.h"
 #endif
