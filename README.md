@@ -117,6 +117,10 @@ rm -rf ./build/
 
 ## Supported config flags
 
+CONFIG_DTYPE_ENABLE_F16: enable F16 support.
+
+CONFIG_DTYPE_ENABLE_I32: enable I32 support.
+
 CONFIG_BACKEND_RISCV_V: use RISC-V Vector backend.
 
 CONFIG_BACKEND_RISCV_ZVFH: use RISC-V Vector Floating-Point Hardware for the FP16 operations.
@@ -124,6 +128,44 @@ CONFIG_BACKEND_RISCV_ZVFH: use RISC-V Vector Floating-Point Hardware for the FP1
 CONFIG_DEBUG_RISCV_V_USE_REDOSUM: use REDOSUM for the reduction operation in RVV. By default, it uses REDUSUM.
 
 
+## Support matrix of backends and operators
+
+| Operator                | Variants  | Scalar CPU | RISC-V Vector | Gemmini |
+| ----------------------- | --------- | ---------- | ------------- | ------- |
+| min                     | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
+| max                     | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
+| add                     | I32       | ✅         | 🔜           |         |
+|                         | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
+| addscalar               | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
+| mul                     | F16       | ✅         | ❌ (ZVFH)    |         |
+|                         | F32       | ✅         | ❌           |         |
+| mulscalar               | F16       | ✅         | ❌ (ZVFH)    |         |
+|                         | F32       | ✅         | ❌           |         |
+| matmul (mm)             | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
+| addmatmul (addmm)       | I32       | ✅         | 🔜           |         |
+|                         | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
+| elu                     | F16       | ✅         |              |         |
+|                         | F32       | ✅         |              |         |
+| relu                    | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
+| tanh                    | F16       | ✅         |              |         |
+|                         | F32       | ✅         |              |         |
+| softmax                 | F16       |            |              |         |
+|                         | F32       | ⚠️         |              |         |
+
+✅: supported
+
+⚠️: partially supported, failing on some tests
+
+❌: not supported
+
+🔜: planned
 
 
 ## Convert the model
