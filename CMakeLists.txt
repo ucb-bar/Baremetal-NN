@@ -22,6 +22,10 @@ option(STATIC_LINKING       "Link statically"                   TRUE    )
 option(X86                  "Build for x86"                     OFF     )
 option(RISCV                "Build for RISC-V"                  OFF     )
 
+# dtype options
+option(CONFIG_DTYPE_ENABLE_F16 "Enable F16 support"             ON      )
+option(CONFIG_DTYPE_ENABLE_I32 "Enable I32 support"             ON      )
+
 # accelerator options
 option(AVX                  "Use AVX implementation"            OFF     )
 option(CONFIG_BACKEND_RISCV_V              "Use RISCV vector extension"        OFF     )
@@ -131,7 +135,15 @@ if (GEMMINI)
 endif ()
 
 
-add_library(nn INTERFACE) 
+add_library(nn INTERFACE)
+
+if (CONFIG_DTYPE_ENABLE_F16)
+  target_compile_definitions(nn INTERFACE CONFIG_DTYPE_ENABLE_F16)
+endif()
+
+if (CONFIG_DTYPE_ENABLE_I32)
+  target_compile_definitions(nn INTERFACE CONFIG_DTYPE_ENABLE_I32)
+endif()
 
 target_include_directories(nn INTERFACE ./nn)
 
