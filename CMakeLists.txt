@@ -87,25 +87,6 @@ target_link_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_link_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
 
-set(cpu_impl 
-  ./src/print.c
-  ./src/cpu/creation.c
-  ./src/cpu/add.c
-  ./src/cpu/addmm.c
-  ./src/cpu/addscalar.c
-  ./src/cpu/dot.c
-  ./src/cpu/elu.c
-  ./src/cpu/equals.c
-  ./src/cpu/max.c
-  ./src/cpu/min.c
-  ./src/cpu/mm.c
-  ./src/cpu/mul.c
-  ./src/cpu/mulscalar.c
-  ./src/cpu/relu.c
-  ./src/cpu/softmax.c
-  ./src/cpu/tanh.c
-)
-
 
 if (AVX)
   message(STATUS "Using AVX implementation")
@@ -164,15 +145,10 @@ if (GEMMINI)
 endif ()
 
 
-add_library(nn
-  ${rvv_impl}
-  ${gemmini_impl}
-  ${cpu_impl}
-)
+add_library(nn INTERFACE) 
 
-target_include_directories(nn PUBLIC 
-  ./nn
-)
+target_include_directories(nn INTERFACE ./nn)
+
   # ./nn/functional
   # ./nn/ops)
 
@@ -186,7 +162,7 @@ elseif (RISCV)
 endif ()
 
 
-target_link_libraries(nn m)
+target_link_libraries(nn INTERFACE m)
 
 
 
