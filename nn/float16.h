@@ -20,8 +20,16 @@
   #include <immintrin.h>
 #endif
 
-
 #ifdef FLT16_MAX
+  #define NATIVE_FLOAT16_SUPPORT 1
+#else
+  #define NATIVE_FLOAT16_SUPPORT 0
+  #define FLT16_MAX 0x7bff
+  #define FLT16_MIN 0xfbff
+#endif
+
+
+#ifdef NATIVE_FLOAT16_SUPPORT
   typedef _Float16  float16_t;
 #else
   #warning "float16_t type is not supported, using manual implementations"
@@ -40,7 +48,7 @@
  * @return The single-precision floating-point number.
  */
 static inline float as_f32(float16_t h) {
-  #ifdef FLT16_MAX
+  #ifdef NATIVE_FLOAT16_SUPPORT
     return (float)h;
   #else
     // from https://github.com/AcademySoftwareFoundation/Imath/blob/main/src/Imath/half.h
@@ -106,7 +114,7 @@ static inline float as_f32(float16_t h) {
  * @return The half-precision floating-point number.
  */
 static inline float16_t as_f16(float f) {
-  #ifdef FLT16_MAX
+  #ifdef NATIVE_FLOAT16_SUPPORT
     return (_Float16)f;
   #else
     // from https://github.com/AcademySoftwareFoundation/Imath/blob/main/src/Imath/half.h

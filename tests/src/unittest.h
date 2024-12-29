@@ -11,12 +11,8 @@
   #include <x86intrin.h>
 #endif
 
-#ifdef RISCV_V
-  #include "riscv_vector.h"
-#endif
-
 static void enable_accelerator_features() {
-  #ifdef RISCV_V
+  #ifdef CONFIG_BACKEND_RISCV_V
     // enable vector operation
     unsigned long mstatus;
     asm volatile("csrr %0, mstatus" : "=r"(mstatus));

@@ -12,7 +12,6 @@ int main() {
 
   size_t cycles = 0;
 
-  
   {
     printf("nn_add1d_f16:           ");
     
