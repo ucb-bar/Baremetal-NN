@@ -145,7 +145,10 @@ if (CONFIG_DTYPE_ENABLE_I32)
   target_compile_definitions(nn INTERFACE CONFIG_DTYPE_ENABLE_I32)
 endif()
 
-target_include_directories(nn INTERFACE ./nn)
+target_include_directories(nn INTERFACE
+  ./nn
+  ./device
+  ./device/gemmini)
 
   # ./nn/functional
   # ./nn/ops)
