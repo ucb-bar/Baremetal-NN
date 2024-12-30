@@ -197,21 +197,27 @@ Baremetal-NN uses the NHWC memory layout and supports up to 4-dimension tensor.
 
 ### Code organization
 
-The torch-like functions that operates on Tensor datatypes are under `nn/functional`.
+The main header files are under `nn/`. The header files can be copied to your project and used as a library.
 
-The low-level implementations of kernels are under `nn/impl/<device>`.
+`device/` provides a set of header files to use on different devices.
 
-For the low-level functions, the following naming convention is used:
+`src/asm/` provides the assembly implementation for the RISC-V Vector backend for cases where the compiler does not support the fp16 intrinsics.
 
-`void nn_operator_datatype(size_t n, <datatype *output_ptr, size_t increment>, <datatype *input_ptr, size_t increment>);`
+### Function APIs
 
-`operator`: the name of the operator, such as `add`, `max`.
+The function APIs are in general of the form:
 
-`dataType`: the datatype of the operands, such as `i8`, `u16`, `f32`. If the datatype of the results and operands are different, it will be named `<operand 0>_<operand 1>_..._to_<result 0>_...`
+```c
+void nn_operator<num>d_<dtype>(Tensor<num>D_<DTYPE> *out, const Tensor<num>D_<DTYPE> *in1, const Tensor<num>D_<DTYPE> *in2, ...<, additional arguments>);
+```
 
-`output_ptr` / `input_ptr`: the pointer to the data buffer with the correct type. The correct pointer type saves the repetitive casting within the function source code.
+`num`: the number of dimensions of the input tensors. The tensors are statically dimensioned and support up to 4 dimensions.
 
-`increment`: the number of element to increment in order to access the next element in the buffer, **in number of elements**, not bytes. (e.g. for `f32` type, increment of 1 will access next element starting from the next 4th byte, and hence the next contiguous fp32 number.)
+`dtype`: the datatype of the operands, such as `i8`, `u16`, `f32`. 
+
+`out` / `in1` / `in2` / ...: the pointer to the tensor.
+
+`additional arguments`: additional arguments for the operator, such as scaling factors and the target dimension to operate on.
 
 
 # Stats
