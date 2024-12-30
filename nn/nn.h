@@ -102,6 +102,9 @@ void nn_print_f32(float v, int16_t num_digits) {
     printf("-");  // Print the minus sign for negative numbers
     v = -v;        // Make the number positive for processing
   }
+  else {
+    printf(" ");
+  }
 
   // Calculate the integer part of the number
   long int_part = (long)v;
