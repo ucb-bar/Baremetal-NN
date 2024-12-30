@@ -17,9 +17,9 @@ target_include_directories(tests PUBLIC inc)
 
 target_compile_features(tests INTERFACE c_std_11)
 
-if (X86)
-  target_link_libraries(tests PUBLIC target-x86)
-elseif (RISCV)
+if (CONFIG_TOOLCHAIN_NATIVE)
+  target_link_libraries(tests PUBLIC target-native)
+elseif (CONFIG_TOOLCHAIN_RISCV)
   target_link_libraries(tests PUBLIC target-riscv)
   set_target_properties(tests PROPERTIES SUFFIX ".elf")
 endif()

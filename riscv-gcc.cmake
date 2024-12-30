@@ -1,6 +1,7 @@
 
 # set the RISCV option to ON
-option(RISCV            "Build for RISC-V"                  ON)
+option(CONFIG_TOOLCHAIN_RISCV           "Build for RISC-V"                    ON      )
+option(CONFIG_TOOLCHAIN_NATIVE          "Build for native"                    OFF     )
 
 # CMake toolchain definition for RISC-V GCC toolchain
 set(CMAKE_SYSTEM_NAME       "Generic"   CACHE STRING "")

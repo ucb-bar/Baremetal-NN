@@ -67,7 +67,7 @@ spike --isa=rv64gcv_zicntr_zfh_zvfh ./build/tests/tests.elf
 
 Running with FP16 support with GCC<14.0
 
-For GCC<14.0, it does not support the fp16 intrinsics, so we need to use the assembly implementation.
+For GCC<14.0, it does not support the fp16 intrinsics, so we need to use the assembly implementation. (TO BE FIXED)
 
 ```bash
 cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug -D CMAKE_TOOLCHAIN_FILE=./riscv-gcc.cmake -D CONFIG_BACKEND_RISCV_V=ON -D RISCV_ZVFH=ON -D RISCV_V_ASM=ON
