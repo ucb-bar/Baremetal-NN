@@ -636,7 +636,7 @@ void nn_max1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) {
       n -= vl;
     }
     y->data = __riscv_vfmv_f_s_f32m1_f32(vec_max);
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     y->data = -FLT_MAX;
     for (size_t i = 0; i < n; i += 1) {
       float val = x->data[i];
@@ -660,7 +660,7 @@ void nn_max2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x) {
       n -= vl;
     }
     y->data = __riscv_vfmv_f_s_f32m1_f32(vec_max);
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     y->data = -FLT_MAX;
     for (size_t i = 0; i < n; i += 1) {
       float val = x->data[i];
@@ -684,7 +684,7 @@ void nn_min1d_f32(Tensor0D_F32 *y, const Tensor1D_F32 *x) {
       n -= vl;
     }
     y->data = __riscv_vfmv_f_s_f32m1_f32(vec_min);
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     y->data = FLT_MAX;
     for (size_t i = 0; i < n; i += 1) {
       float val = x->data[i];
@@ -708,7 +708,7 @@ void nn_min2d_f32(Tensor0D_F32 *y, const Tensor2D_F32 *x) {
       n -= vl;
     }
     y->data = __riscv_vfmv_f_s_f32m1_f32(vec_min);
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     y->data = FLT_MAX;
     for (size_t i = 0; i < n; i += 1) {
       float val = x->data[i];
@@ -752,7 +752,7 @@ void nn_add1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x1->data[i] + x2->data[i]; 
     }
@@ -791,7 +791,7 @@ void nn_add2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x1->data[i] + x2->data[i]; 
     }
@@ -815,7 +815,7 @@ void nn_addscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar) {
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x->data[i] + scalar; 
     }
@@ -839,7 +839,7 @@ void nn_addscalar2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float scalar) {
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x->data[i] + scalar; 
     }
@@ -872,7 +872,7 @@ void nn_mul1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x1->data[i] * x2->data[i]; 
     }
@@ -900,7 +900,7 @@ void nn_mul2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x1->data[i] * x2->data[i]; 
     }
@@ -924,7 +924,7 @@ void nn_mulscalar1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, float scalar) {
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x->data[i] * scalar; 
     }
@@ -948,7 +948,7 @@ void nn_mulscalar2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float scalar) {
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       y->data[i] = x->data[i] * scalar; 
     }
@@ -980,7 +980,7 @@ void nn_dot_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x2)
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     float sum = 0.0f;
     for (size_t i = 0; i < n; i += 1) {
       sum += x1->data[i] * x2->data[i];
@@ -989,6 +989,13 @@ void nn_dot_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x2)
   #endif
 }
 
+/**
+ * Performs a matrix multiplication of the matrices x1 and x2.
+ * 
+ * @param y The output tensor, shape (n, p)
+ * @param x1 The first input tensor, shape (n, m)
+ * @param x2 The second input tensor, shape (m, p)
+ */
 void nn_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) { 
   nn_assert(x1->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
   nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
@@ -999,40 +1006,37 @@ void nn_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) 
   
   for (size_t i = 0; i < n; i += 1) {
     #ifdef CONFIG_BACKEND_RISCV_V
-      float *x1_data = x1->data + i * m;
-      float *x2_data = x2->data;
-      float *y_data = y->data + i * p;
+      float *x1_row = x1->data + i * m;
+      float *y_row = y->data + i * p;
 
       size_t vlmax = __riscv_vsetvlmax_e32m1();
       for (size_t j = 0; j < p; j += 1) {
         vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
         vfloat32m1_t vec_sum = __riscv_vfmv_v_f_f32m1(0, vlmax);
         
-        size_t n = in_features;
+        float *x1_ptr = x1_row;
+        float *x2_ptr = x2->data + j;
+        size_t k = m;
         
-        while (n > 0) {
-          size_t vl = __riscv_vsetvl_e32m1(n);
-          vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x1_data, vl);
-          vfloat32m1_t vec_y = __riscv_vle32_v_f32m1(x2_data, vl);
-          vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x, vec_y, vl);
+        while (k > 0) {
+          size_t vl = __riscv_vsetvl_e32m1(k);
+          vfloat32m1_t vec_x1 = __riscv_vle32_v_f32m1(x1_ptr, vl);
+          vfloat32m1_t vec_x2 = __riscv_vlse32_v_f32m1(x2_ptr, p * sizeof(float), vl);
+          vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x1, vec_x2, vl);
           
-          x1_data += vl;
-          x2_data += vl;
-          n -= vl;
+          x1_ptr += vl;
+          x2_ptr += vl * p;
+          k -= vl;
         }
+        
         #ifdef CONFIG_DEBUG_RISCV_V_USE_REDOSUM
           vec_sum = __riscv_vfredosum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
         #else
           vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
         #endif
-        y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum);
-        
-        x1_data -= m;
+        y_row[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum);
       }
-      
-      x1_data += m;
-      y_data += p;
-    #else  // scalar implementation
+    #else
       for (size_t j = 0; j < p; j += 1) {
         float sum = 0.f;
         for (size_t k = 0; k < m; k += 1) {
@@ -1055,28 +1059,27 @@ void nn_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *c, const Tensor2D_F32 *x1
 
   for (size_t i = 0; i < n; i += 1) {
     #ifdef CONFIG_BACKEND_RISCV_V
-      float *weight_data = weight->data;
-      float *bias_data = bias->data;
-      float *x_data = x_batch_data;
-      float *y_data = y_batch_data;
+      float *x1_row = x1->data + i * m;
+      float *y_row = y->data + i * p;
 
       size_t vlmax = __riscv_vsetvlmax_e32m1();
-
-      for (size_t j = 0; j < out_features; j += 1) {
+      for (size_t j = 0; j < p; j += 1) {
         vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
         vfloat32m1_t vec_sum = __riscv_vfmv_v_f_f32m1(0, vlmax);
         
-        size_t n = in_features;
+        float *x1_ptr = x1_row;
+        float *x2_ptr = x2->data + j;
+        size_t k = m;
         
-        while (n > 0) {
-          size_t vl = __riscv_vsetvl_e32m1(n);
-          vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x_data, vl);
-          vfloat32m1_t vec_y = __riscv_vle32_v_f32m1(weight_data, vl);
-          vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x, vec_y, vl);
+        while (k > 0) {
+          size_t vl = __riscv_vsetvl_e32m1(k);
+          vfloat32m1_t vec_x1 = __riscv_vle32_v_f32m1(x1_ptr, vl);
+          vfloat32m1_t vec_x2 = __riscv_vlse32_v_f32m1(x2_ptr, p * sizeof(float), vl);
+          vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x1, vec_x2, vl);
           
-          x_data += vl;
-          weight_data += vl;
-          n -= vl;
+          x1_ptr += vl;
+          x2_ptr += vl * p;
+          k -= vl;
         }
         
         #ifdef CONFIG_DEBUG_RISCV_V_USE_REDOSUM
@@ -1084,13 +1087,12 @@ void nn_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *c, const Tensor2D_F32 *x1
         #else
           vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
         #endif
-        y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum) + bias_data[j];
-        x_data -= in_features;
+        y_row[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum) + c->data[i * p + j];
       }
       
-      x_batch_data += in_features;
-      y_batch_data += out_features;
-    #else  // scalar implementation
+      x1_row += m;
+      y_row += p;
+    #else
       for (size_t j = 0; j < p; j += 1) {
         float sum = 0.f;
         for (size_t k = 0; k < m; k += 1) {
@@ -1116,8 +1118,6 @@ void nn_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
 
   for (size_t i = 0; i < batch_size; i += 1) {
     #ifdef CONFIG_BACKEND_RISCV_V
-      float *weight_data = weight->data;
-      float *bias_data = bias->data;
       float *x_data = x_batch_data;
       float *y_data = y_batch_data;
 
@@ -1127,16 +1127,17 @@ void nn_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
         vfloat32m1_t vec_zero = __riscv_vfmv_v_f_f32m1(0, vlmax);
         vfloat32m1_t vec_sum = __riscv_vfmv_v_f_f32m1(0, vlmax);
         
+        float *weight_row = weight->data + j * in_features;
         size_t n = in_features;
         
         while (n > 0) {
           size_t vl = __riscv_vsetvl_e32m1(n);
           vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x_data, vl);
-          vfloat32m1_t vec_y = __riscv_vle32_v_f32m1(weight_data, vl);
-          vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x, vec_y, vl);
+          vfloat32m1_t vec_w = __riscv_vle32_v_f32m1(weight_row, vl);
+          vec_sum = __riscv_vfmacc_vv_f32m1(vec_sum, vec_x, vec_w, vl);
           
           x_data += vl;
-          weight_data += vl;
+          weight_row += vl;
           n -= vl;
         }
         
@@ -1145,18 +1146,18 @@ void nn_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
         #else
           vec_sum = __riscv_vfredusum_vs_f32m1_f32m1(vec_sum, vec_zero, vlmax);
         #endif
+        
+        float sum = __riscv_vfmv_f_s_f32m1_f32(vec_sum);
         if (bias) {
-          y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum) + bias_data[j];
+          sum += bias->data[j];
         }
-        else {
-          y_data[j] = __riscv_vfmv_f_s_f32m1_f32(vec_sum);
-        }
-        x_data -= in_features;
+        y_data[j] = sum;
+        x_data = x_batch_data; // reset x_data pointer for next output feature
       }
       
       x_batch_data += in_features;
       y_batch_data += out_features;
-    #else  // scalar implementation
+    #else  /* scalar implementation */
       for (size_t j = 0; j < out_features; j += 1) {
         float sum = 0.f;
         for (size_t k = 0; k < in_features; k += 1) {
@@ -1209,7 +1210,7 @@ void nn_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
       y_data += vl;
       n -= vl;
     }
-  #else  // scalar implementation
+  #else  /* scalar implementation */
     for (size_t i = 0; i < n; i += 1) {
       float x_val = x->data[i];
       y->data[i] = x_val > 0 ? x_val : 0;

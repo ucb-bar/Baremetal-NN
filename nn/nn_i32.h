@@ -455,29 +455,48 @@ void nn_dot_i32(Tensor1D_I32 *y, const Tensor1D_I32 *x1, const Tensor1D_I32 *x2)
 
 
 void nn_mm_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x1, const Tensor2D_I32 *x2) { 
-  nn_assert(x1->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
-  nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
+  nn_assert(x1->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
 
-  const size_t batch_size = x1->shape[0];
-  const size_t in_features = x1->shape[1];
-  const size_t out_features = x2->shape[0];
+  const size_t n = x1->shape[0];
+  const size_t m = x1->shape[1];
+  const size_t p = x2->shape[1];
 
-  for (size_t i = 0; i < batch_size; i += 1) {
-    for (size_t j = 0; j < out_features; j += 1) {
+  for (size_t i = 0; i < n; i += 1) {
+    for (size_t j = 0; j < p; j += 1) {
       int32_t sum = 0;
-      for (size_t k = 0; k < in_features; k += 1) {
-        sum += x1->data[i * in_features + k] * x2->data[j * in_features + k];
+      for (size_t k = 0; k < m; k += 1) {
+        sum += x1->data[i * m + k] * x2->data[k * p + j];
       }
-      y->data[i * out_features + j] = sum;
+      y->data[i * p + j] = sum;
+    }
+  }
+}
+
+void nn_addmm_i32(Tensor2D_I32 *y, const Tensor2D_I32 *c, const Tensor2D_I32 *x1, const Tensor2D_I32 *x2) { 
+  nn_assert(x1->shape[1] == x2->shape[0], "Cannot perform MatMul on tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0] && y->shape[1] == x2->shape[1], "Cannot perform MatMul on tensors of different shapes");
+
+  const size_t n = x1->shape[0];
+  const size_t m = x1->shape[1];
+  const size_t p = x2->shape[1];
+
+  for (size_t i = 0; i < n; i += 1) {
+    for (size_t j = 0; j < p; j += 1) {
+      int32_t sum = 0;
+      for (size_t k = 0; k < m; k += 1) {
+        sum += x1->data[i * m + k] * x2->data[k * p + j];
+      }
+      y->data[i * p + j] = sum + c->data[i * p + j];
     }
   }
 }
 
 
 
-void nn_addmm_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x, const Tensor2D_I32 *weight, const Tensor1D_I32 *bias) { 
+void nn_linear_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x, const Tensor2D_I32 *weight, const Tensor1D_I32 *bias) { 
   nn_assert(x->shape[1] == weight->shape[1], "Cannot perform Linear on tensors of different shapes");
-  nn_assert(bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(!bias || bias->shape[0] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
   nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == weight->shape[0], "Cannot perform Linear on tensors of different shapes");
 
   const size_t batch_size = x->shape[0];
@@ -490,7 +509,10 @@ void nn_addmm_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x, const Tensor2D_I32 *we
       for (size_t k = 0; k < in_features; k += 1) {
         sum += x->data[i * in_features + k] * weight->data[j * in_features + k];
       }
-      y->data[i * out_features + j] = sum + bias->data[j];
+      if (bias) {
+        sum += bias->data[j];
+      }
+      y->data[i * out_features + j] = sum;
     }
   }
 }

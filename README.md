@@ -150,6 +150,8 @@ CONFIG_DEBUG_RISCV_V_USE_REDOSUM: use REDOSUM for the reduction operation in RVV
 | addmatmul (addmm)       | I32       | ✅         | 🔜           |         |
 |                         | F16       | ✅         | ✅ (ZVFH)    |         |
 |                         | F32       | ✅         | ✅           |         |
+| linear                  | F16       | ✅         | ✅ (ZVFH)    |         |
+|                         | F32       | ✅         | ✅           |         |
 | elu                     | F16       | ✅         |              |         |
 |                         | F32       | ✅         |              |         |
 | relu                    | F16       | ✅         | ✅ (ZVFH)    |         |
@@ -157,6 +159,8 @@ CONFIG_DEBUG_RISCV_V_USE_REDOSUM: use REDOSUM for the reduction operation in RVV
 | tanh                    | F16       | ✅         |              |         |
 |                         | F32       | ✅         |              |         |
 | softmax                 | F16       |            |              |         |
+|                         | F32       | ✅         |              |         |
+| scaled_dot_product_attention | F16       |            |              |         |
 |                         | F32       | ⚠️         |              |         |
 
 ✅: supported
