@@ -178,7 +178,7 @@ Tensor4D_F32 *nn_tensor4d_f32(size_t shape[4], const float *data) {
  * @param shape The shape of the tensor.
  * @param data The pointer to the tensor data.
  */
-Tensor1D_F32 *nn_as_tensor1d_f32(size_t shape[1], const float *data) {
+Tensor1D_F32 *nn_as_tensor1d_f32(size_t shape[1], float *data) {
   Tensor1D_F32 *tensor = (Tensor1D_F32 *)malloc(sizeof(Tensor1D_F32));
   tensor->shape[0] = shape[0];
   tensor->data = data;
@@ -191,7 +191,7 @@ Tensor1D_F32 *nn_as_tensor1d_f32(size_t shape[1], const float *data) {
  * @param shape The shape of the tensor.
  * @param data The pointer to the tensor data.
  */
-Tensor2D_F32 *nn_as_tensor2d_f32(size_t shape[2], const float *data) {
+Tensor2D_F32 *nn_as_tensor2d_f32(size_t shape[2], float *data) {
   Tensor2D_F32 *tensor = (Tensor2D_F32 *)malloc(sizeof(Tensor2D_F32));
   tensor->shape[0] = shape[0];
   tensor->shape[1] = shape[1];
@@ -205,7 +205,7 @@ Tensor2D_F32 *nn_as_tensor2d_f32(size_t shape[2], const float *data) {
  * @param shape The shape of the tensor.
  * @param data The pointer to the tensor data.
  */
-Tensor3D_F32 *nn_as_tensor3d_f32(size_t shape[3], const float *data) {
+Tensor3D_F32 *nn_as_tensor3d_f32(size_t shape[3], float *data) {
   Tensor3D_F32 *tensor = (Tensor3D_F32 *)malloc(sizeof(Tensor3D_F32));
   tensor->shape[0] = shape[0];
   tensor->shape[1] = shape[1];
@@ -220,7 +220,7 @@ Tensor3D_F32 *nn_as_tensor3d_f32(size_t shape[3], const float *data) {
  * @param shape The shape of the tensor.
  * @param data The pointer to the tensor data.
  */
-Tensor4D_F32 *nn_as_tensor4d_f32(size_t shape[4], const float *data) {
+Tensor4D_F32 *nn_as_tensor4d_f32(size_t shape[4], float *data) {
   Tensor4D_F32 *tensor = (Tensor4D_F32 *)malloc(sizeof(Tensor4D_F32));
   tensor->shape[0] = shape[0];
   tensor->shape[1] = shape[1];
@@ -1336,14 +1336,21 @@ void nn_scaled_dot_product_attention_f32(Tensor4D_F32 *y, const Tensor4D_F32 *qu
   //         attn_bias += attn_mask
 
   // (n, hq, l, s) = (n, hq, l, e) @ (n, h, s, e).T
-  Tensor4D_F32 *attn_weight = nn_tensor4d_f32((size_t[]){n, h, l, s}, NULL);
+  size_t attn_weight_dims[4] = {n, h, l, s};
+  Tensor4D_F32 *attn_weight = nn_tensor4d_f32(attn_weight_dims, NULL);
   
+  size_t query_head_dims[2] = {l, e};
+  size_t key_head_dims[2] = {l, e};
+  size_t attn_weight_head_dims[2] = {l, s};
+  size_t value_head_dims[2] = {s, ev};
+  size_t y_head_dims[2] = {l, ev};
+
   for (size_t head = 0; head < h; head += 1) {
-    Tensor2D_F32 *query_head = nn_as_tensor2d_f32((size_t[]){l, e}, (float *)query->data + head * l * e);
-    Tensor2D_F32 *key_head = nn_as_tensor2d_f32((size_t[]){s, e}, (float *)key->data + head * s * e);
-    Tensor2D_F32 *attn_weight_head = nn_as_tensor2d_f32((size_t[]){l, s}, (float *)attn_weight->data + head * l * s);
-    Tensor2D_F32 *value_head = nn_as_tensor2d_f32((size_t[]){s, ev}, (float *)value->data + head * s * ev);
-    Tensor2D_F32 *y_head = nn_as_tensor2d_f32((size_t[]){l, ev}, (float *)y->data + head * l * ev);
+    Tensor2D_F32 *query_head = nn_as_tensor2d_f32(query_head_dims, (float *)query->data + head * l * e);
+    Tensor2D_F32 *key_head = nn_as_tensor2d_f32(key_head_dims, (float *)key->data + head * s * e);
+    Tensor2D_F32 *attn_weight_head = nn_as_tensor2d_f32(attn_weight_head_dims, (float *)attn_weight->data + head * l * s);
+    Tensor2D_F32 *value_head = nn_as_tensor2d_f32(value_head_dims, (float *)value->data + head * s * ev);
+    Tensor2D_F32 *y_head = nn_as_tensor2d_f32(y_head_dims, (float *)y->data + head * l * ev);
 
     // attn_weight = query @ key.transpose(-2, -1) * scale_factor
     nn_linear_f32(attn_weight_head, query_head, key_head, NULL);
