@@ -220,7 +220,7 @@ void model_forward(Model* model) {{
         
         # get the argument list
         args_list = [layer_name] + input_names  # output tensor is the same as layer name
-        args_list = [f"&model->{arg_name}" for arg_name in args_list]
+        args_list = [f"&model->{arg_name}" if arg_name is not None else "NULL" for arg_name in args_list]
         if parameters:
             args_list += [str(param) for param in parameters]
         arg_list_str = ", ".join(args_list)
@@ -257,10 +257,8 @@ void model_forward(Model* model) {{
         input_args = n.args
 
         for n in self.node_info[n.name][0]:
-            if n is None:
-                # if e.g. linear has no bias, then the bias argument is None
-                continue
-            input_names.append(n.name)
+            input_name = n.name if n is not None else None
+            input_names.append(input_name)
         
         # Math operations - Pointwise Ops
         if function == operator.__add__:
@@ -368,6 +366,8 @@ void model_forward(Model* model) {{
             input_names.append(f"{layer_name}_weight")
             if bias is not None:
                 input_names.append(f"{layer_name}_bias")
+            else:
+                input_names.append(None)
 
             self.add_uninitialized_tensor(layer_name, out)
             self.add_initialized_tensor(f"{layer_name}_weight", weight)
@@ -486,19 +486,17 @@ if __name__ == "__main__":
     class Net(nn.Module):
         def __init__(self):
             super(Net, self).__init__()
-            self.seq = nn.Sequential(
-                nn.Linear(48, 128, bias=False),
-                nn.ELU(),
-                nn.Linear(128, 5, bias=False),
-            )
-            self.lin2 = nn.Linear(5, 12, bias=False)
+            self.lin1 = nn.Linear(48, 256, bias=False)
+            self.lin2 = nn.Linear(256, 128, bias=False)
+            self.lin3 = nn.Linear(128, 5, bias=False)
 
         def forward(self, input):
-            x = self.seq.forward(input)
+            x = self.lin1.forward(input)
             x = F.relu(x)
-            output = self.lin2.forward(x)
+            x = self.lin2.forward(x)
             x = F.relu(x)
-            return output
+            x = self.lin3.forward(x)
+            return x
 
     m = Net()
     m.eval()
