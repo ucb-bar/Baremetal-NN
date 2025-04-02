@@ -37,7 +37,7 @@ option(CONFIG_BACKEND_GEMMINI           "Use Gemmini implementation"          OF
 option(CONFIG_DEBUG_USE_REDOSUM        "Use redosum instead of redusum" OFF)
 
 
-add_compile_options(-O1 -Wall -Wextra)
+add_compile_options(-O1 -Wall -Wextra -Wno-unused-variable)
 
 add_library(target-native INTERFACE)
 target_compile_features(target-native INTERFACE c_std_11)
