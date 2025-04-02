@@ -1050,8 +1050,8 @@ void nn_mm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) 
 
 
 void nn_addmm_f32(Tensor2D_F32 *y, const Tensor2D_F32 *c, const Tensor2D_F32 *x1, const Tensor2D_F32 *x2) { 
-  nn_assert(x1->shape[1] == x2->shape[0], "Cannot perform Linear on tensors of different shapes");
-  nn_assert(y->shape[0] == c->shape[0] && y->shape[1] == x2->shape[1], "Cannot perform Linear on tensors of different shapes");
+  nn_assert(x1->shape[1] == x2->shape[0], "Cannot perform MatMulAdd on tensors of different shapes");
+  nn_assert(y->shape[0] == c->shape[0] && y->shape[1] == x2->shape[1], "Cannot perform MatMulAdd on tensors of different shapes");
 
   const size_t n = x1->shape[0];
   const size_t m = x1->shape[1];

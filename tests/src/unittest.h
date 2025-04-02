@@ -24,7 +24,9 @@ static void enable_accelerator_features() {
 static size_t read_cycles() {
   #ifdef X86
     return __rdtsc();
-  #elif defined(RISCV)
+  #elif defined(CONFIG_BACKEND_RISCV_V)
     return READ_CSR("mcycle");
+  #else
+    return 0;
   #endif
 }

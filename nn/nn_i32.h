@@ -200,14 +200,14 @@ Tensor2D_I32 *nn_rand2d_i32(size_t shape[2]) {
 /*                                           Tensor Prints                                                  */
 /* ======================================================================================================== */
 /**
- * nn_print_f16
+ * nn_print_i32
  * 
- * Prints a float.
+ * Prints a int32_t.
  * 
- * @param v The float to print.
+ * @param v The int32_t to print.
  * @param num_digits The number of decimal digits to print.
  */
-void nn_print_i32(int32_t v, int16_t num_digits) {
+void nn_print_i32(int32_t v) {
   printf("%d", v);
 }
 
@@ -223,7 +223,7 @@ void nn_print_i32(int32_t v, int16_t num_digits) {
 void nn_print_tensor1d_i32(const Tensor1D_I32 *tensor) {
   printf("[");
   for (size_t i=0; i<tensor->shape[0]; i+=1) {
-    nn_print_i32(*((int32_t *)tensor->data + i), 3);
+    nn_print_i32(*((int32_t *)tensor->data + i));
     if (i < tensor->shape[0]-1) {
       printf(" ");
     }
@@ -246,7 +246,7 @@ void nn_print_tensor2d_i32(const Tensor2D_I32 *tensor) {
     }
     printf("[");
     for (size_t j=0; j<tensor->shape[1]; j+=1) {
-      nn_print_i32(*((int32_t *)tensor->data + i*tensor->shape[1] + j), 3);
+      nn_print_i32(*((int32_t *)tensor->data + i*tensor->shape[1] + j));
       if (j < tensor->shape[1]-1) {
         printf(" ");
       }
