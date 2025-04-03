@@ -174,19 +174,44 @@ CONFIG_DEBUG_RISCV_V_USE_REDOSUM: use REDOSUM for the reduction operation in RVV
 
 ## Convert the model
 
+First, we need to install the Baremetal-NN converter Python library.
+
 ```bash
-python ./scripts/convert.py
+pip install -e ./converter/
 ```
 
-the converter will dump out three files:
+In your Python program, import the core module of the converter, the `TracedModule`.
 
-`nn.h`: stores the library definition.
+```python
+from nn_converter import TracedModule
+```
 
-`operators.h`: stores the operator definitions.
+Assuming the PyTorch model is named `model`, we will wrap it with our TracedModule.
 
-`weights.h`: stores the weights and biases of the network.
+```python
+m = TracedModule(model)
+```
 
-`model.h`: stores the code representation of the model forward pass.
+Then, we need to perform at least one round of inference to let the tool trace the entire forward flow and record the dimension and shape of each layer.
+
+```python
+example_output = m.forward(example_input)
+```
+
+The output content is not used. It is a good idea to examine the output value to make sure that our model still functions correctly.
+
+Now, we can convert the model to C files.
+
+```python
+m.convert(
+  output_directory="./",
+  model_name="model"
+)
+```
+
+We should get a `model.h` and a `model.bin` files under the specified execution directory.
+
+More examples can be found in the `examples/` folder.
 
 
 ### Memory layout
