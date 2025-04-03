@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from torchconverter import TracedModule
+from nn_converter import TracedModule
 
 
 torch.manual_seed(0)

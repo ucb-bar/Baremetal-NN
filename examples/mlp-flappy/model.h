@@ -65,11 +65,11 @@ void model_init(Model* model) {
 }
 
 void model_forward(Model* model) {
-  nn_addmm_f32(&model->mlp_extractor_policy_net_0, &model->obs, &model->mlp_extractor_policy_net_0_weight, &model->mlp_extractor_policy_net_0_bias);
+  nn_linear_f32(&model->mlp_extractor_policy_net_0, &model->obs, &model->mlp_extractor_policy_net_0_weight, &model->mlp_extractor_policy_net_0_bias);
   nn_relu2d_f32(&model->mlp_extractor_policy_net_1, &model->mlp_extractor_policy_net_0);
-  nn_addmm_f32(&model->mlp_extractor_policy_net_2, &model->mlp_extractor_policy_net_1, &model->mlp_extractor_policy_net_2_weight, &model->mlp_extractor_policy_net_2_bias);
+  nn_linear_f32(&model->mlp_extractor_policy_net_2, &model->mlp_extractor_policy_net_1, &model->mlp_extractor_policy_net_2_weight, &model->mlp_extractor_policy_net_2_bias);
   nn_relu2d_f32(&model->mlp_extractor_policy_net_3, &model->mlp_extractor_policy_net_2);
-  nn_addmm_f32(&model->linear, &model->mlp_extractor_policy_net_3, &model->action_net_weight, &model->action_net_bias);
+  nn_linear_f32(&model->linear, &model->mlp_extractor_policy_net_3, &model->action_net_weight, &model->action_net_bias);
   memcpy(model->output.data, model->linear.data, 20);
 }
 
