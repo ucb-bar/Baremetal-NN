@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="baremetal-nn-converter",
+    name="baremetal-nn",
     version="2025.04.02",
     author="-T.K.-",
     author_email="t_k_233@outlook.com",

@@ -64,7 +64,7 @@ for epoch in range(2):  # loop over the dataset multiple times
 
 print("Finished Training")
 
-from nn_converter import TracedModule
+from baremetal_nn import TracedModule
 
 example_input, label = next(iter(testloader))
 
