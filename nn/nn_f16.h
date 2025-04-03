@@ -469,6 +469,14 @@ void nn_max1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x) {
   #endif
 }
 
+/**
+ * nn_max2d_f16
+ *
+ * @brief Finds the maximum value in a 2D tensor with type F16.
+ *
+ * @param y The result tensor.
+ * @param x The input tensor.
+ */
 void nn_max2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x) {
   size_t n = x->shape[0] * x->shape[1];
   float16_t *x_data = x->data;
