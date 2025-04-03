@@ -64,11 +64,14 @@ for epoch in range(2):  # loop over the dataset multiple times
 
 print("Finished Training")
 
-from barstools import TorchConverter
+from nn_converter import TracedModule
 
 example_input, label = next(iter(testloader))
-TorchConverter(model).convert(example_input, ".")
 
-torch.save(model, "model.pth")
+m = TracedModule(model)
+
+m.forward(example_input)
+
+m.convert(".")
 
 

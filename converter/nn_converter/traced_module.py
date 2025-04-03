@@ -1,14 +1,11 @@
 import operator
 import os
-import inspect
-from typing import Any, Dict, List, Tuple, Callable
+from typing import Any, Dict, List, Tuple
 
-import numpy as np
 import torch
 import torch.nn
 import torch.fx
 import jinja2
-import tabulate
 
 
 class TracedModule(torch.fx.Interpreter):
@@ -481,8 +478,10 @@ if __name__ == "__main__":
     import torch.nn as nn
     import torch.nn.functional as F
 
+    # set the seed for reproducibility
     torch.manual_seed(0)
     
+    # define a simple model
     class Net(nn.Module):
         def __init__(self):
             super(Net, self).__init__()
@@ -498,19 +497,35 @@ if __name__ == "__main__":
             x = self.lin3.forward(x)
             return x
 
+    # create the model
     m = Net()
+
+    # set the model to evaluation mode
     m.eval()
 
+    # create an example input
     example_input = torch.ones((48, )).unsqueeze(0)
     print("input:")
     print(example_input)
 
+    # trace the model
     m = TracedModule(m)
 
+    # print the model graph
     m.print_graph()
+
+    # forward the model to get the shape of each layer
+    # a.k.a. trace the model
     output = m.forward(example_input)
     print("output:")
     print(output)
 
-    m.convert()
+    # convert the model to a C model
+    # this function will create the model.h and model.bin files
+    # under the current execution directory
+    m.convert(
+        output_directory="./",
+        model_name="model"
+    )
+
     
