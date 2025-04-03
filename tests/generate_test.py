@@ -12,7 +12,9 @@ class TestGenerator:
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <riscv.h>
+#if CONFIG_TOOLCHAIN_RISCV
+  #include <riscv.h>
+#endif
 
 #include "nn.h"
 #include "unittest.h"

@@ -81,7 +81,7 @@ target_compile_options(target-riscv INTERFACE -march=${ARCH} -mabi=${ABI} -mcmod
 target_compile_options(target-riscv INTERFACE -Wl,-Map=output.map ${SPEC_FLAGS})
 target_compile_options(target-riscv INTERFACE -T ${LINKER_SCRIPT})
 
-
+target_compile_definitions(target-riscv INTERFACE CONFIG_TOOLCHAIN_RISCV=1)
 # target_compile_definitions(target-riscv INTERFACE FLT16_MAX=65504.0f)
 
 target_link_options(target-riscv INTERFACE -static)
