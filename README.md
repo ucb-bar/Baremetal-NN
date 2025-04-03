@@ -177,18 +177,20 @@ CONFIG_DEBUG_RISCV_V_USE_REDOSUM: use REDOSUM for the reduction operation in RVV
 First, we need to install the Baremetal-NN converter Python library.
 
 ```bash
-pip install -e ./converter/
+# Install from PyPI
+pip install baremetal-nn
+
+# Install locally
+pip install -e ./baremetal-nn/
 ```
 
-In your Python program, import the core module of the converter, the `TracedModule`.
+
+
+To export PyTorch model, we will use the `TracedModule` in this converter library. Assuming the PyTorch model is named `model`, we will wrap it with `TracedModule`.
 
 ```python
-from nn_converter import TracedModule
-```
+from baremetal_nn import TracedModule
 
-Assuming the PyTorch model is named `model`, we will wrap it with our TracedModule.
-
-```python
 m = TracedModule(model)
 ```
 
@@ -200,7 +202,7 @@ example_output = m.forward(example_input)
 
 The output content is not used. It is a good idea to examine the output value to make sure that our model still functions correctly.
 
-Now, we can convert the model to C files.
+Finally, we can convert the model to C files.
 
 ```python
 m.convert(
@@ -214,45 +216,22 @@ We should get a `model.h` and a `model.bin` files under the specified execution 
 More examples can be found in the `examples/` folder.
 
 
-### Memory layout
+
+## Memory layout
 
 Baremetal-NN uses the NHWC memory layout and supports up to 4-dimension tensor.
 
 **N**: batch, **H**: height, **W**: width, **C**: channels
 
-### Code organization
 
-The main header files are under `nn/`. The header files can be copied to your project and used as a library.
+## Stats
 
-`device/` provides a set of header files to use on different devices.
-
-`src/asm/` provides the assembly implementation for the RISC-V Vector backend for cases where the compiler does not support the fp16 intrinsics.
-
-### Function APIs
-
-The function APIs are in general of the form:
-
-```c
-void nn_operator<num>d_<dtype>(Tensor<num>D_<DTYPE> *out, const Tensor<num>D_<DTYPE> *in1, const Tensor<num>D_<DTYPE> *in2, ...<, additional arguments>);
-```
-
-`num`: the number of dimensions of the input tensors. The tensors are statically dimensioned and support up to 4 dimensions.
-
-`dtype`: the datatype of the operands, such as `i8`, `u16`, `f32`. 
-
-`out` / `in1` / `in2` / ...: the pointer to the tensor.
-
-`additional arguments`: additional arguments for the operator, such as scaling factors and the target dimension to operate on.
-
-
-# Stats
-
-## Star History
+### Star History
 
 ![](https://api.star-history.com/svg?repos=ucb-bar/Baremetal-NN&type=Date&theme=dark)
 
 
-# Acknowledgement
+## Acknowledgement
 
 If you find this code useful, we would appreciate if you would cite it with the following:
 
