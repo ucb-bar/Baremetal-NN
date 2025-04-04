@@ -2,11 +2,14 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+# import our converter module
 from baremetal_nn import TracedModule
 
 
+# set the seed for reproducibility
 torch.manual_seed(0)
 
+# example network
 class ValueNet(nn.Module):
     def __init__(self):
         super().__init__()
@@ -22,7 +25,8 @@ class ValueNet(nn.Module):
         return hidden
 
 
-
+# in the example application, the network is split into two parts:
+# the mlp_extractor and the action_net
 class MergedNet(nn.Module):
     def __init__(self):
         super().__init__()
@@ -35,21 +39,27 @@ class MergedNet(nn.Module):
         return acs
 
 
-
+# load the trained policy checkpoint
 state_dict = torch.load("policy.pt")
 
+# create the merged network
 m = MergedNet()
+# load the trained policy checkpoint
 m.load_state_dict(state_dict, strict=False)
 
+# set the network to evaluation mode
 m.eval()
 
+# trace the network
 m = TracedModule(m)
 
+# test the network
 test_input = torch.ones((83, )).unsqueeze(0)
-
 with torch.no_grad():
     output = m.forward(test_input)
-    print("output", output)
+    print("output:", output)
 
+# convert the network to our baremetal c runtime
 m.convert()
-print(output)
+
+print("Done.")
