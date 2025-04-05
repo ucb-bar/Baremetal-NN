@@ -80,13 +80,13 @@ void model_init(Model* model) {
 }
 
 void model_forward(Model* model) {
-  nn_addmm_f32(&model->actor_0, &model->input_1, &model->actor_0_weight, &model->actor_0_bias);
+  nn_linear_f32(&model->actor_0, &model->input_1, &model->actor_0_weight, &model->actor_0_bias);
   nn_elu2d_f32(&model->actor_1, &model->actor_0, 1.0);
-  nn_addmm_f32(&model->actor_2, &model->actor_1, &model->actor_2_weight, &model->actor_2_bias);
+  nn_linear_f32(&model->actor_2, &model->actor_1, &model->actor_2_weight, &model->actor_2_bias);
   nn_elu2d_f32(&model->actor_3, &model->actor_2, 1.0);
-  nn_addmm_f32(&model->actor_4, &model->actor_3, &model->actor_4_weight, &model->actor_4_bias);
+  nn_linear_f32(&model->actor_4, &model->actor_3, &model->actor_4_weight, &model->actor_4_bias);
   nn_elu2d_f32(&model->actor_5, &model->actor_4, 1.0);
-  nn_addmm_f32(&model->actor_6, &model->actor_5, &model->actor_6_weight, &model->actor_6_bias);
+  nn_linear_f32(&model->actor_6, &model->actor_5, &model->actor_6_weight, &model->actor_6_bias);
   memcpy(model->output.data, model->actor_6.data, 48);
 }
 
