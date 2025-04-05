@@ -1439,106 +1439,6 @@ void nn_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
 
 
 /* ======================================================================================================== */
-/*                                           Attention                                                      */
-/* ======================================================================================================== */
-
-/**
- * nn_scaled_dot_product_attention_f32
- *
- * @brief Computes scaled dot product attention on query, key and value tensors.
- *
- * Computes: y = softmax((query @ key.transpose(-2, -1)) / sqrt(E)) @ value
- *
- * Shape legend:
- * - N: batch size
- * - H: number of attention heads
- * - L: target sequence length (query length)
- * - S: source sequence length (key/value length)
- * - E: embedding dimension of the query and key
- * - Ev: embedding dimension of the value
- *
- * @param y The output tensor, of shape (N, H, L, Ev).
- * @param query The query tensor, of shape (N, H, L, E).
- * @param key The key tensor, of shape (N, H, S, E).
- * @param value The value tensor, of shape (N, H, S, Ev).
- */
-void nn_scaled_dot_product_attention_f32(Tensor4D_F32 *y, const Tensor4D_F32 *query, const Tensor4D_F32 *key, const Tensor4D_F32 *value) {
-  nn_assert(query->shape[0] == key->shape[0] && query->shape[0] == value->shape[0], "Query, key, and value must have the same batch size");
-  nn_assert(query->shape[1] == key->shape[1] && query->shape[1] == value->shape[1], "Query, key, and value must have the same number of heads");
-  nn_assert(key->shape[2] == value->shape[2], "Key and value must have the same sequence length");
-  nn_assert(query->shape[3] == key->shape[3], "Query and key must have the same embedding dimension");
-
-  size_t n = query->shape[0]; // batch size
-  size_t h = query->shape[1]; // head count
-  size_t l = query->shape[2]; // target sequence length (query)
-  size_t s = key->shape[2];   // source sequence length (key/value)
-  size_t e = query->shape[3]; // embedding dimension
-  size_t ev = value->shape[3]; // value embedding dimension
-
-  // scale_factor = 1 / math.sqrt(query.size(-1))
-  float scale_factor = 1.0f / sqrt(e);
-
-  // Process each batch
-  for (size_t batch = 0; batch < n; batch += 1) {
-    // Process each head
-    for (size_t head = 0; head < h; head += 1) {
-      // Set up tensor views for the current batch and head
-      size_t query_head_dims[2] = {l, e};
-      size_t key_head_dims[2] = {s, e};  // Corrected: should be s, not l
-      size_t key_transposed_dims[2] = {e, s};  // Transposed key dimensions
-      size_t attn_weight_head_dims[2] = {l, s};
-      size_t value_head_dims[2] = {s, ev};
-      size_t y_head_dims[2] = {l, ev};
-
-      // Get the data pointers for the current batch and head
-      float *query_data = (float *)query->data + (batch * h * l * e) + (head * l * e);
-      float *key_data = (float *)key->data + (batch * h * s * e) + (head * s * e);
-      float *value_data = (float *)value->data + (batch * h * s * ev) + (head * s * ev);
-      float *y_data = (float *)y->data + (batch * h * l * ev) + (head * l * ev);
-
-      // Create tensor views
-      Tensor2D_F32 *query_head = nn_as_tensor2d_f32(query_head_dims, query_data);
-      Tensor2D_F32 *key_head = nn_as_tensor2d_f32(key_head_dims, key_data);
-      Tensor2D_F32 *value_head = nn_as_tensor2d_f32(value_head_dims, value_data);
-      Tensor2D_F32 *y_head = nn_as_tensor2d_f32(y_head_dims, y_data);
-
-      // Create and transpose the key matrix manually (key.transpose(-2, -1))
-      Tensor2D_F32 *key_transposed = nn_tensor2d_f32(key_transposed_dims, NULL);
-      for (size_t i = 0; i < s; i += 1) {
-        for (size_t j = 0; j < e; j += 1) {
-          key_transposed->data[j * s + i] = key_head->data[i * e + j];
-        }
-      }
-
-      // Calculate attention weights: attn_weight = query @ key.transpose(-2, -1)
-      Tensor2D_F32 *attn_weight_head = nn_tensor2d_f32(attn_weight_head_dims, NULL);
-      nn_mm_f32(attn_weight_head, query_head, key_transposed);
-
-      // Apply scaling: attn_weight = attn_weight * scale_factor
-      nn_mulscalar2d_f32(attn_weight_head, attn_weight_head, scale_factor);
-
-      // attn_weight = torch.softmax(attn_weight, dim=-1)
-      nn_softmax2d_f32(attn_weight_head, attn_weight_head, 1);
-
-      // (n, h, l, ev) = (n, h, l, s) @ (n, h, s, ev)
-      // output = attn_weight @ value
-      nn_mm_f32(y_head, attn_weight_head, value_head);
-
-      // Free the temporary tensors we created
-      free(query_head);
-      free(key_head);
-      free(key_transposed->data);
-      free(key_transposed);
-      free(attn_weight_head->data);
-      free(attn_weight_head);
-      free(value_head);
-      free(y_head);
-    }
-  }
-}
-
-
-/* ======================================================================================================== */
 /*                                           Non-linear                                                     */
 /* ======================================================================================================== */
 
@@ -1744,5 +1644,106 @@ void nn_rms_norm1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, const Tensor1D_F3
   nn_mulscalar1d_f32(y, x, 1.0f / sqrtf(ss));
   nn_mul1d_f32(y, y, weight);
 }
+
+
+/* ======================================================================================================== */
+/*                                           Attention                                                      */
+/* ======================================================================================================== */
+
+/**
+ * nn_scaled_dot_product_attention_f32
+ *
+ * @brief Computes scaled dot product attention on query, key and value tensors.
+ *
+ * Computes: y = softmax((query @ key.transpose(-2, -1)) / sqrt(E)) @ value
+ *
+ * Shape legend:
+ * - N: batch size
+ * - H: number of attention heads
+ * - L: target sequence length (query length)
+ * - S: source sequence length (key/value length)
+ * - E: embedding dimension of the query and key
+ * - Ev: embedding dimension of the value
+ *
+ * @param y The output tensor, of shape (N, H, L, Ev).
+ * @param query The query tensor, of shape (N, H, L, E).
+ * @param key The key tensor, of shape (N, H, S, E).
+ * @param value The value tensor, of shape (N, H, S, Ev).
+ */
+void nn_scaled_dot_product_attention_f32(Tensor4D_F32 *y, const Tensor4D_F32 *query, const Tensor4D_F32 *key, const Tensor4D_F32 *value) {
+  nn_assert(query->shape[0] == key->shape[0] && query->shape[0] == value->shape[0], "Query, key, and value must have the same batch size");
+  nn_assert(query->shape[1] == key->shape[1] && query->shape[1] == value->shape[1], "Query, key, and value must have the same number of heads");
+  nn_assert(key->shape[2] == value->shape[2], "Key and value must have the same sequence length");
+  nn_assert(query->shape[3] == key->shape[3], "Query and key must have the same embedding dimension");
+
+  size_t n = query->shape[0]; // batch size
+  size_t h = query->shape[1]; // head count
+  size_t l = query->shape[2]; // target sequence length (query)
+  size_t s = key->shape[2];   // source sequence length (key/value)
+  size_t e = query->shape[3]; // embedding dimension
+  size_t ev = value->shape[3]; // value embedding dimension
+
+  // scale_factor = 1 / math.sqrt(query.size(-1))
+  float scale_factor = 1.0f / sqrt(e);
+
+  // Process each batch
+  for (size_t batch = 0; batch < n; batch += 1) {
+    // Process each head
+    for (size_t head = 0; head < h; head += 1) {
+      // Set up tensor views for the current batch and head
+      size_t query_head_dims[2] = {l, e};
+      size_t key_head_dims[2] = {s, e};  // Corrected: should be s, not l
+      size_t key_transposed_dims[2] = {e, s};  // Transposed key dimensions
+      size_t attn_weight_head_dims[2] = {l, s};
+      size_t value_head_dims[2] = {s, ev};
+      size_t y_head_dims[2] = {l, ev};
+
+      // Get the data pointers for the current batch and head
+      float *query_data = (float *)query->data + (batch * h * l * e) + (head * l * e);
+      float *key_data = (float *)key->data + (batch * h * s * e) + (head * s * e);
+      float *value_data = (float *)value->data + (batch * h * s * ev) + (head * s * ev);
+      float *y_data = (float *)y->data + (batch * h * l * ev) + (head * l * ev);
+
+      // Create tensor views
+      Tensor2D_F32 *query_head = nn_as_tensor2d_f32(query_head_dims, query_data);
+      Tensor2D_F32 *key_head = nn_as_tensor2d_f32(key_head_dims, key_data);
+      Tensor2D_F32 *value_head = nn_as_tensor2d_f32(value_head_dims, value_data);
+      Tensor2D_F32 *y_head = nn_as_tensor2d_f32(y_head_dims, y_data);
+
+      // Create and transpose the key matrix manually (key.transpose(-2, -1))
+      Tensor2D_F32 *key_transposed = nn_tensor2d_f32(key_transposed_dims, NULL);
+      for (size_t i = 0; i < s; i += 1) {
+        for (size_t j = 0; j < e; j += 1) {
+          key_transposed->data[j * s + i] = key_head->data[i * e + j];
+        }
+      }
+
+      // Calculate attention weights: attn_weight = query @ key.transpose(-2, -1)
+      Tensor2D_F32 *attn_weight_head = nn_tensor2d_f32(attn_weight_head_dims, NULL);
+      nn_mm_f32(attn_weight_head, query_head, key_transposed);
+
+      // Apply scaling: attn_weight = attn_weight * scale_factor
+      nn_mulscalar2d_f32(attn_weight_head, attn_weight_head, scale_factor);
+
+      // attn_weight = torch.softmax(attn_weight, dim=-1)
+      nn_softmax2d_f32(attn_weight_head, attn_weight_head, 1);
+
+      // (n, h, l, ev) = (n, h, l, s) @ (n, h, s, ev)
+      // output = attn_weight @ value
+      nn_mm_f32(y_head, attn_weight_head, value_head);
+
+      // Free the temporary tensors we created
+      free(query_head);
+      free(key_head);
+      free(key_transposed->data);
+      free(key_transposed);
+      free(attn_weight_head->data);
+      free(attn_weight_head);
+      free(value_head);
+      free(y_head);
+    }
+  }
+}
+
 
 #endif // __NN_F32_H
