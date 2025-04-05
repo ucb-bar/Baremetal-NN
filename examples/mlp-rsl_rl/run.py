@@ -11,16 +11,16 @@ torch.manual_seed(0)
 
 
 # load the trained policy checkpoint
-m = torch.load("model_4000.pt")
+model = torch.load("./policy.pt", weights_only=False, map_location=torch.device('cpu'))
 
 # set the network to evaluation mode
-m.eval()
+model.eval()
 
 # trace the network
-m = TracedModule(m)
+m = TracedModule(model)
 
 # test the network
-test_input = torch.ones((83, )).unsqueeze(0)
+test_input = torch.zeros((81, )).unsqueeze(0)
 with torch.no_grad():
     output = m.forward(test_input)
     print("output:", output)

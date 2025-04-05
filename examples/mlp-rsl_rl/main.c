@@ -10,16 +10,14 @@
 #include <string.h>
 #include <time.h>
 
-#include "rv.h"
+// #include "riscv.h"
 #include "nn.h"
 #include "model.h"
 
 #include "udp.h"
 
-
-
-#define N_OBSERVATIONS    123
-#define N_ACTIONS         37
+#define N_OBSERVATIONS    81
+#define N_ACTIONS         23
 
 #define ENV_IP            "172.28.0.2"
 #define ENV_PORT          8010
@@ -32,13 +30,13 @@ int main() {
   Model *model = malloc(sizeof(Model));
 
   // get the input and output layer tensor data pointer
-  float obs[N_OBSERVATIONS];
-  float acs[N_ACTIONS];
+  float obs[N_OBSERVATIONS] = {0.f};
+  float acs[N_ACTIONS] = {0.f};
 
   size_t counter = 0;
   
   printf("Initalizing model...\n");
-  init(model);
+  model_init(model);
 
 
   printf("Initalizing UDP communication...\n");
@@ -60,21 +58,21 @@ int main() {
 
   while (1) {
     /* receive */
-    receive_obs(&comm, obs);
+    // receive_obs(&comm, obs);
     
 
     /* forward */
     clock_gettime(CLOCK_REALTIME, &inference_start_time);
 
     memcpy(model->input_1.data, obs, N_OBSERVATIONS * sizeof(float));
-    forward(model);
+    model_forward(model);
     memcpy(acs, model->_6.data, N_ACTIONS * sizeof(float));
     
     clock_gettime(CLOCK_REALTIME, &inference_end_time);
     
 
     /* transmit */
-    send_acs(&comm, acs);
+    // send_acs(&comm, acs);
     
 
     /* log */

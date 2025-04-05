@@ -1,10 +1,7 @@
 #ifndef __MODEL_H
 #define __MODEL_H
 
-#include <stdint.h>
-#include <stddef.h>
 #include "nn.h"
-
 
 // load the weight data block from the model.bin file
 INCLUDE_FILE(".rodata", "./model.bin", model_weight);
@@ -13,90 +10,84 @@ extern size_t model_weight_start[];
 extern size_t model_weight_end[];
 
 typedef struct {
-  Tensor input_1;
-  Tensor _0_weight;
-  Tensor _0_bias;
-  Tensor _0;
-  Tensor _1;
-  Tensor _2_weight;
-  Tensor _2_bias;
-  Tensor _2;
-  Tensor _3;
-  Tensor _4_weight;
-  Tensor _4_bias;
-  Tensor _4;
-  Tensor _5;
-  Tensor _6_weight;
-  Tensor _6_bias;
-  Tensor _6;
-
+  Tensor2D_F32 input_1;
+  Tensor2D_F32 _0;
+  Tensor2D_F32 _0_weight;
+  Tensor1D_F32 _0_bias;
+  Tensor2D_F32 _1;
+  Tensor2D_F32 _2;
+  Tensor2D_F32 _2_weight;
+  Tensor1D_F32 _2_bias;
+  Tensor2D_F32 _3;
+  Tensor2D_F32 _4;
+  Tensor2D_F32 _4_weight;
+  Tensor1D_F32 _4_bias;
+  Tensor2D_F32 _5;
+  Tensor2D_F32 _6;
+  Tensor2D_F32 _6_weight;
+  Tensor1D_F32 _6_bias;
+  Tensor2D_F32 output;
 } Model;
 
-
-void init(Model *model);
-
-void forward(Model *model);
-
-/**
- * Initialize the required tensors for the model
- */
-void init(Model *model) {
-  float *weight_ptr = (float *)model_weight_data;
-
-  nn_init_tensor(&model->input_1, 2, (size_t[]){ 1, 123 }, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: _0
-  nn_init_tensor(&model->_0_weight, 2, (size_t[]){ 256, 123 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 31488;
-  nn_init_tensor(&model->_0_bias, 1, (size_t[]){ 256 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 256;
-  nn_init_tensor(&model->_0, 2, (size_t[]){ 1, 256 }, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.activation.ELU'>: _1
-  nn_init_tensor(&model->_1, 2, (size_t[]){ 1, 256 }, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: _2
-  nn_init_tensor(&model->_2_weight, 2, (size_t[]){ 128, 256 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 32768;
-  nn_init_tensor(&model->_2_bias, 1, (size_t[]){ 128 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 128;
-  nn_init_tensor(&model->_2, 2, (size_t[]){ 1, 128 }, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.activation.ELU'>: _3
-  nn_init_tensor(&model->_3, 2, (size_t[]){ 1, 128 }, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: _4
-  nn_init_tensor(&model->_4_weight, 2, (size_t[]){ 128, 128 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 16384;
-  nn_init_tensor(&model->_4_bias, 1, (size_t[]){ 128 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 128;
-  nn_init_tensor(&model->_4, 2, (size_t[]){ 1, 128 }, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.activation.ELU'>: _5
-  nn_init_tensor(&model->_5, 2, (size_t[]){ 1, 128 }, DTYPE_F32, NULL);
-
-  // <class 'torch.nn.modules.linear.Linear'>: _6
-  nn_init_tensor(&model->_6_weight, 2, (size_t[]){ 37, 128 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 4736;
-  nn_init_tensor(&model->_6_bias, 1, (size_t[]){ 37 }, DTYPE_F32, weight_ptr);
-  weight_ptr += 37;
-  nn_init_tensor(&model->_6, 2, (size_t[]){ 1, 37 }, DTYPE_F32, NULL);
-
+void model_init(Model* model) {
+  model->input_1.shape[0] = 1;
+  model->input_1.shape[1] = 81;
+  model->input_1.data = (float *)malloc(324);
+  model->_0.shape[0] = 1;
+  model->_0.shape[1] = 256;
+  model->_0.data = (float *)malloc(1024);
+  model->_0_weight.shape[0] = 256;
+  model->_0_weight.shape[1] = 81;
+  model->_0_weight.data = (float *)(model_weight_data + 0);
+  model->_0_bias.shape[0] = 256;
+  model->_0_bias.data = (float *)(model_weight_data + 82944);
+  model->_1.shape[0] = 1;
+  model->_1.shape[1] = 256;
+  model->_1.data = (float *)malloc(1024);
+  model->_2.shape[0] = 1;
+  model->_2.shape[1] = 128;
+  model->_2.data = (float *)malloc(512);
+  model->_2_weight.shape[0] = 128;
+  model->_2_weight.shape[1] = 256;
+  model->_2_weight.data = (float *)(model_weight_data + 83968);
+  model->_2_bias.shape[0] = 128;
+  model->_2_bias.data = (float *)(model_weight_data + 215040);
+  model->_3.shape[0] = 1;
+  model->_3.shape[1] = 128;
+  model->_3.data = (float *)malloc(512);
+  model->_4.shape[0] = 1;
+  model->_4.shape[1] = 128;
+  model->_4.data = (float *)malloc(512);
+  model->_4_weight.shape[0] = 128;
+  model->_4_weight.shape[1] = 128;
+  model->_4_weight.data = (float *)(model_weight_data + 215552);
+  model->_4_bias.shape[0] = 128;
+  model->_4_bias.data = (float *)(model_weight_data + 281088);
+  model->_5.shape[0] = 1;
+  model->_5.shape[1] = 128;
+  model->_5.data = (float *)malloc(512);
+  model->_6.shape[0] = 1;
+  model->_6.shape[1] = 23;
+  model->_6.data = (float *)malloc(92);
+  model->_6_weight.shape[0] = 23;
+  model->_6_weight.shape[1] = 128;
+  model->_6_weight.data = (float *)(model_weight_data + 281600);
+  model->_6_bias.shape[0] = 23;
+  model->_6_bias.data = (float *)(model_weight_data + 293376);
+  model->output.shape[0] = 1;
+  model->output.shape[1] = 23;
+  model->output.data = (float *)malloc(92);
 }
 
-
-/**
- * Forward pass of the model
- */
-void forward(Model *model) {
-  nn_linear(&model->_0, &model->input_1, &model->_0_weight, &model->_0_bias);
-  nn_elu(&model->_1, &model->_0, 1.0);
-  nn_linear(&model->_2, &model->_1, &model->_2_weight, &model->_2_bias);
-  nn_elu(&model->_3, &model->_2, 1.0);
-  nn_linear(&model->_4, &model->_3, &model->_4_weight, &model->_4_bias);
-  nn_elu(&model->_5, &model->_4, 1.0);
-  nn_linear(&model->_6, &model->_5, &model->_6_weight, &model->_6_bias);
-
+void model_forward(Model* model) {
+  nn_linear_f32(&model->_0, &model->input_1, &model->_0_weight, &model->_0_bias);
+  nn_elu2d_f32(&model->_1, &model->_0, 1.0);
+  nn_linear_f32(&model->_2, &model->_1, &model->_2_weight, &model->_2_bias);
+  nn_elu2d_f32(&model->_3, &model->_2, 1.0);
+  nn_linear_f32(&model->_4, &model->_3, &model->_4_weight, &model->_4_bias);
+  nn_elu2d_f32(&model->_5, &model->_4, 1.0);
+  nn_linear_f32(&model->_6, &model->_5, &model->_6_weight, &model->_6_bias);
+  memcpy(model->output.data, model->_6.data, 92);
 }
 
-#endif
+#endif  // __MODEL_H
