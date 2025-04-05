@@ -463,7 +463,7 @@ void nn_max1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x) {
   #else  // scalar implementation
     y->data = -FLT16_MAX;
     for (size_t i = 0; i < n; i += 1) {
-      float val = as_f32(x->data[i]);
+      float val = as_f32(x_data[i]);
       y->data = val > y->data ? val : y->data;
     }
   #endif
@@ -495,7 +495,7 @@ void nn_max2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x) {
   #else  // scalar implementation
     y->data = -FLT16_MAX;
     for (size_t i = 0; i < n; i += 1) {
-      float val = as_f32(x->data[i]);
+      float val = as_f32(x_data[i]);
       y->data = val > y->data ? val : y->data;
     }
   #endif
@@ -528,7 +528,7 @@ void nn_min1d_f16(Tensor0D_F16 *y, const Tensor1D_F16 *x) {
   #else  // scalar implementation
     y->data = FLT16_MAX;
     for (size_t i = 0; i < n; i += 1) {
-      float val = as_f32(x->data[i]);
+      float val = as_f32(x_data[i]);
       y->data = val < y->data ? val : y->data;
     }
   #endif
@@ -561,7 +561,7 @@ void nn_min2d_f16(Tensor0D_F16 *y, const Tensor2D_F16 *x) {
   #else  // scalar implementation
     y->data = FLT16_MAX;
     for (size_t i = 0; i < n; i += 1) {
-      float val = as_f32(x->data[i]);
+      float val = as_f32(x_data[i]);
       y->data = val < y->data ? val : y->data;
     }
   #endif
@@ -605,11 +605,10 @@ void nn_add1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1, const Tensor1D_F16 *x
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x1->data[i]) + as_f32(x2->data[i]));
+      y_data[i] = as_f16(as_f32(x1_data[i]) + as_f32(x2_data[i]));
     }
   #endif
 }
-
 
 
 /**
@@ -646,7 +645,7 @@ void nn_add2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x1->data[i]) + as_f32(x2->data[i]));
+      y_data[i] = as_f16(as_f32(x1_data[i]) + as_f32(x2_data[i]));
     }
   #endif
 }
@@ -679,7 +678,7 @@ void nn_addscalar1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x, float16_t scalar
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x->data[i]) + as_f32(scalar));
+      y_data[i] = as_f16(as_f32(x_data[i]) + as_f32(scalar));
     }
   #endif
 }
@@ -712,7 +711,7 @@ void nn_addscalar2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float16_t scalar
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x->data[i]) + as_f32(scalar));
+      y_data[i] = as_f16(as_f32(x_data[i]) + as_f32(scalar));
     }
   #endif
 }
@@ -756,7 +755,7 @@ void nn_mul1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1, const Tensor1D_F16 *x
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x1->data[i]) * as_f32(x2->data[i]));
+      y_data[i] = as_f16(as_f32(x1_data[i]) * as_f32(x2_data[i]));
     }
   #endif
 }
@@ -793,7 +792,7 @@ void nn_mul2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x1->data[i]) * as_f32(x2->data[i]));
+      y_data[i] = as_f16(as_f32(x1_data[i]) * as_f32(x2_data[i]));
     }
   #endif
 }
@@ -826,7 +825,7 @@ void nn_mulscalar1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x, float16_t scalar
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x->data[i]) * as_f32(scalar));
+      y_data[i] = as_f16(as_f32(x_data[i]) * as_f32(scalar));
     }
   #endif
 }
@@ -859,7 +858,7 @@ void nn_mulscalar2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float16_t scalar
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = as_f16(as_f32(x->data[i]) * as_f32(scalar));
+      y_data[i] = as_f16(as_f32(x_data[i]) * as_f32(scalar));
     }
   #endif
 }
@@ -883,11 +882,15 @@ void nn_dot_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x1, const Tensor1D_F16 *x2)
   nn_assert(y->shape[0] == x1->shape[0], "Cannot dot tensors of different shapes");
 
   size_t n = y->shape[0];
+  float16_t *x1_data = x1->data;
+  float16_t *x2_data = x2->data;
+  float16_t *y_data = y->data;
+
   float sum_f32 = 0;
   for (size_t i = 0; i < n; i += 1) {
-    sum_f32 += as_f32(x1->data[i]) * as_f32(x2->data[i]);
+    sum_f32 += as_f32(x1_data[i]) * as_f32(x2_data[i]);
   }
-  y->data[0] = as_f16(sum_f32);
+  y_data[0] = as_f16(sum_f32);
 }
 
 /**
@@ -908,27 +911,27 @@ void nn_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) 
   const size_t p = x2->shape[1];
 
   for (size_t i = 0; i < n; i += 1) {
+    float16_t *x1_row = x1->data + i * m;
+    float16_t *y_row = y->data + i * p;
+
     #ifdef CONFIG_BACKEND_RISCV_ZVFH
-      float16_t *x1_row = x1->data + i * m;
-      float16_t *y_row = y->data + i * p;
 
       size_t vlmax = __riscv_vsetvlmax_e16m1();
       for (size_t j = 0; j < p; j += 1) {
         vfloat16m1_t vec_zero = __riscv_vfmv_v_f_f16m1(0, vlmax);
         vfloat16m1_t vec_sum = __riscv_vfmv_v_f_f16m1(0, vlmax);
 
-        float16_t *x1_ptr = x1_row;
-        float16_t *x2_ptr = x2->data + j;
+        float16_t *x2_col = x2->data + j;
         size_t k = m;
 
         while (k > 0) {
           size_t vl = __riscv_vsetvl_e16m1(k);
-          vfloat16m1_t vec_x1 = __riscv_vle16_v_f16m1(x1_ptr, vl);
-          vfloat16m1_t vec_x2 = __riscv_vlse16_v_f16m1(x2_ptr, p * sizeof(float16_t), vl);
+          vfloat16m1_t vec_x1 = __riscv_vle16_v_f16m1(x1_row, vl);
+          vfloat16m1_t vec_x2 = __riscv_vlse16_v_f16m1(x2_col, p * sizeof(float16_t), vl);
           vec_sum = __riscv_vfmacc_vv_f16m1(vec_sum, vec_x1, vec_x2, vl);
 
-          x1_ptr += vl;
-          x2_ptr += vl * p;
+          x1_row += vl;
+          x2_col += vl * p;
           k -= vl;
         }
 
@@ -941,11 +944,13 @@ void nn_mm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x1, const Tensor2D_F16 *x2) 
       }
     #else
       for (size_t j = 0; j < p; j += 1) {
+        float16_t *x2_col = x2->data + j;
+
         float sum = 0.f;
         for (size_t k = 0; k < m; k += 1) {
-          sum += as_f32(x1->data[i * m + k]) * as_f32(x2->data[k * p + j]);
+          sum += as_f32(x1_row[k]) * as_f32(x2_col[k * p]);
         }
-        y->data[i * p + j] = as_f16(sum);
+        y_row[j] = as_f16(sum);
       }
     #endif
   }
@@ -970,27 +975,28 @@ void nn_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *c, const Tensor2D_F16 *x1
   const size_t p = x2->shape[1];
 
   for (size_t i = 0; i < n; i += 1) {
+    float16_t *x1_row = x1->data + i * m;
+    float16_t *c_row = c->data + i * p;
+    float16_t *y_row = y->data + i * p;
+
     #ifdef CONFIG_BACKEND_RISCV_ZVFH
-      float16_t *x1_row = x1->data + i * m;
-      float16_t *y_row = y->data + i * p;
 
       size_t vlmax = __riscv_vsetvlmax_e16m1();
       for (size_t j = 0; j < p; j += 1) {
         vfloat16m1_t vec_zero = __riscv_vfmv_v_f_f16m1(0, vlmax);
         vfloat16m1_t vec_sum = __riscv_vfmv_v_f_f16m1(0, vlmax);
 
-        float16_t *x1_ptr = x1_row;
-        float16_t *x2_ptr = x2->data + j;
+        float16_t *x2_col = x2->data + j;
         size_t k = m;
 
         while (k > 0) {
           size_t vl = __riscv_vsetvl_e16m1(k);
-          vfloat16m1_t vec_x1 = __riscv_vle16_v_f16m1(x1_ptr, vl);
-          vfloat16m1_t vec_x2 = __riscv_vlse16_v_f16m1(x2_ptr, p * sizeof(float16_t), vl);
+          vfloat16m1_t vec_x1 = __riscv_vle16_v_f16m1(x1_row, vl);
+          vfloat16m1_t vec_x2 = __riscv_vlse16_v_f16m1(x2_col, p * sizeof(float16_t), vl);
           vec_sum = __riscv_vfmacc_vv_f16m1(vec_sum, vec_x1, vec_x2, vl);
 
-          x1_ptr += vl;
-          x2_ptr += vl * p;
+          x1_row += vl;
+          x2_col += vl * p;
           k -= vl;
         }
 
@@ -999,18 +1005,21 @@ void nn_addmm_f16(Tensor2D_F16 *y, const Tensor2D_F16 *c, const Tensor2D_F16 *x1
         #else
           vec_sum = __riscv_vfredusum_vs_f16m1_f16m1(vec_sum, vec_zero, vlmax);
         #endif
-        y_row[j] = __riscv_vfmv_f_s_f16m1_f16(vec_sum) + c->data[i * p + j];
+        y_row[j] = __riscv_vfmv_f_s_f16m1_f16(vec_sum) + c_row[j];
       }
 
       x1_row += m;
       y_row += p;
     #else
+
       for (size_t j = 0; j < p; j += 1) {
+        float16_t *x2_col = x2->data + j;
+
         float sum = 0.f;
         for (size_t k = 0; k < m; k += 1) {
-          sum += as_f32(x1->data[i * m + k]) * as_f32(x2->data[k * p + j]);
+          sum += as_f32(x1_row[k]) * as_f32(x2_col[k * p]);
         }
-        y->data[i * p + j] = as_f16(sum + as_f32(c->data[i * p + j]));
+        y_row[j] = as_f16(sum + as_f32(c_row[j]));
       }
     #endif
   }
@@ -1041,9 +1050,10 @@ void nn_linear_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *w
   float16_t *y_batch_data = y->data;
 
   for (size_t i = 0; i < batch_size; i += 1) {
+    float16_t *x_data = x_batch_data;
+    float16_t *y_data = y_batch_data;
+
     #ifdef CONFIG_BACKEND_RISCV_ZVFH
-      float16_t *x_data = x_batch_data;
-      float16_t *y_data = y_batch_data;
 
       size_t vlmax = __riscv_vsetvlmax_e16m1();
 
@@ -1079,20 +1089,23 @@ void nn_linear_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, const Tensor2D_F16 *w
         x_data = x_batch_data; // reset x_data pointer for next output feature
       }
 
-      x_batch_data += in_features;
-      y_batch_data += out_features;
     #else  // scalar implementation
       for (size_t j = 0; j < out_features; j += 1) {
+        float16_t *weight_row = weight->data + j * in_features;
+
         float sum = 0.f;
         for (size_t k = 0; k < in_features; k += 1) {
-          sum += as_f32(x->data[i * in_features + k]) * as_f32(weight->data[j * in_features + k]);
+          sum += as_f32(x_data[k]) * as_f32(weight_row[k]);
         }
         if (bias) {
           sum += as_f32(bias->data[j]);
         }
-        y->data[i * out_features + j] = as_f16(sum);
+        y_data[j] = as_f16(sum);
       }
     #endif
+
+    x_batch_data += in_features;
+    y_batch_data += out_features;
   }
 }
 
@@ -1115,12 +1128,15 @@ void nn_elu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x, float alpha) {
   nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");
 
   const size_t n = y->shape[0] * y->shape[1];
+  float16_t *x_data = x->data;
+  float16_t *y_data = y->data;
+
   for (size_t i = 0; i < n; i += 1) {
-    if (as_f32(x->data[i]) > 0) {
-      y->data[i] = x->data[i];
+    if (as_f32(x_data[i]) > 0) {
+      y_data[i] = x_data[i];
     }
     else {
-      y->data[i] = as_f16(alpha * (expf(as_f32(x->data[i])) - 1.f));
+      y_data[i] = as_f16(alpha * (expf(as_f32(x_data[i])) - 1.f));
     }
   }
 }
@@ -1154,8 +1170,8 @@ void nn_relu2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x) {
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      float x_val = as_f32(x->data[i]);
-      y->data[i] = x_val > 0 ? as_f16(x_val) : 0;
+      float x_val = as_f32(x_data[i]);
+      y_data[i] = x_val > 0 ? as_f16(x_val) : 0;
     }
   #endif
 }
@@ -1172,13 +1188,16 @@ void nn_softmax1d_f16(Tensor1D_F16 *y, const Tensor1D_F16 *x) {
   nn_assert(y->shape[0] == x->shape[0], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0];
+  float16_t *x_data = x->data;
+  float16_t *y_data = y->data;
+
   float sum = 0.0f;
   for (size_t i = 0; i < n; i += 1) {
-    sum += expf(as_f32(x->data[i]));
+    sum += expf(as_f32(x_data[i]));
   }
 
   for (size_t i = 0; i < n; i += 1) {
-    y->data[i] = as_f16(expf(as_f32(x->data[i])) / sum);
+    y_data[i] = as_f16(expf(as_f32(x_data[i])) / sum);
   }
 }
 
@@ -1194,9 +1213,12 @@ void nn_tanh2d_f16(Tensor2D_F16 *y, const Tensor2D_F16 *x) {
   nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
 
   const size_t n = y->shape[0] * y->shape[1];
+  float16_t *x_data = x->data;
+  float16_t *y_data = y->data;
+
   for (size_t i = 0; i < n; i += 1) {
-    float x_val = as_f32(x->data[i]);
-    y->data[i] = as_f16(tanh(x_val));
+    float x_val = as_f32(x_data[i]);
+    y_data[i] = as_f16(tanh(x_val));
   }
 }
 

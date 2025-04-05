@@ -455,7 +455,7 @@ void nn_add1d_i32(Tensor1D_I32 *y, const Tensor1D_I32 *x1, const Tensor1D_I32 *x
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = x1->data[i] + x2->data[i];
+      y_data[i] = x1_data[i] + x2_data[i];
     }
   #endif
 }
@@ -496,7 +496,7 @@ void nn_add2d_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x1, const Tensor2D_I32 *x
     }
   #else  // scalar implementation
     for (size_t i = 0; i < n; i += 1) {
-      y->data[i] = x1->data[i] + x2->data[i];
+      y_data[i] = x1_data[i] + x2_data[i];
     }
   #endif
 }
@@ -516,8 +516,11 @@ void nn_addscalar1d_i32(Tensor1D_I32 *y, const Tensor1D_I32 *x, int32_t scalar) 
   nn_assert(y->shape[0] == x->shape[0], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0];
+  int32_t *x_data = x->data;
+  int32_t *y_data = y->data;
+
   for (size_t i = 0; i < n; i += 1) {
-    y->data[i] = x->data[i] + scalar;
+    y_data[i] = x_data[i] + scalar;
   }
 }
 
@@ -536,9 +539,11 @@ void nn_addscalar2d_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x, int32_t scalar) 
   nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == x->shape[1], "Cannot add tensors of different shapes");
 
   size_t n = y->shape[0] * y->shape[1];
+  int32_t *x_data = x->data;
+  int32_t *y_data = y->data;
 
   for (size_t i = 0; i < n; i += 1) {
-    y->data[i] = x->data[i] + scalar;
+    y_data[i] = x_data[i] + scalar;
   }
 }
 
@@ -572,11 +577,15 @@ void nn_dot_i32(Tensor1D_I32 *y, const Tensor1D_I32 *x1, const Tensor1D_I32 *x2)
   nn_assert(y->shape[0] == x1->shape[0], "Cannot dot tensors of different shapes");
 
   size_t n = y->shape[0];
+  int32_t *x1_data = x1->data;
+  int32_t *x2_data = x2->data;
+  int32_t *y_data = y->data;
+
   int32_t sum_i32 = 0;
   for (size_t i = 0; i < n; i += 1) {
-    sum_i32 += x1->data[i] * x2->data[i];
+    sum_i32 += x1_data[i] * x2_data[i];
   }
-  y->data[0] = sum_i32;
+  y_data[0] = sum_i32;
 }
 
 /**
@@ -597,14 +606,17 @@ void nn_mm_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x1, const Tensor2D_I32 *x2) 
   const size_t n = x1->shape[0];
   const size_t m = x1->shape[1];
   const size_t p = x2->shape[1];
+  int32_t *x1_data = x1->data;
+  int32_t *x2_data = x2->data;
+  int32_t *y_data = y->data;
 
   for (size_t i = 0; i < n; i += 1) {
     for (size_t j = 0; j < p; j += 1) {
       int32_t sum = 0;
       for (size_t k = 0; k < m; k += 1) {
-        sum += x1->data[i * m + k] * x2->data[k * p + j];
+        sum += x1_data[i * m + k] * x2_data[k * p + j];
       }
-      y->data[i * p + j] = sum;
+      y_data[i * p + j] = sum;
     }
   }
 }
@@ -628,14 +640,18 @@ void nn_addmm_i32(Tensor2D_I32 *y, const Tensor2D_I32 *c, const Tensor2D_I32 *x1
   const size_t n = x1->shape[0];
   const size_t m = x1->shape[1];
   const size_t p = x2->shape[1];
+  int32_t *x1_data = x1->data;
+  int32_t *x2_data = x2->data;
+  int32_t *c_data = c->data;
+  int32_t *y_data = y->data;
 
   for (size_t i = 0; i < n; i += 1) {
     for (size_t j = 0; j < p; j += 1) {
       int32_t sum = 0;
       for (size_t k = 0; k < m; k += 1) {
-        sum += x1->data[i * m + k] * x2->data[k * p + j];
+        sum += x1_data[i * m + k] * x2_data[k * p + j];
       }
-      y->data[i * p + j] = sum + c->data[i * p + j];
+      y_data[i * p + j] = sum + c_data[i * p + j];
     }
   }
 }
@@ -662,17 +678,28 @@ void nn_linear_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x, const Tensor2D_I32 *w
   const size_t in_features = x->shape[1];
   const size_t out_features = weight->shape[0];
 
+  int32_t *x_batch_data = x->data;
+  int32_t *y_batch_data = y->data;
+
   for (size_t i = 0; i < batch_size; i += 1) {
+    int32_t *x_data = x_batch_data;
+    int32_t *y_data = y_batch_data;
+    
     for (size_t j = 0; j < out_features; j += 1) {
+      int32_t *weight_row = weight->data + j * in_features;
+
       int32_t sum = 0;
       for (size_t k = 0; k < in_features; k += 1) {
-        sum += x->data[i * in_features + k] * weight->data[j * in_features + k];
+        sum += x_data[k] * weight_row[k];
       }
       if (bias) {
         sum += bias->data[j];
       }
-      y->data[i * out_features + j] = sum;
+      y_data[ + j] = sum;
     }
+    
+    x_batch_data += in_features;
+    y_batch_data += out_features;
   }
 }
 
@@ -700,7 +727,7 @@ void nn_relu2d_i32(Tensor2D_I32 *y, const Tensor2D_I32 *x) {
   int32_t *y_data = y->data;
 
   for (size_t i = 0; i < n; i += 1) {
-    y->data[i] = x->data[i] > 0 ? x->data[i] : 0;
+    y_data[i] = x_data[i] > 0 ? x_data[i] : 0;
   }
 }
 
