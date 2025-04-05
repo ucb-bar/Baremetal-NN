@@ -25,13 +25,15 @@ jobs:
     - name: Configure CMake
       run: |
         cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
-    - name: Build
+    - name: Build Tests
       run: |
         cmake --build ./build/ --target tests
-        ./build/tests/tests
-    - name: Run binary
+    - name: Run Tests
       run: |
         ./build/tests/tests
+    - name: Build All
+      run: |
+        cmake --build ./build/ --target all
   
   # build-riscv:
   #   defaults:
