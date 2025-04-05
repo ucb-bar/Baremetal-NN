@@ -17,8 +17,8 @@
 
 
 // http://elm-chan.org/junk/32bit/binclude.html
-#ifdef __APPLE__
-#define INCLUDE_FILE(section, filename, symbol) asm (\
+#if defined(__APPLE__)
+  #define INCLUDE_FILE(section, filename, symbol) asm (\
     ".align 4\n"                             /* Word alignment */\
     ".globl _"#symbol"_start\n"              /* Export the object start address */\
     ".globl _"#symbol"_data\n"               /* Export the object address */\
@@ -28,8 +28,13 @@
     ".globl _"#symbol"_end\n"                /* Export the object end address */\
     "_"#symbol"_end:\n"                      /* Define the object end address label */\
     ".align 4\n")                            /* Word alignment */
+#elif defined(ARDUINO)
+  #define INCBIN_PREFIX 
+  #define INCBIN_STYLE INCBIN_STYLE_SNAKE
+  #include "incbin.h"
+  #define INCLUDE_FILE(section, filename, symbol) INCBIN(symbol, filename)
 #else
-#define INCLUDE_FILE(section, filename, symbol) asm (\
+  #define INCLUDE_FILE(section, filename, symbol) asm (\
     ".section "#section"\n"                   /* Change section */\
     ".balign 4\n"                             /* Word alignment */\
     ".global "#symbol"_start\n"               /* Export the object start address */\
