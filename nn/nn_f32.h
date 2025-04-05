@@ -1200,6 +1200,34 @@ void nn_dot_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x1, const Tensor1D_F32 *x2)
 }
 
 /**
+ * nn_mv_f32
+ * 
+ * @brief Performs a matrix-vector multiplication of the matrix x1 and the vector x2.
+ * 
+ * y[i] = x1[i][j] * x2[j]
+ * 
+ * @param y The result tensor.
+ * @param x1 The matrix.
+ * @param x2 The vector.
+ */
+void nn_mv_f32(Tensor1D_F32 *y, const Tensor2D_F32 *x1, const Tensor1D_F32 *x2) {
+  nn_assert(x1->shape[1] == x2->shape[0], "Cannot perform MV on tensors of different shapes");
+  nn_assert(y->shape[0] == x1->shape[0], "Cannot perform MV on tensors of different shapes");
+
+  const size_t n = x1->shape[0]; // rows in matrix
+  const size_t m = x1->shape[1]; // columns in matrix
+
+  for (size_t i = 0; i < y->shape[0]; i += 1) {
+    float sum = 0.0;
+    for (size_t j = 0; j < m; j += 1) {
+      sum += x1->data[i * m + j] * x2->data[j];
+    }
+    y->data[i] = sum;
+  }
+}
+  
+
+/**
  * nn_mm_f32
  *
  * @brief Performs a matrix multiplication of the matrices x1 and x2.
@@ -1410,169 +1438,9 @@ void nn_linear_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, const Tensor2D_F32 *w
 }
 
 
-
 /* ======================================================================================================== */
-/*                                           Non-linear                                                     */
+/*                                           Attention                                                      */
 /* ======================================================================================================== */
-
-/**
- * nn_elu2d_f32
- *
- * @brief Applies the ELU activation function to a 2D floating-point tensor.
- *
- * y[i][j] = x[i][j] if x[i][j] > 0 else alpha * (exp(x[i][j]) - 1)
- *
- * @param y The result tensor.
- * @param x The input tensor.
- * @param alpha The alpha parameter.
- */
-void nn_elu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float alpha) {
-  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");
-
-  const size_t n = y->shape[0] * y->shape[1];
-  for (size_t i = 0; i < n; i += 1) {
-    if (x->data[i] > 0) {
-      y->data[i] = x->data[i];
-    }
-    else {
-      y->data[i] = alpha * (expf(x->data[i]) - 1.f);
-    }
-  }
-}
-
-/**
- * nn_relu2d_f32
- *
- * @brief Applies the ReLU activation function to a 2D floating-point tensor.
- *
- * y[i][j] = max(x[i][j], 0)
- *
- * @param y The result tensor.
- * @param x The input tensor.
- */
-void nn_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
-  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
-
-  size_t n = y->shape[0] * y->shape[1];
-  float *x_data = x->data;
-  float *y_data = y->data;
-
-  #ifdef CONFIG_BACKEND_RISCV_V
-    float zero = 0.0f;
-
-    while (n > 0) {
-      size_t vl = __riscv_vsetvl_e32m1(n);
-      vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x_data, vl);
-      vfloat32m1_t vec_y = __riscv_vfmax_vf_f32m1(vec_x, zero, vl);
-      __riscv_vse32_v_f32m1(y_data, vec_y, vl);
-      x_data += vl;
-      y_data += vl;
-      n -= vl;
-    }
-  #else  /* scalar implementation */
-    for (size_t i = 0; i < n; i += 1) {
-      float x_val = x->data[i];
-      y->data[i] = x_val > 0 ? x_val : 0;
-    }
-  #endif
-}
-
-/**
- * nn_softmax1d_f32
- *
- * @brief Applies the softmax activation function to a 1D floating-point tensor.
- *
- * y[i] = exp(x[i]) / sum(exp(x))
- *
- * @param y The result tensor.
- * @param x The input tensor.
- */
-void nn_softmax1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x) {
-  nn_assert(y->shape[0] == x->shape[0], "Cannot add tensors of different shapes");
-
-  size_t n = y->shape[0];
-  float sum = 0.0f;
-  for (size_t i = 0; i < n; i += 1) {
-    sum += expf(x->data[i]);
-  }
-
-  for (size_t i = 0; i < n; i += 1) {
-    y->data[i] = expf(x->data[i]) / sum;
-  }
-}
-
-/**
- * nn_softmax2d_f32
- *
- * @brief Applies the softmax activation function to a 2D floating-point tensor.
- *
- * y[i][j] = exp(x[i][j]) / sum(exp(x[i]))
- *
- * @param y The result tensor.
- * @param x The input tensor.
- * @param dim The dimension to apply the softmax to.
- */
-void nn_softmax2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, size_t dim) {
-  nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == x->shape[1], "Cannot add tensors of different shapes");
-
-  float *y_data = y->data;
-  float *x_data = x->data;
-
-  if (dim == 0) {
-    for (size_t i = 0; i < y->shape[1]; i += 1) {
-      size_t n = y->shape[0];
-      size_t m = y->shape[1];
-      float sum = 0.0f;
-      for (size_t j = 0; j < n; j += 1) {
-        sum += expf(x_data[j * m]);
-      }
-
-      for (size_t j = 0; j < n; j += 1) {
-        y_data[j * m] = expf(x_data[j * m]) / sum;
-      }
-
-      x_data += 1;
-      y_data += 1;
-    }
-  }
-  else if (dim == 1) {
-    // HACK: fix batch size
-    for (size_t i = 0; i < y->shape[0]; i += 1) {
-      size_t n = y->shape[1];
-      float sum = 0.0f;
-      for (size_t j = 0; j < n; j += 1) {
-        sum += expf(x_data[j]);
-      }
-
-      for (size_t j = 0; j < n; j += 1) {
-        y_data[j] = expf(x_data[j]) / sum;
-      }
-
-      x_data += n;
-      y_data += n;
-    }
-  }
-  else {
-    nn_assert(0, "Invalid dimension for softmax");
-  }
-}
-
-/**
- * nn_tanh2d_f32
- *
- * @brief Applies the tanh activation function to a 2D floating-point tensor.
- *
- * y[i][j] = tanh(x[i][j])
- */
-void nn_tanh2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
-  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
-
-  const size_t n = y->shape[0] * y->shape[1];
-  for (size_t i = 0; i < n; i += 1) {
-    float x_val = x->data[i];
-    y->data[i] = tanh(x_val);
-  }
-}
 
 /**
  * nn_scaled_dot_product_attention_f32
@@ -1669,5 +1537,212 @@ void nn_scaled_dot_product_attention_f32(Tensor4D_F32 *y, const Tensor4D_F32 *qu
   }
 }
 
+
+/* ======================================================================================================== */
+/*                                           Non-linear                                                     */
+/* ======================================================================================================== */
+
+/**
+ * nn_elu2d_f32
+ *
+ * @brief Applies the ELU activation function to a 2D floating-point tensor.
+ *
+ * y[i][j] = x[i][j] if x[i][j] > 0 else alpha * (exp(x[i][j]) - 1)
+ *
+ * @param y The result tensor.
+ * @param x The input tensor.
+ * @param alpha The alpha parameter.
+ */
+void nn_elu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, float alpha) {
+  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ELU on tensors of different shapes");
+
+  const size_t n = y->shape[0] * y->shape[1];
+  for (size_t i = 0; i < n; i += 1) {
+    if (x->data[i] > 0) {
+      y->data[i] = x->data[i];
+    }
+    else {
+      y->data[i] = alpha * (expf(x->data[i]) - 1.f);
+    }
+  }
+}
+
+/**
+ * nn_relu2d_f32
+ *
+ * @brief Applies the ReLU activation function to a 2D floating-point tensor.
+ *
+ * y[i][j] = max(x[i][j], 0)
+ *
+ * @param y The result tensor.
+ * @param x The input tensor.
+ */
+void nn_relu2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
+  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
+
+  size_t n = y->shape[0] * y->shape[1];
+  float *x_data = x->data;
+  float *y_data = y->data;
+
+  #ifdef CONFIG_BACKEND_RISCV_V
+    float zero = 0.0f;
+
+    while (n > 0) {
+      size_t vl = __riscv_vsetvl_e32m1(n);
+      vfloat32m1_t vec_x = __riscv_vle32_v_f32m1(x_data, vl);
+      vfloat32m1_t vec_y = __riscv_vfmax_vf_f32m1(vec_x, zero, vl);
+      __riscv_vse32_v_f32m1(y_data, vec_y, vl);
+      x_data += vl;
+      y_data += vl;
+      n -= vl;
+    }
+  #else  /* scalar implementation */
+    for (size_t i = 0; i < n; i += 1) {
+      float x_val = x->data[i];
+      y->data[i] = x_val > 0 ? x_val : 0;
+    }
+  #endif
+}
+
+/**
+ * nn_silu1d_f32
+ *
+ * @brief Applies the SiLU (Sigmoid Linear Unit) activation function to a 1D floating-point tensor.
+ *
+ * y[i] = x[i] * sigmoid(x[i])
+ *
+ * @param y The result tensor.
+ * @param x The input tensor.
+ */
+void nn_silu1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x) {
+  nn_assert(x->shape[0] == y->shape[0], "Cannot perform SiLU on tensors of different shapes");
+
+  const size_t n = y->shape[0];
+  float *x_data = x->data;
+  float *y_data = y->data;
+
+  for (size_t i = 0; i < n; i++) {
+    float x_i = x_data[i];
+    float sigmoid_x = 1.0f / (1.0f + expf(-x_i));
+    y_data[i] = x_i * sigmoid_x;
+  }
+}
+
+/**
+ * nn_softmax1d_f32
+ *
+ * @brief Applies the softmax activation function to a 1D floating-point tensor.
+ *
+ * y[i] = exp(x[i]) / sum(exp(x))
+ *
+ * @param y The result tensor.
+ * @param x The input tensor.
+ */
+void nn_softmax1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x) {
+  nn_assert(y->shape[0] == x->shape[0], "Cannot add tensors of different shapes");
+
+  const size_t n = y->shape[0];
+
+  float sum = 0.0f;
+  for (size_t i = 0; i < n; i += 1) {
+    y->data[i] = expf(x->data[i]);
+    sum += y->data[i];
+  }
+  // normalize
+  for (size_t i = 0; i < n; i += 1) {
+    y->data[i] /= sum;
+  }
+}
+
+/**
+ * nn_softmax2d_f32
+ *
+ * @brief Applies the softmax activation function to a 2D floating-point tensor.
+ *
+ * y[i][j] = exp(x[i][j]) / sum(exp(x[i]))
+ *
+ * @param y The result tensor.
+ * @param x The input tensor.
+ * @param dim The dimension to apply the softmax to.
+ */
+void nn_softmax2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x, size_t dim) {
+  nn_assert(y->shape[0] == x->shape[0] && y->shape[1] == x->shape[1], "Cannot add tensors of different shapes");
+
+  float *y_data = y->data;
+  float *x_data = x->data;
+
+  if (dim == 0) {
+    for (size_t i = 0; i < y->shape[1]; i += 1) {
+      size_t n = y->shape[0];
+      size_t m = y->shape[1];
+      float sum = 0.0f;
+      for (size_t j = 0; j < n; j += 1) {
+        sum += expf(x_data[j * m]);
+      }
+
+      for (size_t j = 0; j < n; j += 1) {
+        y_data[j * m] = expf(x_data[j * m]) / sum;
+      }
+
+      x_data += 1;
+      y_data += 1;
+    }
+  }
+  else if (dim == 1) {
+    // HACK: fix batch size
+    for (size_t i = 0; i < y->shape[0]; i += 1) {
+      size_t n = y->shape[1];
+      float sum = 0.0f;
+      for (size_t j = 0; j < n; j += 1) {
+        sum += expf(x_data[j]);
+      }
+
+      for (size_t j = 0; j < n; j += 1) {
+        y_data[j] = expf(x_data[j]) / sum;
+      }
+
+      x_data += n;
+      y_data += n;
+    }
+  }
+  else {
+    nn_assert(0, "Invalid dimension for softmax");
+  }
+}
+
+/**
+ * nn_tanh2d_f32
+ *
+ * @brief Applies the tanh activation function to a 2D floating-point tensor.
+ *
+ * y[i][j] = tanh(x[i][j])
+ */
+void nn_tanh2d_f32(Tensor2D_F32 *y, const Tensor2D_F32 *x) {
+  nn_assert(x->shape[0] == y->shape[0] && x->shape[1] == y->shape[1], "Cannot perform ReLU on tensors of different shapes");
+
+  const size_t n = y->shape[0] * y->shape[1];
+  for (size_t i = 0; i < n; i += 1) {
+    float x_val = x->data[i];
+    y->data[i] = tanh(x_val);
+  }
+}
+
+void nn_rms_norm1d_f32(Tensor1D_F32 *y, const Tensor1D_F32 *x, const Tensor1D_F32 *weight, float eps) {
+  nn_assert(x->shape[0] == y->shape[0], "Cannot perform RMSNorm on tensors of different shapes");
+
+  const size_t n = y->shape[0];
+  
+  float ss = 0.0f;
+  for (size_t i = 0; i < n; i += 1) {
+    ss += x->data[i] * x->data[i];
+  }
+  ss /= n;
+  ss += eps;
+
+  // normalize and scale
+  // y = (x / ss) * w
+  nn_mulscalar1d_f32(y, x, 1.0f / sqrtf(ss));
+  nn_mul1d_f32(y, y, weight);
+}
 
 #endif // __NN_F32_H
