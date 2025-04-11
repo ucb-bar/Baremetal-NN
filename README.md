@@ -1,8 +1,14 @@
+![](docs/cover.png)
+
 # Baremetal-NN
 
-![](docs/overview.png)
+![CI-status](https://img.shields.io/github/actions/workflow/status/ucb-bar/Baremetal-NN/run-tests.yaml?branch=main&style=flat-square&label=CI&logo=githubactions&logoColor=fff)
+![API-Docs-status](https://img.shields.io/github/actions/workflow/status/ucb-bar/Baremetal-NN/build-docs.yaml?branch=main&style=flat-square&label=Docs&logo=googledocs&logoColor=fff)
+[![License](https://img.shields.io/badge/license-MIT-yellow.svg?style=flat-square&label=License)](https://opensource.org/license/apache-2-0)
 
 Baremetal-NN is a tool for converting PyTorch models into raw C codes that can be executed standalone in a baremetal runtime on research chips. 
+
+![](docs/overview.png)
 
 > Note:
 > After a discussion with [@iansseijelly](https://github.com/iansseijelly), we decided to switch to the simpler way of assuming array will be contiguous, and therefore directly use shape to index into elements, instead of the more generic strided access. The previous strided implementation can be access on the ["strided"](https://github.com/ucb-bar/Baremetal-NN/tree/strided) branch.
