@@ -2,7 +2,7 @@ name: Running C tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "improve-ci" ]
   pull_request:
     branches: [ "main" ]
 
@@ -25,6 +25,10 @@ jobs:
     - name: Configure CMake
       run: |
         cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
+    - name: Generate Tests
+      run: |
+        pip install torch torchvision torchao torchtune jinja2
+        python ./tests/generate_test.py
     - name: Build Tests
       run: |
         cmake --build ./build/ --target tests
