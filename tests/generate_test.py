@@ -299,6 +299,36 @@ if __name__ == "__main__":
     t.add_test("nn_min1d_f32",   lambda x: torch.min(x),                              [("x", t.rand((7, )))])
     t.add_test("nn_min2d_f32",   lambda x: torch.min(x),                              [("x", t.rand((6, 7)))])
 
+    # Convolution
+    t.add_test("nn_conv2d_f32",  lambda x, w, b: torch.nn.functional.conv2d(
+        x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b,
+        stride=1, padding=0, dilation=1, groups=1
+        ).permute((0, 2, 3, 1)),
+        [
+            ("x", t.rand((1, 16, 16, 3))), ("w", t.rand((3, 3, 3, 6))), ("b", t.rand((6, ))), 
+            ("(size_t[]){1, 1}, (size_t[]){0, 0}, (size_t[]){1, 1}, 1", None)
+        ])
+    t.add_test("nn_conv2d_f32",  lambda x, w, b: torch.nn.functional.conv2d(
+        x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=1).permute((0, 2, 3, 1)),
+        [
+            ("x", t.rand((1, 16, 16, 3))), ("w", t.rand((3, 3, 3, 71))), ("b", t.rand((71, ))),
+            ("(size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1", None)
+        ])
+    t.add_test("nn_nchw_to_nhwc_f32",  lambda x: x.permute((0, 2, 3, 1)),  [("x", t.rand((1, 2, 3, 3)))                                    ]),
+    t.add_test("nn_nhwc_to_nchw_f32",  lambda x: x.permute((0, 3, 1, 2)),  [("x", t.rand((1, 3, 3, 2)))                                    ]),
+    t.add_test("nn_conv2d_f32",  lambda x, w, b: torch.nn.functional.conv2d(
+        x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=16).permute((0, 2, 3, 1)),
+        [
+            ("x", t.rand((1, 12, 12, 16))), ("w", t.rand((3, 3, 1, 16))), ("b", t.rand((16, ))),
+            ("(size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 16", None)
+        ])
+    t.add_test("nn_conv2d_f32",      lambda x, w, b: torch.nn.functional.conv2d(
+        x.permute((0, 3, 1, 2)), w.permute((3, 2, 0, 1)), b, stride=1, padding=1, dilation=1, groups=1).permute((0, 2, 3, 1)),
+        [
+            ("x", t.rand((1, 12, 12, 16))), ("w", t.rand((3, 3, 16, 56))), ("b", t.rand((56, ))), 
+            ("(size_t[]){1, 1}, (size_t[]){1, 1}, (size_t[]){1, 1}, 1", None)
+        ])
+    
     # Linear
     t.add_test("nn_linear_f32",  lambda x, w: torch.nn.functional.linear(x, w),       [("x", t.rand((6, 7))),   ("w", t.rand((5, 7)))],  extra_args=["NULL"] )
     t.add_test("nn_linear_f32",  lambda x, w, b: torch.nn.functional.linear(x, w, b), [("x", t.rand((6, 7))),   ("w", t.rand((5, 7))), ("b", t.rand((5, ))) ])
