@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main", "improve-ci" ]
   pull_request:
-    branches: [ "main", "improve-ci" ]
+    branches: [ "main" ]
 
 jobs:
   build-x86:
@@ -27,7 +27,7 @@ jobs:
         cmake -S ./ -B ./build/ -D CMAKE_BUILD_TYPE=Debug
     - name: Generate Tests
       run: |
-        pip install torch torchtune jinja2
+        pip install torch torchvision torchao torchtune jinja2
         python ./tests/generate_test.py
     - name: Build Tests
       run: |
