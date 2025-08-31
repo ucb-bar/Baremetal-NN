@@ -30,50 +30,48 @@ def softmax(x, dim=-1):
 
 
 def eager_attention_forward(
-    attention_mask, batch_size, head_dim, query_states, key_states, value_states
+    attention_mask, head_dim, query_states, key_states, value_states
 ):
-    # query_states: batch_size, sequence_length, num_att_head, head_dim
-    # key_states: batch_size, sequence_length, num_key_value_head, head_dim
-    # value_states: batch_size, sequence_length, num_key_value_head, head_dim
+    # query_states: sequence_length, num_att_head, head_dim
+    # key_states: sequence_length, num_key_value_head, head_dim
+    # value_states: sequence_length, num_key_value_head, head_dim
 
     # 8
     num_key_value_groups = num_attention_heads // num_key_value_heads
     # 2048
     token_dim = num_key_value_heads * num_key_value_groups * head_dim
     # 816
-    sequence_length = key_states.shape[1]
+    sequence_length = key_states.shape[0]
 
-    # (1, 8, 816, 256) <- (1, 816, 8, 256)
-    query_states = query_states.transpose(0, 2, 1, 3)
+    # (8, 816, 256) <- (816, 8, 256)
+    query_states = query_states.transpose(1, 0, 2)
 
-    # (1, 8, 816, 256) <- (1, 816, 1, 256)
-    key_states = np.concatenate([key_states[:, None, :, 0, :]] * num_key_value_groups, axis=1)
-    # (1, 8, 256, 816) <- (1, 8, 816, 256)
-    key_states_transposed = key_states.transpose(0, 1, 3, 2)
+    # (8, 816, 256) <- (816, 1, 256)
+    key_states = np.concatenate([key_states[None, :, 0, :]] * num_key_value_groups, axis=0)
+    # (8, 256, 816) <- (8, 816, 256)
+    key_states_transposed = key_states.transpose(0, 2, 1)
 
-    # (1, 8, 816, 256) <- (1, 816, 1, 256)
-    value_states = np.concatenate([value_states[:, None, :, 0, :]] * num_key_value_groups, axis=1)
+    # (8, 816, 256) <- (816, 1, 256)
+    value_states = np.concatenate([value_states[None, :, 0, :]] * num_key_value_groups, axis=0)
 
-    # (1, 8, 816, 816) <- (1, 8, 816, 256) x (1, 8, 256, 816)
+    # (8, 816, 816) <- (8, 816, 256) x (8, 256, 816)
     att_weights = np.matmul(query_states, key_states_transposed)
     att_weights *= head_dim**-0.5
     big_neg = -2.3819763e38  # See gemma/modules.py
 
-    masked_att_weights = np.where(attention_mask[:, :, :], att_weights, big_neg)
+    masked_att_weights = np.where(attention_mask[:, :], att_weights, big_neg)
     probs = softmax(masked_att_weights, dim=-1)
 
-    # (1, 8, 816, 256) <- (1, 8, 816, 816) x (1, 8, 816, 256)
+    # (8, 816, 256) <- (8, 816, 816) x (8, 816, 256)
     att_output = np.matmul(probs, value_states)
 
-    # (1, 816, 8, 256) <- (1, 8, 816, 256)
-    att_output = att_output.transpose(0, 2, 1, 3)
+    # (816, 8, 256) <- (8, 816, 256)
+    att_output = att_output.transpose(1, 0, 2)
 
-    # (1, 816, 2048) <- (1, 8, 816, 256)
-    att_output = att_output.reshape(batch_size, sequence_length, token_dim)
+    # (816, 2048) <- (8, 816, 256)
+    att_output = att_output.reshape(sequence_length, token_dim)
 
     return att_output
-
-
 
 
 def apply_rope(x, positions, max_wavelength=10_000):
@@ -105,7 +103,6 @@ def gemma_mlp_forward(layer, x):
     gate_proj = layer.gate_proj
     up_proj = layer.up_proj
     down_proj = layer.down_proj
-    # act_fn = layer.act_fn
 
     x_gated = np.matmul(
         x,
@@ -127,15 +124,14 @@ def gemma_mlp_forward(layer, x):
 def paligemma_with_expert_forward(
     attention_mask: np.ndarray,
     position_ids: np.ndarray | None = None,
-    past_key_values = None,
-    inputs_embeds: list[np.ndarray] = None,
-    use_cache: bool | None = None,
-    fill_kv_cache = True,
+    input_embeds: np.ndarray = None,
 ):
 
     model = policy.model.paligemma_with_expert.paligemma.language_model
 
-    input_embeddings = inputs_embeds[0]
+    # (816, 2048)
+    input_embeddings = input_embeds.copy()
+    past_key_values = {}
 
     for layer_idx in range(num_hidden_layers):
         # query_states = []
@@ -143,6 +139,7 @@ def paligemma_with_expert_forward(
         # value_states = []
         layer = model.layers[layer_idx]
 
+        # (816, 2048)
         hidden_states = input_embeddings
 
         # hidden_states = layer.input_layernorm(hidden_states)
@@ -152,31 +149,42 @@ def paligemma_with_expert_forward(
             layer.input_layernorm.eps,
         )
 
-        hidden_shape = (hidden_states.shape[0], hidden_states.shape[1], -1, layer.self_attn.head_dim)
+        hidden_shape = (hidden_states.shape[0], -1, layer.self_attn.head_dim)
 
+        # (816, 2048)
         query_states = np.matmul(
             hidden_states,
             layer.self_attn.q_proj.weight.float().detach().cpu().numpy().T
         )
+        # (816, 256)
         key_states = np.matmul(
             hidden_states,
             layer.self_attn.k_proj.weight.float().detach().cpu().numpy().T
         )
+        # (816, 256)
         value_states = np.matmul(
             hidden_states,
             layer.self_attn.v_proj.weight.float().detach().cpu().numpy().T
         )
 
+        # (816, 8, 256)
         query_states = query_states.reshape(hidden_shape)
+        # (816, 1, 256)
         key_states = key_states.reshape(hidden_shape)
+        # (816, 1, 256)
         value_states = value_states.reshape(hidden_shape)
 
         query_states = apply_rope(query_states, position_ids)
         key_states = apply_rope(key_states, position_ids)
 
+        past_key_values[layer_idx] = {
+            "key_states": key_states,
+            "value_states": value_states,
+        }
+
+        # (816, 2048)
         att_output = eager_attention_forward(
             attention_mask=attention_mask,
-            batch_size=hidden_states.shape[0],
             head_dim=head_dim,
             query_states=query_states,
             key_states=key_states,
@@ -184,10 +192,11 @@ def paligemma_with_expert_forward(
         )
         # print("att_output", att_output[0, 0, :10])
 
-        hidden_states = input_embeddings
+        hidden_states = input_embeddings.copy()
 
         start = 0
         end = start + hidden_states.shape[1]
+        # (816, 2048) <- (816, 2048) x (2048, 2048)
         out_emb = np.matmul(
             att_output[:, start:end],
             layer.self_attn.o_proj.weight.float().detach().cpu().numpy().T
@@ -204,8 +213,8 @@ def paligemma_with_expert_forward(
             layer.post_attention_layernorm.weight.float().detach().cpu().numpy(),
             layer.post_attention_layernorm.eps,
         )
+        # (816, 2048)
         out_emb = gemma_mlp_forward(layer.mlp, out_emb)
-
 
         # second residual
         out_emb += after_first_residual

@@ -18,13 +18,13 @@ def test_attention():
     test_key_states = np.random.randn(1, 816, 1, 256).astype(np.float32)
     test_value_states = np.random.randn(1, 816, 1, 256).astype(np.float32)
 
+    # our implementation does not support batching
     att_output = eager_attention_forward(
-        test_attention_mask,
-        test_batch_size,
+        test_attention_mask[0, ...],
         test_head_dim,
-        test_query_states,
-        test_key_states,
-        test_value_states,
+        test_query_states[0, ...],
+        test_key_states[0, ...],
+        test_value_states[0, ...],
     )
 
     model = PaliGemmaWithExpertModel(PaliGemmaWithExpertConfig())
@@ -51,7 +51,8 @@ def test_vlm_mlp_forward():
     test_input_emb = np.random.randn(1, 816, 2048).astype(np.float32)
 
     model = policy.model.paligemma_with_expert.paligemma.language_model
-    out_emb = gemma_mlp_forward(model.layers[0].mlp, test_input_emb)
+    # our implementation does not support batching
+    out_emb = gemma_mlp_forward(model.layers[0].mlp, test_input_emb[0, ...])
 
     out_emb_gold = policy.model.paligemma_with_expert.paligemma.language_model.layers[0].mlp(
         torch.from_numpy(test_input_emb).to("cuda")
@@ -72,12 +73,9 @@ def test_vlm_forward():
     test_prefix_embs = np.random.randn(1, 816, 2048).astype(np.float32)
 
     att_output, _ = paligemma_with_expert_forward(
-        attention_mask=test_attention_2d_mask,
-        position_ids=test_position_ids,
-        past_key_values=None,
-        inputs_embeds=[test_prefix_embs, None],
-        use_cache=True,
-        fill_kv_cache=True,
+        attention_mask=test_attention_2d_mask[0, ...],
+        position_ids=test_position_ids[0, ...],
+        input_embeds=test_prefix_embs[0, ...],
     )
 
     att_output_golden, _ = policy.model.paligemma_with_expert.forward(
