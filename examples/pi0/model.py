@@ -29,6 +29,27 @@ def softmax(x, dim=-1):
     return shifted_exp / shifted_exp.sum(axis=dim, keepdims=True)
 
 
+def create_sinusoidal_pos_embedding(
+    time: np.ndarray, dimension: int, min_period: float, max_period: float,
+) -> np.ndarray:
+    """Computes sine-cosine positional embedding vectors for scalar positions."""
+    if dimension % 2 != 0:
+        raise ValueError(f"dimension ({dimension}) must be divisible by 2")
+
+    if time.ndim != 1:
+        raise ValueError("The time tensor is expected to be of shape `(batch_size, )`.")
+
+    fraction = np.linspace(0.0, 1.0, dimension // 2, dtype=np.float64)
+    period = min_period * (max_period / min_period) ** fraction
+
+    # Compute the outer product
+    scaling_factor = 1.0 / period * 2 * np.pi
+    sin_input = scaling_factor[None, :] * time[:, None]
+    pos_emb = np.concatenate([np.sin(sin_input), np.cos(sin_input)], axis=1)
+    pos_emb = pos_emb.astype(np.float32)
+    return pos_emb
+
+
 def eager_attention_forward(
     attention_mask, head_dim, query_states, key_states, value_states
 ):
@@ -232,3 +253,122 @@ def paligemma_with_expert_forward(
     )
 
     return outputs_embeds, past_key_values
+
+
+def embed_prefix(
+    images, img_masks, lang_tokens, lang_masks,
+):
+    return policy.model.paligemma_with_expert.paligemma.language_model.embed_prefix(
+        images, img_masks, lang_tokens, lang_masks
+    )
+
+
+def embed_suffix(
+    state,
+    noisy_actions,
+    timestep
+):
+    embs = []
+    pad_masks = []
+    att_masks = []
+
+    proj_width = 1024
+
+    model = policy.model
+
+    # Embed state
+    state_emb = np.matmul(state, model.state_proj.weight.float().detach().cpu().numpy().T)
+    embs.append(state_emb[:, None, :])
+    bsize = state_emb.shape[0]
+
+    state_mask = np.ones((bsize, 1), dtype=np.bool)
+    pad_masks.append(state_mask)
+
+    # Set attention masks so that image and language inputs do not attend to state or actions
+    att_masks += [1]
+
+    # Embed timestep using sine-cosine positional encoding with sensitivity in the range [0, 1]
+    time_emb = create_sinusoidal_pos_embedding(
+        timestep, proj_width, min_period=4e-3, max_period=4.0
+    )
+    # print(time_emb[0, :10])
+
+    # Fuse timestep + action information using an MLP
+    action_emb = np.matmul(noisy_actions, model.action_in_proj.weight.float().detach().cpu().numpy().T) + model.action_in_proj.bias.float().detach().cpu().numpy()
+
+    time_emb = time_emb[:, None, :].repeat(action_emb.shape[1], axis=1)
+    action_time_emb = np.concatenate([action_emb, time_emb], axis=2)
+
+    action_time_emb = np.matmul(action_time_emb, model.action_time_mlp_in.weight.float().detach().cpu().numpy().T) + model.action_time_mlp_in.bias.float().detach().cpu().numpy()
+    # swish == silu
+    action_time_emb = torch.nn.functional.silu(torch.from_numpy(action_time_emb)).numpy()
+    action_time_emb = np.matmul(action_time_emb, model.action_time_mlp_out.weight.float().detach().cpu().numpy().T) + model.action_time_mlp_out.bias.float().detach().cpu().numpy()
+
+    # Add to input tokens
+    embs.append(action_time_emb)
+
+    bsize, action_time_dim = action_time_emb.shape[:2]
+    action_time_mask = np.ones((bsize, action_time_dim), dtype=np.bool)
+    pad_masks.append(action_time_mask)
+
+    # Set attention masks so that image, language and state inputs do not attend to action tokens
+    att_masks += [1] + ([0] * (policy.config.n_action_steps - 1))
+
+    embs = np.concatenate(embs, axis=1)
+    pad_masks = np.concatenate(pad_masks, axis=1)
+    att_masks = np.array(att_masks, dtype=embs.dtype)
+    att_masks = att_masks[None, :].repeat(bsize, axis=0)
+
+    return embs, pad_masks, att_masks
+
+
+def denoise_step(
+    state,
+    prefix_pad_masks,
+    past_key_values,
+    x_t,
+    timestep,
+):
+    suffix_embs, suffix_pad_masks, suffix_att_masks = embed_suffix(state, x_t, timestep)
+
+
+
+
+def sample_actions(
+    images, img_masks, lang_tokens, lang_masks, state,
+):
+    prefix_embs, prefix_pad_masks, prefix_att_masks = embed_prefix(
+        images, img_masks, lang_tokens, lang_masks
+    )
+    
+    prefix_att_2d_masks = make_att_2d_masks(prefix_pad_masks, prefix_att_masks)
+    prefix_position_ids = torch.cumsum(prefix_pad_masks, dim=1) - 1
+
+    _, past_key_values = paligemma_with_expert_forward(
+        attention_mask=prefix_att_2d_masks,
+        position_ids=prefix_position_ids,
+        inputs_embeds=prefix_embs,
+    )
+    
+    dt = -1.0 / self.config.num_steps
+    dt = torch.tensor(dt, dtype=torch.float32, device=device)
+
+    x_t = noise
+    time = torch.tensor(1.0, dtype=torch.float32, device=device)
+
+    while time >= -dt / 2:
+        expanded_time = time.expand(bsize)
+
+        # v_t: (1, 50, 32), float32
+        v_t = self.denoise_step(
+            state,
+            prefix_pad_masks,
+            past_key_values,
+            x_t,
+            expanded_time,
+        )
+
+        # Euler step
+        x_t += dt * v_t
+        time += dt
+    return x_t
