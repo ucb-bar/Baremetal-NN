@@ -29,6 +29,66 @@ def softmax(x, dim):
     return shifted_exp / shifted_exp.sum(axis=dim, keepdims=True)
 
 
+def normalize_states(state: np.ndarray) -> np.ndarray:
+    mean = state.mean()
+    std = state.std()
+    state = (state - mean) / (std + 1e-8)
+    return state
+
+
+def unnormalize_actions(actions: np.ndarray) -> np.ndarray:
+    mean = actions.mean()
+    std = actions.std()
+    actions = actions * std + mean
+    return actions
+
+
+def prepare_images(images: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Apply Pi0 preprocessing to the images, like resizing to 224x224 and padding to keep aspect ratio, and
+    convert pixel range from [0.0, 1.0] to [-1.0, 1.0] as requested by SigLIP.
+    """
+    num_images = images.shape[0]
+
+    assert images.shape[2] == 224 and images.shape[3] == 224, "images must be resized to 224x224"
+
+    # Preprocess image features present in the batch
+    # for key in present_img_keys:
+    images = images * 2.0 - 1.0
+    img_masks = np.ones(num_images, dtype=np.bool)
+
+    return images, img_masks
+
+
+def prepare_state(state):
+    """Pad state"""
+    # state = pad_vector(batch[OBS_STATE], self.config.max_state_dim)
+    max_state_dim = policy.config.max_state_dim
+    state = np.concatenate([state, np.zeros((max_state_dim - state.shape[0],))], axis=0)
+    return state
+
+
+def prepare_language(task_text):
+    """Tokenize the text input"""
+
+    # PaliGemma prompt has to end with a new line
+    # tasks: ["Just try to do something useful.\n"], length of 33
+    tasks = [task if task.endswith("\n") else f"{task}\n" for task in task_text]
+
+    # tokenized_prompt["input_ids"]: [batch, max_lang_seq_len], int64 --- (1, 48)
+    # tokenized_prompt["attention_mask"]: [batch, max_lang_seq_len], int64 --- (1, 48)
+    tokenized_prompt = policy.language_tokenizer.__call__(
+        tasks,
+        padding="max_length",
+        padding_side="right",
+        max_length=policy.config.tokenizer_max_length,
+        return_tensors="pt",
+    )
+    lang_tokens = tokenized_prompt["input_ids"][0].detach().cpu().numpy()
+    lang_masks = tokenized_prompt["attention_mask"][0].detach().cpu().numpy()
+
+    return lang_tokens, lang_masks
+
+
 def create_sinusoidal_pos_embedding(
     time: float,
     dimension: int,
@@ -394,18 +454,22 @@ def paligemma_action_expert_forward(
 
 
 def embed_prefix(
-    images, img_masks, lang_tokens, lang_masks
+    images: np.ndarray,
+    img_masks: np.ndarray,
+    lang_tokens: np.ndarray,
+    lang_masks: np.ndarray,
 ):
     # TODO: avoid list in python and torch.cat ; prefer pre-allocation with torch.empty
     embs = []
     pad_masks = []
     att_masks = []
 
+    num_images = images.shape[0]
+
     # TODO: remove for loop
-    for (
-        img,
-        img_mask,
-    ) in zip(images, img_masks, strict=False):
+    for img_idx in range(num_images):
+        img = images[img_idx, ...]
+        img_mask = img_masks[img_idx]
         # img: [batch, channel, height, width], uint8
         # img_emb: [batch, num_patches, token_dim], float32
         # (256, 2048) <- (3, 224, 224)
@@ -645,43 +709,39 @@ def sample_actions(
     return x_t
 
 
-def select_action(batch):
-    """Select a single action given environment observations.
+def select_action(images, state, task, noise=None):
 
-    This method wraps `select_actions` in order to return one action at a time for execution in the
-    environment. It works by managing the actions in a queue and only calling `select_actions` when the
-    queue is empty.
-    """
+    # HACK: match hf policy
+    # state = normalize_states(state)
 
-    batch = normalize_inputs(batch)
+    # images: [num_img, channel, height, width], float32 --- (3, 3, 224, 224)
+    # img_masks: [num_img], bool --- (3,)
+    images, img_masks = prepare_images(images)
 
-    # Action queue logic for n_action_steps > 1. When the action_queue is depleted, populate it by
-    # querying the policy.
-    # images: list of num_img x [batch, channel, height, width], float32 --- 3 x (1, 3, 224, 224)
-    # img_masks: list of num_img x [1], bool --- 3 x (1)
-    images, img_masks = prepare_images(batch)
+    # state: [max_state_dim,], float32 --- (32,)
+    state = prepare_state(state)
 
-    # state: [batch, max_state_dim], float32 --- (1, 32)
-    state = prepare_state(batch)
+    # lang_tokens: [max_lang_seq_len], int32 --- (48,)
+    # lang_masks: [max_lang_seq_len], bool --- (48,)
+    lang_tokens, lang_masks = prepare_language(task)
 
-    # lang_tokens: [batch, max_lang_seq_len], int32 --- (1, 48)
-    # lang_masks: [batch, max_lang_seq_len], bool --- (1, 48)
-    lang_tokens, lang_masks = prepare_language(batch)
+    # print("images", images[0, 0, 0, :10])
+    # print("lang_tokens", lang_tokens[:10])
+    # print("state", state[:10])
 
-    # actions: [batch, steps, max_action_dim], float32 --- (1, 50, 32)
+    # actions: [steps, max_action_dim], float32 --- (50, 32)
     actions = sample_actions(
-        images, img_masks, lang_tokens, lang_masks, state
+        images, img_masks, lang_tokens, lang_masks, state, noise
     )
 
+    # print("actions", actions[0, :10])
+
     # Unpad actions
-    original_action_dim = policy.config.action_feature.shape[0]
-    # actions: (1, 50, 7)
-    actions = actions[:, :, :original_action_dim]
+    original_action_dim = 7  # policy.config.action_feature.shape[0]
+    # (50, 7) <- (50, 32)
+    actions = actions[:, :original_action_dim]
 
-    actions = unnormalize_outputs({"action": actions})["action"]
+    # HACK: match hf policy
+    # actions = unnormalize_actions(actions)
 
-    # `self.model.forward` returns a (batch_size, n_action_steps, action_dim) tensor, but the queue
-    # effectively has shape (n_action_steps, batch_size, *), hence the transpose.
-    actions = actions.transpose(0, 1)
-
-    return actions
+    return actions[0]

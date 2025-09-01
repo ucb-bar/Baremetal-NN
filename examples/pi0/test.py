@@ -3,6 +3,7 @@ import torch
 from lerobot.policies.pi0.paligemma_with_expert import PaliGemmaWithExpertModel, PaliGemmaWithExpertConfig
 from lerobot.policies.pi0.modeling_pi0 import create_sinusoidal_pos_embedding as create_sinusoidal_pos_embedding_golden
 from lerobot.policies.pi0.modeling_pi0 import make_att_2d_masks as make_att_2d_masks_golden
+from lerobot.configs.types import FeatureType, PolicyFeature
 
 from model import (
     eager_attention_forward,
@@ -17,7 +18,36 @@ from model import (
     paligemma_with_expert_forward,
     paligemma_action_expert_forward,
     denoise_step,
+    select_action,
 )
+
+
+# initialize policy config
+policy.config.empty_cameras = 3  # support up to 3 camera inputs
+policy.config.input_features = {
+    "observation.images.top": PolicyFeature(
+        type=FeatureType.VISUAL,
+        shape=(3, 224, 224)
+    ),
+    "observation.images.left_wrist": PolicyFeature(
+        type=FeatureType.VISUAL,
+        shape=(3, 224, 224)
+    ),
+    "observation.images.right_wrist": PolicyFeature(
+        type=FeatureType.VISUAL,
+        shape=(3, 224, 224)
+    ),
+    "observation.state": PolicyFeature(
+        type=FeatureType.STATE,
+        shape=(7,)
+    )
+}
+policy.config.output_features = {
+    "action": PolicyFeature(
+        type=FeatureType.ACTION,
+        shape=(7,)
+    )
+}
 
 
 test_past_key_values = {}
@@ -227,8 +257,8 @@ def tset_create_sinusoidal_pos_embedding():
 
 def test_embed_prefix():
     print("TEST test_embed_prefix")
-    test_images = [np.random.randn(3, 224, 224).astype(np.float32)] * 3
-    test_img_masks = [1] * 3
+    test_images = np.random.randn(3, 3, 224, 224).astype(np.float32)
+    test_img_masks = np.ones((3,), dtype=np.bool)
     test_lang_tokens = np.random.randint(0, 100, (48,)).astype(np.int32)
     test_lang_masks = np.ones((48,), dtype=np.bool)
 
@@ -239,8 +269,8 @@ def test_embed_prefix():
         test_lang_masks,
     )
     prefix_embs_golden, prefix_pad_masks_golden, prefix_att_masks_golden = policy.model.embed_prefix(
-        [torch.from_numpy(image[None, ...]).to("cuda") for image in test_images],
-        [torch.tensor([img_mask]).to("cuda") for img_mask in test_img_masks],
+        [torch.from_numpy(test_images[img_idx, ...][None, ...]).to("cuda") for img_idx in range(test_images.shape[0])],
+        [torch.tensor([1 if mask else 0], dtype=torch.bool).to("cuda") for mask in test_img_masks],
         torch.from_numpy(test_lang_tokens[None, ...]).to("cuda"),
         torch.from_numpy(test_lang_masks[None, ...]).to("cuda"),
     )
@@ -307,8 +337,8 @@ def test_denoise_step():
 
 def test_sample_actions():
     print("TEST test_sample_actions")
-    test_images = [np.random.randn(3, 224, 224).astype(np.float32)] * 3
-    test_img_masks = [1] * 3
+    test_images = np.random.randn(3, 3, 224, 224).astype(np.float32)
+    test_img_masks = np.ones((3,), dtype=np.bool)
     test_lang_tokens = np.random.randint(0, 100, (48,)).astype(np.int32)
     test_lang_masks = np.ones((48,), dtype=np.bool)
     test_state = np.random.randn(32,).astype(np.float32)
@@ -324,8 +354,8 @@ def test_sample_actions():
     )
 
     actions_golden = policy.model.sample_actions(
-        images=[torch.from_numpy(img[None, ...]).to("cuda") for img in test_images],
-        img_masks=[torch.tensor([img_mask], dtype=torch.bool).to("cuda") for img_mask in test_img_masks],
+        images=[torch.from_numpy(test_images[img_idx, ...][None, ...]).to("cuda") for img_idx in range(test_images.shape[0])],
+        img_masks=[torch.tensor([1 if mask else 0], dtype=torch.bool).to("cuda") for mask in test_img_masks],
         lang_tokens=torch.from_numpy(test_lang_tokens[None, ...]).to("cuda"),
         lang_masks=torch.from_numpy(test_lang_masks[None, ...]).to("cuda"),
         state=torch.from_numpy(test_state[None, ...]).to("cuda"),
@@ -342,34 +372,39 @@ def test_sample_actions():
 
 def test_select_action():
     print("TEST test_select_action")
-    test_images = [np.random.randn(3, 224, 224).astype(np.float32)] * 3
-    test_img_masks = [1] * 3
-    test_lang_tokens = np.random.randint(0, 100, (48,)).astype(np.int32)
-    test_lang_masks = np.ones((48,), dtype=np.bool)
-    test_state = np.random.randn(32,).astype(np.float32)
+
+    test_images = np.random.randn(3, 3, 224, 224).astype(np.float32)
+    test_state = np.random.randn(12,).astype(np.float32)
+    test_task = ["Just try to do something useful."]
+    test_noise = sample_noise((50, 32))
+
+    observation = {
+        "observation.images.top": torch.from_numpy(test_images[0][None, ...]).cuda(),
+        "observation.images.left_wrist": torch.from_numpy(test_images[1][None, ...]).cuda(),
+        "observation.images.right_wrist": torch.from_numpy(test_images[2][None, ...]).cuda(),
+        "observation.state": torch.from_numpy(test_state[None, ...]).cuda(),
+        "task": test_task,
+    }
 
     actions = select_action(
-        images=test_images,
-        img_masks=test_img_masks,
-        lang_tokens=test_lang_tokens,
-        lang_masks=test_lang_masks,
-        state=test_state,
+        images=test_images.copy(),
+        state=test_state.copy(),
+        task=test_task.copy(),
+        noise=test_noise.copy(),
     )
 
-    actions_golden = policy.model.select_action(
-        images=[torch.from_numpy(img[None, ...]).to("cuda") for img in test_images],
-        img_masks=[torch.tensor([img_mask], dtype=torch.bool).to("cuda") for img_mask in test_img_masks],
-        lang_tokens=torch.from_numpy(test_lang_tokens[None, ...]).to("cuda"),
-        lang_masks=torch.from_numpy(test_lang_masks[None, ...]).to("cuda"),
-        state=torch.from_numpy(test_state[None, ...]).to("cuda"),
+    actions_golden = policy.select_action(
+        observation,
+        noise=torch.from_numpy(test_noise[None, ...]).to("cuda"),
     )
 
-    if np.allclose(actions, actions_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+    # 0.1 as error tolerance somehow is not sufficient, might be a bug
+    if np.allclose(actions, actions_golden.float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
         print(" ✔ TEST PASSED")
     else:
         print(" ✘ TEST FAILED")
-        print("actions:", actions[0, :10])
-        print("golden actions:", actions_golden[0, 0, :10])
+        print("actions:", actions[:3, :10])
+        print("golden actions:", actions_golden[:3, :10])
 
 
 test_attention()
@@ -385,4 +420,4 @@ test_denoise_step()
 
 # overall test
 test_sample_actions()
-# test_select_action()
+test_select_action()
