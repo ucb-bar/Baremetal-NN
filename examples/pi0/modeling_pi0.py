@@ -17,7 +17,6 @@ We follow the original Attention paper and PyTorch to use the following naming c
 import numpy as np
 
 import torch
-import torch.nn as nn
 from lerobot.policies.pi0.modeling_pi0 import PI0Policy
 from configuration_pi0 import (
     CONFIG_N_ACTION_STEPS,
@@ -89,6 +88,14 @@ def pi0_softmax(x: np.ndarray) -> np.ndarray:
             shifted_exp = np.exp(x[h, s, :] - x_maximum)
             output[h, s, :] = shifted_exp / shifted_exp.sum()
     return output
+
+
+def gelu_tanh_approximate(x: np.ndarray) -> np.ndarray:
+    return 0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * (x * x * x))))
+
+
+def silu(x: np.ndarray) -> np.ndarray:
+    return x / (1 + np.exp(-x))
 
 
 def pi0_normalize(x: np.ndarray) -> np.ndarray:
@@ -365,7 +372,7 @@ def embed_suffix(
         model.action_time_mlp_in.weight.float().detach().cpu().numpy().T,
     ) + model.action_time_mlp_in.bias.float().detach().cpu().numpy()
     # swish == silu
-    action_time_emb = torch.nn.functional.silu(torch.from_numpy(action_time_emb)).numpy()
+    action_time_emb = silu(action_time_emb)
     action_time_emb = np.matmul(
         action_time_emb,
         model.action_time_mlp_out.weight.float().detach().cpu().numpy().T,
@@ -507,7 +514,7 @@ def eager_attention_forward(
     return att_output
 
 
-def gemma_mlp_forward(layer: nn.Module, x: np.ndarray) -> np.ndarray:
+def gemma_mlp_forward(layer: torch.nn.Module, x: np.ndarray) -> np.ndarray:
     gate_proj = layer.gate_proj
     up_proj = layer.up_proj
     down_proj = layer.down_proj
@@ -516,7 +523,7 @@ def gemma_mlp_forward(layer: nn.Module, x: np.ndarray) -> np.ndarray:
         x,
         gate_proj.weight.float().detach().cpu().numpy().T
     )
-    x_gated_activated = torch.nn.functional.gelu(torch.from_numpy(x_gated), approximate="tanh").numpy()
+    x_gated_activated = gelu_tanh_approximate(x_gated)
     x_up_projected = np.matmul(
         x,
         up_proj.weight.float().detach().cpu().numpy().T
