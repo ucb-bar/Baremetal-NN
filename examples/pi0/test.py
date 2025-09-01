@@ -2,55 +2,118 @@ import numpy as np
 import torch
 from lerobot.policies.pi0.paligemma_with_expert import PaliGemmaWithExpertModel, PaliGemmaWithExpertConfig
 from lerobot.policies.pi0.modeling_pi0 import create_sinusoidal_pos_embedding as create_sinusoidal_pos_embedding_golden
+from lerobot.policies.pi0.modeling_pi0 import make_att_2d_masks as make_att_2d_masks_golden
 
 from model import (
     eager_attention_forward,
-    paligemma_with_expert_forward,
+    sample_noise,
+    make_att_2d_masks,
     gemma_mlp_forward,
     create_sinusoidal_pos_embedding,
+    embed_prefix,
     embed_suffix,
     sample_actions,
     policy,
+    paligemma_with_expert_forward,
+    paligemma_action_expert_forward,
+    denoise_step,
 )
 
 
+test_past_key_values = {}
+test_past_key_values_torch = {}
+for layer_idx in range(18):
+    key_states = np.random.randn(816, 1, 256).astype(np.float32)
+    value_states = np.random.randn(816, 1, 256).astype(np.float32)
+    test_past_key_values[layer_idx] = {
+        "key_states": key_states,
+        "value_states": value_states,
+    }
+    test_past_key_values_torch[layer_idx] = {
+        "key_states": torch.from_numpy(key_states[None, ...]).to("cuda"),
+        "value_states": torch.from_numpy(value_states[None, ...]).to("cuda"),
+    }
+
+
 def test_attention():
-    test_attention_mask = np.tril(np.ones((816,), dtype=np.bool))[None, :, :]
+    print("TEST test_attention")
+    test_attention_mask = np.tril(np.ones((816,), dtype=np.bool))
     test_batch_size = 1
     test_head_dim = 256
-    test_query_states = np.random.randn(1, 816, 8, 256).astype(np.float32)
-    test_key_states = np.random.randn(1, 816, 1, 256).astype(np.float32)
-    test_value_states = np.random.randn(1, 816, 1, 256).astype(np.float32)
+    test_query_states = np.random.randn(816, 8, 256).astype(np.float32)
+    test_key_states = np.random.randn(816, 1, 256).astype(np.float32)
+    test_value_states = np.random.randn(816, 1, 256).astype(np.float32)
 
     # our implementation does not support batching
     att_output = eager_attention_forward(
-        test_attention_mask[0, ...],
+        test_attention_mask,
         test_head_dim,
-        test_query_states[0, ...],
-        test_key_states[0, ...],
-        test_value_states[0, ...],
+        test_query_states,
+        test_key_states,
+        test_value_states,
     )
 
     model = PaliGemmaWithExpertModel(PaliGemmaWithExpertConfig())
 
     att_output_golden = model.eager_attention_forward(
-        torch.from_numpy(test_attention_mask),
+        torch.from_numpy(test_attention_mask[None, ...]),
         test_batch_size,
         test_head_dim,
-        torch.from_numpy(test_query_states),
-        torch.from_numpy(test_key_states),
-        torch.from_numpy(test_value_states)
+        torch.from_numpy(test_query_states[None, ...]),
+        torch.from_numpy(test_key_states[None, ...]),
+        torch.from_numpy(test_value_states[None, ...])
     )
-    print("TEST test_attention")
     if np.allclose(att_output, att_output_golden, atol=1e-4, rtol=1e-4):
         print(" ✔ TEST PASSED")
     else:
         print(" ✘ TEST FAILED")
-        print("test att_output:", att_output[0, 0, :10])
+        print("test att_output:", att_output[0, :10])
         print("golden att_output:", att_output_golden[0, 0, :10])
 
 
+def test_sample_noise():
+    print("TEST test_sample_noise")
+    test_shape = (816, 256)
+    test_noise = sample_noise(test_shape)
+    test_noise_golden = policy.model.sample_noise(
+        (1, *test_shape),
+        torch.device("cuda"),
+    ).float().detach().cpu().numpy()
+    # if shape matches and means and stds match
+    if (
+        test_noise.shape == test_noise_golden.shape[1:]
+        and np.abs(np.mean(test_noise) - np.mean(test_noise_golden)) < 0.1
+        and np.abs(np.std(test_noise) - np.std(test_noise_golden)) < 0.1
+    ):
+        print(" ✔ TEST PASSED")
+    else:
+        print(" ✘ TEST FAILED")
+        print("test_noise:", test_noise.shape, np.mean(test_noise), np.std(test_noise))
+        print("golden test_noise:", test_noise_golden.shape, np.mean(test_noise_golden), np.std(test_noise_golden))
+
+
+def test_make_att_2d_masks():
+    print("TEST test_make_att_2d_masks")
+    test_pad_masks = np.ones((816,), dtype=np.bool)
+    test_att_masks = np.ones((816,), dtype=np.bool)
+    test_att_2d_masks = make_att_2d_masks(
+        test_pad_masks,
+        test_att_masks,
+    )
+    test_att_2d_masks_golden = make_att_2d_masks_golden(
+        torch.from_numpy(test_pad_masks[None, ...]).to("cuda"),
+        torch.from_numpy(test_att_masks[None, ...]).to("cuda"),
+    )
+    if np.allclose(test_att_2d_masks, test_att_2d_masks_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+        print(" ✔ TEST PASSED")
+    else:
+        print(" ✘ TEST FAILED")
+        print("test_att_2d_masks:", test_att_2d_masks[0, :10])
+        print("golden test_att_2d_masks:", test_att_2d_masks_golden[0, 0, :10])
+
+
 def test_vlm_mlp_forward():
+    print("TEST test_vlm_mlp_forward")
     # Test MLP forward
     test_input_emb = np.random.randn(1, 816, 2048).astype(np.float32)
 
@@ -62,46 +125,82 @@ def test_vlm_mlp_forward():
         torch.from_numpy(test_input_emb).to("cuda")
     )
 
-    print("TEST test_vlm_mlp_forward")
     if np.allclose(out_emb, out_emb_gold.float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
         print(" ✔ TEST PASSED")
     else:
         print(" ✘ TEST FAILED")
-        print("test out_emb:", out_emb[0, 0, :10])
+        print("test out_emb:", out_emb[0, :10])
         print("golden out_emb:", out_emb_gold[0, 0, :10])
 
 
 def test_vlm_forward():
-    test_attention_2d_mask = np.tril(np.ones((816,), dtype=np.bool))[None, :, :]
-    test_position_ids = np.arange(816, dtype=np.int64)[None, :]
-    test_prefix_embs = np.random.randn(1, 816, 2048).astype(np.float32)
+    print("TEST test_vlm_forward")
+    test_attention_2d_mask = np.tril(np.ones((816,), dtype=np.bool))
+    test_position_ids = np.arange(816, dtype=np.int64)
+    test_prefix_embs = np.random.randn(816, 2048).astype(np.float32)
 
-    att_output, _ = paligemma_with_expert_forward(
-        attention_mask=test_attention_2d_mask[0, ...],
-        position_ids=test_position_ids[0, ...],
-        input_embeds=test_prefix_embs[0, ...],
+    att_output, kv_cache_output = paligemma_with_expert_forward(
+        attention_mask=test_attention_2d_mask,
+        position_ids=test_position_ids,
+        input_embeds=test_prefix_embs,
     )
 
-    att_output_golden, _ = policy.model.paligemma_with_expert.forward(
-        attention_mask=torch.from_numpy(test_attention_2d_mask).to("cuda"),
-        position_ids=torch.from_numpy(test_position_ids).to("cuda"),
+    att_output_golden, kv_cache_output_golden = policy.model.paligemma_with_expert.forward(
+        attention_mask=torch.from_numpy(test_attention_2d_mask[None, ...]).to("cuda"),
+        position_ids=torch.from_numpy(test_position_ids[None, ...]).to("cuda"),
         past_key_values=None,
-        inputs_embeds=[torch.from_numpy(test_prefix_embs).to("cuda"), None],
+        inputs_embeds=[torch.from_numpy(test_prefix_embs[None, ...]).to("cuda"), None],
         use_cache=True,
         fill_kv_cache=True,
     )
 
-    print("TEST test_vlm_forward")
-    if np.allclose(att_output, att_output_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+    kv_cache_match = True
+    for layer_idx in range(18):
+        if not np.allclose(kv_cache_output[layer_idx]["key_states"], kv_cache_output_golden[layer_idx]["key_states"][0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+            kv_cache_match = False
+            break
+
+    if kv_cache_match and np.allclose(att_output, att_output_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
         print(" ✔ TEST PASSED")
     else:
         print(" ✘ TEST FAILED")
-        print("att_output:", att_output[0, 0, :10])
+        print("att_output:", att_output[0, :10])
         print("golden att_output:", att_output_golden[0][0, 0, :10])
 
 
+def test_action_expert_forward():
+    print("TEST test_action_expert_forward")
+    test_attention_2d_mask = np.ones((51, 867), dtype=np.bool)
+    test_position_ids = np.arange(51, dtype=np.int64)
+    test_suffix_embs = np.random.randn(51, 1024).astype(np.float32)
+
+    att_output = paligemma_action_expert_forward(
+        attention_mask=test_attention_2d_mask,
+        position_ids=test_position_ids,
+        input_embeds=test_suffix_embs,
+        past_key_values=test_past_key_values,
+    )
+
+    att_output_golden, _ = policy.model.paligemma_with_expert.forward(
+        attention_mask=torch.from_numpy(test_attention_2d_mask[None, ...]).to("cuda"),
+        position_ids=torch.from_numpy(test_position_ids[None, ...]).to("cuda"),
+        past_key_values=test_past_key_values_torch,
+        inputs_embeds=[None, torch.from_numpy(test_suffix_embs[None, ...]).to("cuda")],
+        use_cache=True,
+        fill_kv_cache=False,
+    )
+
+    if np.allclose(att_output, att_output_golden[1].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+        print(" ✔ TEST PASSED")
+    else:
+        print(" ✘ TEST FAILED")
+        print("att_output:", att_output[0, :10])
+        print("golden att_output:", att_output_golden[1][0, 0, :10])
+
+
 def tset_create_sinusoidal_pos_embedding():
-    test_timestep = np.array([0.5], dtype=np.float32)
+    print("TEST test_create_sinusoidal_pos_embedding")
+    test_timestep = 0.5
     test_proj_width = 2048
 
     time_emb = create_sinusoidal_pos_embedding(
@@ -111,50 +210,109 @@ def tset_create_sinusoidal_pos_embedding():
         max_period=4.0,
     )
     time_emb_golden = create_sinusoidal_pos_embedding_golden(
-        torch.from_numpy(test_timestep).to("cuda"),
+        torch.tensor([test_timestep]).to("cuda"),
         test_proj_width,
         min_period=4e-3,
         max_period=4.0,
         device=torch.device("cuda"),
     )
 
-    print("TEST test_create_sinusoidal_pos_embedding")
     if np.allclose(time_emb, time_emb_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
         print(" ✔ TEST PASSED")
     else:
         print(" ✘ TEST FAILED")
-        print("time_emb:", time_emb[0, 0, :10])
+        print("time_emb:", time_emb[0, :10])
         print("golden time_emb:", time_emb_golden[0][0, 0, :10])
 
 
+def test_embed_prefix():
+    print("TEST test_embed_prefix")
+    test_images = [np.random.randn(3, 224, 224).astype(np.float32)] * 3
+    test_img_masks = [1] * 3
+    test_lang_tokens = np.random.randint(0, 100, (48,)).astype(np.int32)
+    test_lang_masks = np.ones((48,), dtype=np.bool)
+
+    prefix_embs, prefix_pad_masks, prefix_att_masks = embed_prefix(
+        test_images,
+        test_img_masks,
+        test_lang_tokens,
+        test_lang_masks,
+    )
+    prefix_embs_golden, prefix_pad_masks_golden, prefix_att_masks_golden = policy.model.embed_prefix(
+        [torch.from_numpy(image[None, ...]).to("cuda") for image in test_images],
+        [torch.tensor([img_mask]).to("cuda") for img_mask in test_img_masks],
+        torch.from_numpy(test_lang_tokens[None, ...]).to("cuda"),
+        torch.from_numpy(test_lang_masks[None, ...]).to("cuda"),
+    )
+    if np.allclose(prefix_embs, prefix_embs_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+        print(" ✔ TEST PASSED")
+    else:
+        print(" ✘ TEST FAILED")
+        print("prefix_embs:", prefix_embs[0, :10])
+        print("golden prefix_embs:", prefix_embs_golden[0, 0, :10])
+
+
 def test_embed_suffix():
-    test_state = np.random.randn(1, 32).astype(np.float32)
-    test_noisy_actions = np.random.randn(1, 50, 32).astype(np.float32)
-    test_timestep = np.array([0.5], dtype=np.float32)
+    print("TEST test_embed_suffix")
+    test_state = np.random.randn(32,).astype(np.float32)
+    test_noisy_actions = np.random.randn(50, 32).astype(np.float32)
+    test_timestep = 0.5
 
     suffix_embs, suffix_pad_masks, suffix_att_masks = embed_suffix(
-        test_state, test_noisy_actions, test_timestep
+        test_state,
+        test_noisy_actions,
+        test_timestep,
     )
     suffix_embs_golden, suffix_pad_masks_golden, suffix_att_masks_golden = policy.model.embed_suffix(
-        torch.from_numpy(test_state).to("cuda"),
-        torch.from_numpy(test_noisy_actions).to("cuda"),
-        torch.from_numpy(test_timestep).to("cuda"),
+        torch.from_numpy(test_state[None, ...]).to("cuda"),
+        torch.from_numpy(test_noisy_actions[None, ...]).to("cuda"),
+        torch.tensor([test_timestep]).to("cuda"),
     )
-    print("TEST test_embed_suffix")
     if np.allclose(suffix_embs, suffix_embs_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
         print(" ✔ TEST PASSED")
     else:
         print(" ✘ TEST FAILED")
-        print("suffix_embs:", suffix_embs[0, 0, :10])
+        print("suffix_embs:", suffix_embs[0, :10])
         print("golden suffix_embs:", suffix_embs_golden[0, 0, :10])
 
 
+def test_denoise_step():
+    print("TEST test_denoise_step")
+    test_state = np.random.randn(32,).astype(np.float32)
+    test_prefix_pad_masks = np.ones((816,), dtype=np.bool)
+    test_x_t = np.random.randn(50, 32).astype(np.float32)
+    test_timestep = 0.5
+
+    v_t = denoise_step(
+        test_state,
+        test_prefix_pad_masks,
+        test_past_key_values,
+        test_x_t,
+        test_timestep,
+    )
+    v_t_golden = policy.model.denoise_step(
+        torch.from_numpy(test_state[None, ...]).to("cuda"),
+        torch.from_numpy(test_prefix_pad_masks[None, ...]).to("cuda"),
+        test_past_key_values_torch,
+        torch.from_numpy(test_x_t[None, ...]).to("cuda"),
+        torch.tensor([test_timestep]).to("cuda"),
+    )
+    if np.allclose(v_t, v_t_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+        print(" ✔ TEST PASSED")
+    else:
+        print(" ✘ TEST FAILED")
+        print("v_t:", v_t[0, :10])
+        print("golden v_t:", v_t_golden[0, 0, :10])
+
+
 def test_sample_actions():
-    test_images = [np.random.randn(1, 3, 224, 224).astype(np.float32)] * 3
-    test_img_masks = [np.ones((1,), dtype=np.bool)] * 3
-    test_lang_tokens = np.random.randint(0, 100, (1, 48)).astype(np.int32)
-    test_lang_masks = np.ones((1, 48), dtype=np.bool)
-    test_state = np.random.randn(1, 32).astype(np.float32)
+    print("TEST test_sample_actions")
+    test_images = [np.random.randn(3, 224, 224).astype(np.float32)] * 3
+    test_img_masks = [1] * 3
+    test_lang_tokens = np.random.randint(0, 100, (48,)).astype(np.int32)
+    test_lang_masks = np.ones((48,), dtype=np.bool)
+    test_state = np.random.randn(32,).astype(np.float32)
+    test_noise = sample_noise((50, 32))
 
     actions = sample_actions(
         images=test_images,
@@ -162,28 +320,69 @@ def test_sample_actions():
         lang_tokens=test_lang_tokens,
         lang_masks=test_lang_masks,
         state=test_state,
+        noise=test_noise.copy(),
     )
 
     actions_golden = policy.model.sample_actions(
-        images=[torch.from_numpy(img).to("cuda") for img in test_images],
-        img_masks=[torch.from_numpy(img_mask).to("cuda") for img_mask in test_img_masks],
-        lang_tokens=torch.from_numpy(test_lang_tokens).to("cuda"),
-        lang_masks=torch.from_numpy(test_lang_masks).to("cuda"),
-        state=torch.from_numpy(test_state).to("cuda"),
+        images=[torch.from_numpy(img[None, ...]).to("cuda") for img in test_images],
+        img_masks=[torch.tensor([img_mask], dtype=torch.bool).to("cuda") for img_mask in test_img_masks],
+        lang_tokens=torch.from_numpy(test_lang_tokens[None, ...]).to("cuda"),
+        lang_masks=torch.from_numpy(test_lang_masks[None, ...]).to("cuda"),
+        state=torch.from_numpy(test_state[None, ...]).to("cuda"),
+        noise=torch.from_numpy(test_noise[None, ...]).to("cuda"),
     )
 
-    print("TEST test_sample_actions")
     if np.allclose(actions, actions_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
         print(" ✔ TEST PASSED")
     else:
         print(" ✘ TEST FAILED")
-        print("actions:", actions[0, 0, :10])
+        print("actions:", actions[0, :10])
         print("golden actions:", actions_golden[0, 0, :10])
 
 
-# test_attention()
+def test_select_action():
+    print("TEST test_select_action")
+    test_images = [np.random.randn(3, 224, 224).astype(np.float32)] * 3
+    test_img_masks = [1] * 3
+    test_lang_tokens = np.random.randint(0, 100, (48,)).astype(np.int32)
+    test_lang_masks = np.ones((48,), dtype=np.bool)
+    test_state = np.random.randn(32,).astype(np.float32)
+
+    actions = select_action(
+        images=test_images,
+        img_masks=test_img_masks,
+        lang_tokens=test_lang_tokens,
+        lang_masks=test_lang_masks,
+        state=test_state,
+    )
+
+    actions_golden = policy.model.select_action(
+        images=[torch.from_numpy(img[None, ...]).to("cuda") for img in test_images],
+        img_masks=[torch.tensor([img_mask], dtype=torch.bool).to("cuda") for img_mask in test_img_masks],
+        lang_tokens=torch.from_numpy(test_lang_tokens[None, ...]).to("cuda"),
+        lang_masks=torch.from_numpy(test_lang_masks[None, ...]).to("cuda"),
+        state=torch.from_numpy(test_state[None, ...]).to("cuda"),
+    )
+
+    if np.allclose(actions, actions_golden[0].float().detach().cpu().numpy(), atol=0.1, rtol=0.1):
+        print(" ✔ TEST PASSED")
+    else:
+        print(" ✘ TEST FAILED")
+        print("actions:", actions[0, :10])
+        print("golden actions:", actions_golden[0, 0, :10])
+
+
+test_attention()
+test_sample_noise()
+test_make_att_2d_masks()
 tset_create_sinusoidal_pos_embedding()
+test_embed_prefix()
 test_embed_suffix()
-# test_vlm_mlp_forward()
-# test_vlm_forward()
-# test_sample_actions()
+test_vlm_mlp_forward()
+test_vlm_forward()
+test_action_expert_forward()
+test_denoise_step()
+
+# overall test
+test_sample_actions()
+# test_select_action()
