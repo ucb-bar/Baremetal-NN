@@ -19,23 +19,23 @@ import numpy as np
 import torch
 import torch.nn as nn
 from lerobot.policies.pi0.modeling_pi0 import PI0Policy
+from configuration_pi0 import (
+    CONFIG_N_ACTION_STEPS,
+    CONFIG_NUM_HIDDEN_LAYERS,
+    CONFIG_NUM_HEADS,
+    CONFIG_HEAD_DIM,
+    CONFIG_NUM_IMAGES,
+    CONFIG_IMAGE_PATCH_LEN,
+    CONFIG_MAX_LANGUAGE_SEQ_LEN,
+    CONFIG_MAX_STATE_DIM,
+    CONFIG_MAX_ACTION_DIM,
+    CONFIG_VLM_WIDTH,
+    CONFIG_VLA_WIDTH,
+    CONFIG_VLM_SEQ_LEN,
+    CONFIG_VLA_SEQ_LEN,
+    CONFIG_TOTAL_SEQ_LEN,
+)
 
-
-CONFIG_N_ACTION_STEPS = 50
-CONFIG_NUM_HIDDEN_LAYERS = 18
-CONFIG_NUM_HEADS = 8
-CONFIG_HEAD_DIM = 256
-CONFIG_NUM_IMAGES = 3
-CONFIG_IMAGE_PATCH_LEN = 256
-CONFIG_MAX_LANGUAGE_SEQ_LEN = 48
-CONFIG_VLM_SEQ_LEN = (CONFIG_NUM_IMAGES * CONFIG_IMAGE_PATCH_LEN) + CONFIG_MAX_LANGUAGE_SEQ_LEN
-CONFIG_MAX_STATE_DIM = 32
-CONFIG_MAX_ACTION_DIM = 32
-CONFIG_VLA_SEQ_LEN = CONFIG_VLM_SEQ_LEN + (CONFIG_N_ACTION_STEPS + 1)
-
-
-assert CONFIG_VLM_SEQ_LEN == 816
-assert CONFIG_VLA_SEQ_LEN == 867
 
 # load policy
 policy = PI0Policy.from_pretrained("lerobot/pi0", cache_dir="./cache")
@@ -459,7 +459,8 @@ def eager_attention_forward(
         output: (sequence_length, hidden_dim)
     """
 
-    # 816
+    # vlm: 816
+    # acs: 51
     sequence_length = query_states.shape[0]
     # 8
     num_heads = query_states.shape[1]
@@ -548,18 +549,17 @@ def paligemma_vlm_forward(
     """
     model = policy.model.paligemma_with_expert.paligemma.language_model
 
-    past_key_values = {}
-
     # (816, 2048)
-    hidden_states = np.zeros_like(input_embeddings)
-    hidden_states_residual = np.zeros_like(input_embeddings)
+    hidden_states = np.zeros((CONFIG_VLM_SEQ_LEN, CONFIG_VLM_WIDTH))
+    hidden_states_residual = np.zeros((CONFIG_VLM_SEQ_LEN, CONFIG_VLM_WIDTH))
     hidden_states[:, :] = input_embeddings
+
+    past_key_values = {}
 
     for layer_idx in range(CONFIG_NUM_HIDDEN_LAYERS):
         layer = model.layers[layer_idx]
 
-        hidden_shape = (attention_mask.shape[0], -1, CONFIG_HEAD_DIM)
-        # hidden_shape = (attention_mask.shape[0], -1, layer.self_attn.head_dim)
+        hidden_shape = (CONFIG_VLM_SEQ_LEN, -1, CONFIG_HEAD_DIM)
 
         # (816, 2048)
         hidden_states_residual[:, :] = hidden_states
@@ -610,7 +610,6 @@ def paligemma_vlm_forward(
             key_states=key_states,
             value_states=value_states,
         )
-
         # (816, 2048) <- (816, 2048) x (2048, 2048)
         hidden_states[:, :] = np.matmul(
             hidden_states,
@@ -663,16 +662,15 @@ def paligemma_action_forward(
     model = policy.model.paligemma_with_expert.gemma_expert.model
 
     # (51, 1024)
-    hidden_states = np.zeros_like(input_embeddings)
-    hidden_states_residual = np.zeros_like(input_embeddings)
+    hidden_states = np.zeros((CONFIG_VLA_SEQ_LEN, CONFIG_VLA_WIDTH))
+    hidden_states_residual = np.zeros((CONFIG_VLA_SEQ_LEN, CONFIG_VLA_WIDTH))
+    attention_output = np.zeros((CONFIG_VLA_SEQ_LEN, CONFIG_NUM_HEADS * CONFIG_HEAD_DIM))
     hidden_states[:, :] = input_embeddings
 
     for layer_idx in range(CONFIG_NUM_HIDDEN_LAYERS):
         layer = model.layers[layer_idx]
 
-        hidden_shape = (attention_mask.shape[0], -1, CONFIG_HEAD_DIM)
-        # hidden_shape = (attention_mask.shape[0], -1, layer.self_attn.head_dim)
-        # print("head_dim:", layer.self_attn.head_dim)
+        hidden_shape = (CONFIG_VLA_SEQ_LEN, -1, CONFIG_HEAD_DIM)
 
         # (51, 1024)
         hidden_states_residual[:, :] = hidden_states
@@ -715,13 +713,12 @@ def paligemma_action_forward(
         value_states = np.concatenate([past_key_values[layer_idx]["value_states"], value_states], axis=0)
 
         # (51, 2048)
-        attention_output = eager_attention_forward(
+        attention_output[:, :] = eager_attention_forward(
             attention_mask=attention_mask,
             query_states=query_states,
             key_states=key_states,
             value_states=value_states,
         )
-
         # (51, 1024) <- (51, 2048) x (2048, 1024)
         hidden_states[:, :] = np.matmul(
             attention_output,

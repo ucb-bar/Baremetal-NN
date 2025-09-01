@@ -6,7 +6,7 @@ from lerobot.policies.pi0.modeling_pi0 import make_att_2d_masks as make_att_2d_m
 from lerobot.configs.types import FeatureType, PolicyFeature
 from transformers.models.gemma.modeling_gemma import GemmaRMSNorm
 
-from model import (
+from modeling_pi0 import (
     eager_attention_forward,
     sample_noise,
     make_att_2d_masks,
